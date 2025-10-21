@@ -1,44 +1,87 @@
-# Java & Maven/Gradle
+# === Java & Maven/Gradle ===
 /target/
-/build/
+build/
 *.class
 *.jar
 *.war
 *.ear
+*.hprof
 
-# IntelliJ IDEA
+# === Maven Wrapper ===
+.mvn/
+!/.mvn/wrapper/maven-wrapper.jar
+
+# === Gradle Wrapper ===
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# === IntelliJ IDEA ===
 .idea/
 *.iml
 *.ipr
 *.iws
 out/
 
-# Eclipse
+# === Eclipse ===
 .metadata/
 *.classpath
 *.project
 *.settings/
 
-# VS Code
+# === NetBeans ===
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# === VS Code ===
 .vscode/
 
-# OS files
+# === OS files ===
 .DS_Store
 Thumbs.db
 
-# Logs
+# === Logs ===
 *.log
+logs/
+*.pid
 
-# Test reports
+# === Test reports ===
 /test-output/
 /surefire-reports/
 /jacoco.exec
 
-# Environment files
+# === Environment files ===
 .env
+.env.*
+*.env
+*.env.*
 
-# Node (nếu có frontend)
+# === Properties/config (không commit file thật, chỉ commit file mẫu) ===
+src/main/resources/application.properties
+src/main/resources/application.yml
+src/main/resources/db.properties
+
+# === Node.js ===
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
 
-# Others
+# === Coverage ===
+coverage/
+.nyc_output/
+
+# === Others ===
 *.swp
+*.swo
+*.tmp
+*.bak
+
+# === Frontend build (nếu có) ===
+dist/
+build/
