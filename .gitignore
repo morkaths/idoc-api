@@ -1,0 +1,44 @@
+# Java & Maven/Gradle
+/target/
+/build/
+*.class
+*.jar
+*.war
+*.ear
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Eclipse
+.metadata/
+*.classpath
+*.project
+*.settings/
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Test reports
+/test-output/
+/surefire-reports/
+/jacoco.exec
+
+# Environment files
+.env
+
+# Node (nếu có frontend)
+node_modules/
+
+# Others
+*.swp
