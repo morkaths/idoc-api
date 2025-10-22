@@ -16,6 +16,8 @@ import com.idoc.auth.model.Role;
 import com.idoc.auth.model.User;
 import com.idoc.auth.service.UserService;
 
+import jakarta.annotation.security.PermitAll;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -24,20 +26,21 @@ public class UserController {
 	private UserService userService;
 	
 	@GetMapping
+	@PermitAll
 	public ResponseEntity<Map<String, Object>> getAllUsers() {
 		List<UserEntity> entities = userService.findAllUser();
 
 		List<User> data = entities.stream().map(entity -> {
-        return new User(
-            entity.getId(),
-            entity.getUsername(),
-            entity.getEmail(),
-            entity.getStatus(),
-            entity.getRoles().stream()
-                .map(role -> new Role(role.getId(), role.getCode(), role.getName()))
-                .collect(Collectors.toSet())
-        );
-    }).toList();
+	        return new User(
+	            entity.getId(),
+	            entity.getUsername(),
+	            entity.getEmail(),
+	            entity.getStatus(),
+	            entity.getRoles().stream()
+	                .map(role -> new Role(role.getId(), role.getCode(), role.getName()))
+	                .collect(Collectors.toSet())
+	        );
+		}).toList();
 		
 		Map<String, Object> response = new HashMap<>();
 		response.put("status", "success");

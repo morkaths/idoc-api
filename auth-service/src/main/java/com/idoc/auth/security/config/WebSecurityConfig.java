@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -14,23 +15,28 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.idoc.auth.security.handler.UnauthorizedHandler;
+import com.idoc.auth.security.handler.CustomAccessDeniedHandler;
+import com.idoc.auth.security.handler.CustomUnauthorizedHandler;
 import com.idoc.auth.security.jwt.JwtAuthenticationFilter;
 import com.idoc.auth.security.service.CustomUserDetailService;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class WebSecurityConfig {
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 	private final CustomUserDetailService customUserDetailService;
-	private final UnauthorizedHandler unauthorizedHandler;
+	private final CustomUnauthorizedHandler unauthorizedHandler;
+	private final CustomAccessDeniedHandler accessDeniedHandler;
 
 	@Autowired
 	public WebSecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
-			CustomUserDetailService customUserDetailService, UnauthorizedHandler unauthorizedHandler) {
+			CustomUserDetailService customUserDetailService, CustomUnauthorizedHandler unauthorizedHandler,
+			CustomAccessDeniedHandler accessDeniedHandler) {
 		this.jwtAuthenticationFilter = jwtAuthenticationFilter;
 		this.customUserDetailService = customUserDetailService;
 		this.unauthorizedHandler = unauthorizedHandler;
+		this.accessDeniedHandler = accessDeniedHandler;
 	}
 
 	@Bean
@@ -40,9 +46,10 @@ public class WebSecurityConfig {
 		http.csrf(AbstractHttpConfigurer::disable)
 				.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.formLogin(AbstractHttpConfigurer::disable)
-				.exceptionHandling(h -> h.authenticationEntryPoint(unauthorizedHandler))
-				.authorizeHttpRequests(registry -> registry.requestMatchers("/api/**", "/api/auth/login").permitAll()
-						.requestMatchers("/api/admin/**").hasRole("ADMIN").anyRequest().authenticated());
+				.exceptionHandling(
+						ex -> ex.authenticationEntryPoint(unauthorizedHandler).accessDeniedHandler(accessDeniedHandler))
+				.authorizeHttpRequests(registry -> registry.requestMatchers("/api/auth/**").permitAll()
+						.requestMatchers("/api/**").authenticated().anyRequest().denyAll());
 		return http.build();
 	}
 

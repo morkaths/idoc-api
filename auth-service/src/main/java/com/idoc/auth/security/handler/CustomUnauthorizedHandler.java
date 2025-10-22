@@ -9,11 +9,14 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-public class UnauthorizedHandler implements AuthenticationEntryPoint {
+public class CustomUnauthorizedHandler implements AuthenticationEntryPoint {
 	@Override
-    public void commence(
-            HttpServletRequest request, HttpServletResponse response, AuthenticationException authException
-    ) throws IOException, ServletException {
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
-    }
+	public void commence(HttpServletRequest request, HttpServletResponse response,
+			AuthenticationException authException) throws IOException, ServletException {
+		response.setContentType("application/json");
+		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		response.getWriter().write(
+				"{\"error\": \"Unauthorized\", \"message\": \"You are not logged in or the token is invalid.\"}");
+
+	}
 }
