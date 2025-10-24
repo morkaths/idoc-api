@@ -1,13 +1,15 @@
 package com.idoc.auth.model;
 
+import java.util.Set;
+
 public class Role {
 	private Long id;
 	private String code;
 	private String name;
+	private Set<Permission> permissions;
 
 	public Role() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public Role(Long id, String code, String name) {
@@ -39,6 +41,14 @@ public class Role {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public Set<Permission> getPermissions() {
+		return permissions;
+	}
+
+	public void setPermissions(Set<Permission> permissions) {
+		this.permissions = permissions;
 	}
 
 }

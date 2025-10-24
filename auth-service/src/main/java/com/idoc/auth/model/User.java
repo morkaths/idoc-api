@@ -5,22 +5,22 @@ import java.util.Set;
 public class User {
 	private Long id;
 	private String username;
+	private String password;
 	private String email;
 	private int status;
 	private Set<Role> roles;
 
 	public User() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	public User(Long id, String username, String email, int status, Set<Role> roles) {
+	public User(Long id, String username, String password, String email, int status) {
 		super();
 		this.id = id;
 		this.username = username;
+		this.password = password;
 		this.email = email;
 		this.status = status;
-		this.roles = roles;
 	}
 
 	public Long getId() {
@@ -37,6 +37,14 @@ public class User {
 
 	public void setUsername(String username) {
 		this.username = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public String getEmail() {

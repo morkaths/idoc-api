@@ -2,9 +2,9 @@ package com.idoc.auth.service;
 
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.idoc.auth.constant.RoleConstants;
 import com.idoc.auth.entity.RoleEntity;
 import com.idoc.auth.entity.UserEntity;
 import com.idoc.auth.repository.RoleRepository;
@@ -20,7 +20,6 @@ public class AuthServiceImpl implements AuthService {
 	private final RoleRepository roleRepository;
 	private final JwtTokenProvider jwtTokenProvider;
 
-	@Autowired
 	public AuthServiceImpl(UserRepository userRepository, RoleRepository roleRepository,
 			JwtTokenProvider jwtTokenProvider) {
 		this.userRepository = userRepository;
@@ -29,14 +28,17 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public String login(String email, String password) {
-		UserEntity user = userRepository.findByEmail(email);
+	public String login(String identifier, String password) {
+		UserEntity user = userRepository.findByUsernameOrEmail(identifier, identifier);
 		if (user == null || !PasswordUtil.matches(password, user.getPassword())) {
-			throw new IllegalArgumentException("Invalid email or password");
+			throw new IllegalArgumentException("Invalid username/email or password");
 		}
 
-		String token = jwtTokenProvider.createToken(new JwtTokenRequest(user.getId(), user.getUsername(),
-				user.getEmail(), user.getRoles().stream().map(RoleEntity::getName).toList()));
+		String token = jwtTokenProvider.createToken(new JwtTokenRequest(
+				user.getId(),
+				user.getUsername(),
+				user.getEmail(),
+				user.getRoles().stream().map(RoleEntity::getCode).toList()));
 		if (token == null) {
 			throw new IllegalStateException("Failed to generate token");
 		}
@@ -55,15 +57,16 @@ public class AuthServiceImpl implements AuthService {
 		}
 
 		String hashedPassword = PasswordUtil.hash(password);
-		RoleEntity userRole = roleRepository.findByName("USER");
+		RoleEntity userRole = roleRepository.findByName(RoleConstants.USER);
 
-		UserEntity newUser = userRepository.save(new UserEntity(username, hashedPassword, email, 1, Set.of(userRole)));
-		if (newUser == null) {
-			throw new IllegalStateException("Failed to register user");
-		}
+		UserEntity newUser = userRepository.save(new UserEntity(
+				username, hashedPassword, email, 1, Set.of(userRole)));
 
-		String token = jwtTokenProvider.createToken(new JwtTokenRequest(newUser.getId(), newUser.getUsername(),
-				newUser.getEmail(), newUser.getRoles().stream().map(RoleEntity::getName).toList()));
+		String token = jwtTokenProvider.createToken(new JwtTokenRequest(
+				newUser.getId(),
+				newUser.getUsername(),
+				newUser.getEmail(),
+				newUser.getRoles().stream().map(RoleEntity::getCode).toList()));
 		if (token == null) {
 			throw new IllegalStateException("Failed to generate token");
 		}

@@ -1,0 +1,298 @@
+{
+  "info": {
+    "name": "Auth Service #microservice",
+    "description": "API collection for Auth service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Test route",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/auth"
+          }
+        },
+        {
+          "name": "register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"email\": \"testuser@email.com\", \"username\": \"testuser\", \"password\": \"123456\" }"
+            },
+            "url": "{{api_url}}/auth/register"
+          }
+        },
+        {
+          "name": "login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"testuser@email.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": "{{api_url}}/auth/login"
+          }
+        },
+        {
+          "name": "update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newemail@email.com\"\n}"
+            },
+            "url": "{{api_url}}/auth/update"
+          }
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "getAll",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/users"
+          }
+        },
+        {
+          "name": "search",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/users/search?query=user"
+          }
+        },
+        {
+          "name": "getById",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/users/{{userId}}"
+          }
+        },
+        {
+          "name": "updateUser",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"new@email.com\"\n}"
+            },
+            "url": "{{api_url}}/users/{{userId}}"
+          }
+        },
+        {
+          "name": "delete",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{api_url}}/users/{{userId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Role",
+      "item": [
+        {
+          "name": "getAll",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/roles"
+          }
+        },
+        {
+          "name": "search",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/roles/search?query=admin"
+          }
+        },
+        {
+          "name": "getById",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/roles/{{roleId}}"
+          }
+        },
+        {
+          "name": "create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"newrole\"\n}"
+            },
+            "url": "{{api_url}}/roles"
+          }
+        },
+        {
+          "name": "update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"updatedrole\"\n}"
+            },
+            "url": "{{api_url}}/roles/{{roleId}}"
+          }
+        },
+        {
+          "name": "delete",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{api_url}}/roles/{{roleId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Permission",
+      "item": [
+        {
+          "name": "getAll",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/permissions"
+          }
+        },
+        {
+          "name": "search",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/permissions/search?query=read"
+          }
+        },
+        {
+          "name": "getById",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/permissions/{{permissionId}}"
+          }
+        },
+        {
+          "name": "create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"newpermission\"\n}"
+            },
+            "url": "{{api_url}}/permissions"
+          }
+        },
+        {
+          "name": "update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"updatedpermission\"\n}"
+            },
+            "url": "{{api_url}}/permissions/{{permissionId}}"
+          }
+        },
+        {
+          "name": "delete",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{api_url}}/permissions/{{permissionId}}"
+          }
+        }
+      ]
+    }
+  ]
+}
