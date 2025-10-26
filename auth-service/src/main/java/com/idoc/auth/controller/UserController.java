@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -13,11 +15,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.idoc.auth.model.User;
-import com.idoc.auth.service.UserService;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.idoc.auth.dto.UserDto;
+import com.idoc.auth.service.UserService;
+import com.idoc.auth.util.ResponseUtil;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/users")
@@ -28,25 +34,27 @@ public class UserController {
 
 	@GetMapping
 	public ResponseEntity<Map<String, Object>> getAllUsers() {
-		List<User> data = userService.findAllUser();
-		Map<String, Object> response = new HashMap<>();
-		response.put("status", "success");
-		response.put("message", "Users retrieved successfully");
-		response.put("data", data);
-		return ResponseEntity.ok(response);
+		List<UserDto> data = userService.findAll();
+		if (data.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No users found");
+		}
+		return ResponseUtil.buildSuccessResponse("Users retrieved successfully", data);
 	}
 
 	@GetMapping("/{id}")
+	@PreAuthorize("hasRole('admin')")
 	public ResponseEntity<Map<String, Object>> getUserById(@PathVariable Long id) {
-		User data = userService.findUserById(id);
-		Map<String, Object> response = new HashMap<>();
-		response.put("status", "success");
-		response.put("message", "User retrieved successfully");
-		response.put("data", data);
-		return ResponseEntity.ok(response);
+		if (id == null || id <= 0) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid user ID");
+		}
+		UserDto data = userService.findById(id);
+		if (data == null) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + id);
+		}
+		return ResponseUtil.buildSuccessResponse("User retrieved successfully", data);
 	}
 
-	@GetMapping
+	@GetMapping("/search")
 	public ResponseEntity<Map<String, Object>> searchUsers(@RequestParam Map<String, String> params) {
 		Map<String, Object> filter = new HashMap<>();
 		params.forEach((key, value) -> {
@@ -54,41 +62,48 @@ public class UserController {
 				filter.put(key, value);
 			}
 		});
-		List<User> data = userService.search(filter);
-		Map<String, Object> response = new HashMap<>();
-		response.put("status", "success");
-		response.put("message", "Users searched successfully");
-		response.put("data", data);
-		return ResponseEntity.ok(response);
+		List<UserDto> data = userService.search(filter);
+		if (data.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No users found matching the criteria");
+		}
+		return ResponseUtil.buildSuccessResponse("Users retrieved successfully", data);
 	}
 
 	@PostMapping
-	public ResponseEntity<Map<String, Object>> createUser(@RequestBody User request) {
-		User data = userService.createUser(request);
-		Map<String, Object> response = new HashMap<>();
-		response.put("status", "success");
-		response.put("message", "User created successfully");
-		response.put("data", data);
-		return ResponseEntity.ok(response);
+	@PreAuthorize("hasAuthority('user.edit')")
+	public ResponseEntity<Map<String, Object>> createUser(@Valid @RequestBody UserDto request) {
+		UserDto data = userService.create(request);
+		if (data == null) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to create user");
+		}
+		return ResponseUtil.buildCreatedResponse("User created successfully", data);
 	}
 
+	//TODO: Update method to support partial updates
 	@PatchMapping("/{id}")
+	@PreAuthorize("hasRole('admin')")
 	public ResponseEntity<Map<String, Object>> updateUser(@PathVariable Long id,
 			@RequestBody Map<String, Object> request) {
-		User data = userService.partialUpdateUser(id, request);
-		Map<String, Object> response = new HashMap<>();
-		response.put("status", "success");
-		response.put("message", "User updated successfully");
-		response.put("data", data);
-		return ResponseEntity.ok(response);
+		if (id == null || id <= 0) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid user ID");
+		}
+		UserDto data = userService.partialUpdate(id, request);
+		if (data == null) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + id);
+		}
+		return ResponseUtil.buildSuccessResponse("User updated successfully", data);
 	}
 
 	@DeleteMapping("/{id}")
+	@PreAuthorize("hasAuthority('user.delete')")
 	public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable Long id) {
-		userService.deleteUserById(id);
-		Map<String, Object> response = new HashMap<>();
-		response.put("status", "success");
-		response.put("message", "User deleted successfully");
-		return ResponseEntity.ok(response);
+		if (id == null || id <= 0) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid user ID");
+		}
+		boolean deleted = userService.delete(id);
+		if (!deleted) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + id);
+		}
+		return ResponseUtil.buildNoContentResponse();
 	}
 }

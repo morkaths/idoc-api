@@ -1,25 +1,18 @@
 package com.idoc.auth.mapper;
 
+import org.mapstruct.Mapper;
+
+import com.idoc.auth.core.BaseMapper;
+import com.idoc.auth.dto.PermissionDto;
 import com.idoc.auth.entity.PermissionEntity;
-import com.idoc.auth.model.Permission;
 
-public class PermissionMapper {
+@Mapper(componentModel = "spring")
+public interface PermissionMapper extends BaseMapper<PermissionEntity, PermissionDto> {
 
-  public static PermissionEntity toEntity(Permission model) {
-    if (model == null)
-      return null;
-    return new PermissionEntity(
-        model.getCode(),
-        model.getName());
-  }
+  @Override
+  @org.mapstruct.Mapping(target = "roles", ignore = true)
+  PermissionEntity toEntity(PermissionDto model);
 
-  public static Permission toModel(PermissionEntity entity) {
-    if (entity == null)
-      return null;
-    return new Permission(
-        entity.getId(),
-        entity.getCode(),
-        entity.getName());
-  }
-
+  @Override
+  PermissionDto toDto(PermissionEntity entity);
 }

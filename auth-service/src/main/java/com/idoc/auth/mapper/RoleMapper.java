@@ -1,25 +1,25 @@
 package com.idoc.auth.mapper;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
+
+import com.idoc.auth.core.BaseMapper;
+import com.idoc.auth.dto.RoleDto;
 import com.idoc.auth.entity.RoleEntity;
-import com.idoc.auth.model.Role;
 
-public class RoleMapper {
+@Mapper(componentModel = "spring", uses = PermissionMapper.class)
+public interface RoleMapper extends BaseMapper<RoleEntity, RoleDto> {
 
-  public static RoleEntity toEntity(Role model) {
-    if (model == null)
-      return null;
-    return new RoleEntity(
-        model.getCode(),
-        model.getName());
-  }
+  RoleMapper INSTANCE = Mappers.getMapper(RoleMapper.class);
 
-  public static Role toModel(RoleEntity entity) {
-    if (entity == null)
-      return null;
-    return new Role(
-        entity.getId(),
-        entity.getCode(),
-        entity.getName());
-  }
+  @Override
+  @Mapping(target = "users", ignore = true)
+  @Mapping(target = "permissions", source = "permissions")
+  RoleEntity toEntity(RoleDto dto);
+
+  @Override
+  @Mapping(target = "permissions", source = "permissions")
+  RoleDto toDto(RoleEntity entity);
 
 }

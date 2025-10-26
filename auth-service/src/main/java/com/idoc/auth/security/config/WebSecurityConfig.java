@@ -62,7 +62,7 @@ public class WebSecurityConfig {
 		// Configure route authorization
 		http.authorizeHttpRequests(registry -> registry
 				.requestMatchers(SecurityConstants.PUBLIC_ROUTES).permitAll()
-				.requestMatchers("/api/roles/**","/api/permissions/**").hasRole(RoleConstants.ADMIN)
+				.requestMatchers("/api/permissions/**").hasRole(RoleConstants.ADMIN)
 				.requestMatchers("/api/**").authenticated()
 				.anyRequest().denyAll());
 
@@ -105,10 +105,12 @@ public class WebSecurityConfig {
 	 * @throws Exception - if an error occurs
 	 */
 	// @Bean
-	// public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-	// 	AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
-	// 	builder.userDetailsService(customUserDetailService).passwordEncoder(passwordEncoder());
-	// 	return builder.build();
+	// public AuthenticationManager authenticationManager(HttpSecurity http) throws
+	// Exception {
+	// AuthenticationManagerBuilder builder =
+	// http.getSharedObject(AuthenticationManagerBuilder.class);
+	// builder.userDetailsService(customUserDetailService).passwordEncoder(passwordEncoder());
+	// return builder.build();
 	// }
 
 	/**

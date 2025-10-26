@@ -3,6 +3,7 @@ package com.idoc.auth.entity;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.idoc.auth.core.BaseEntity;
 
 import jakarta.persistence.Column;
@@ -38,6 +39,7 @@ public class UserEntity extends BaseEntity {
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+	@JsonIgnore
 	private Set<RoleEntity> roles = new HashSet<>();
 
 	public UserEntity() {

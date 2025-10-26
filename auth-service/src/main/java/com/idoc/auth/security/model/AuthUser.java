@@ -1,4 +1,4 @@
-package com.idoc.auth.model;
+package com.idoc.auth.security.model;
 
 import java.util.Collection;
 
@@ -10,29 +10,19 @@ import com.idoc.auth.entity.UserEntity;
 public class AuthUser extends User {
 
 	private static final long serialVersionUID = 1L;
-	private Long id;
-	private String email;
+	private UserEntity user;
 
 	public AuthUser(UserEntity user, Collection<? extends GrantedAuthority> authorities) {
 		super(user.getUsername(), user.getPassword(), user.getStatus() == 1, true, true, true, authorities);
-		this.id = user.getId();
-		this.email = user.getEmail();
+		this.user = user;
 	}
 
-	public Long getId() {
-		return id;
+	public UserEntity getUser() {
+		return user;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
+	public void setUser(UserEntity user) {
+		this.user = user;
 	}
 
 }

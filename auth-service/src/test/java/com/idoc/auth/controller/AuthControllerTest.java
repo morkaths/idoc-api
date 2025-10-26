@@ -12,7 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.idoc.auth.model.RegisterRequest;
+import com.idoc.auth.dto.RegisterRequest;
 
 @SpringBootTest
 @AutoConfigureMockMvc

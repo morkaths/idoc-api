@@ -1,8 +1,16 @@
-package com.idoc.auth.model;
+package com.idoc.auth.dto;
+
+import jakarta.validation.constraints.NotBlank;
 
 public class RegisterRequest {
+	
+	@NotBlank(message = "Email is required")
 	private String email;
+
+	@NotBlank(message = "Username is required")
 	private String username;
+
+	@NotBlank(message = "Password is required")
 	private String password;
 
 	public String getEmail() {

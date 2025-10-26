@@ -2,108 +2,69 @@ package com.idoc.auth.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.idoc.auth.core.BaseServiceImpl;
+import com.idoc.auth.dto.UserDto;
+import com.idoc.auth.entity.RoleEntity;
 import com.idoc.auth.entity.UserEntity;
 import com.idoc.auth.mapper.UserMapper;
-import com.idoc.auth.model.User;
+import com.idoc.auth.repository.RoleRepository;
 import com.idoc.auth.repository.UserRepository;
+import com.idoc.auth.util.SpecificationBuilder;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends BaseServiceImpl<UserDto, UserEntity, Long> implements UserService {
+
+	private final UserRepository userRepository;
+	private final UserMapper userMapper;
+
+	public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
+		super(userRepository, userMapper);
+		this.userRepository = userRepository;
+		this.userMapper = userMapper;
+	}
 
 	@Autowired
-	private UserRepository userRepository;
-
-	@Autowired
-	private ObjectMapper objectMapper;
+	private RoleRepository roleRepository;
 
 	@Override
-	public List<User> findAllUser() {
-		return userRepository.findAll()
+	public List<UserDto> search(Map<String, Object> filter) {
+		SpecificationBuilder<UserEntity> builder = SpecificationBuilder.<UserEntity>builder()
+				.queryFields("username", "email")
+				.likeFields("username", "email", "status")
+				.manyToManyField("roles", "code")
+				.build();
+		Specification<UserEntity> specification = builder.build(filter);
+		return userRepository.findAll(specification)
 				.stream()
-				.map(UserMapper::toModel)
+				.map(userMapper::toDto)
 				.toList();
 	}
 
 	@Override
-	public List<User> search(Map<String, Object> filter) {
-		Specification<UserEntity> spec = null;
-		for (Map.Entry<String, Object> entry : filter.entrySet()) {
-			String key = entry.getKey();
-			Object value = entry.getValue();
-			if (value == null)
-				continue;
-			String[] values = value.toString().split(",");
-			Specification<UserEntity> fieldSpec = null;
-			for (String v : values) {
-				Specification<UserEntity> s = (root, query, cb) -> cb.equal(root.get(key), v.trim());
-				fieldSpec = (fieldSpec == null) ? s : fieldSpec.or(s);
-			}
-			spec = (spec == null) ? fieldSpec : spec.and(fieldSpec);
-		}
-
-		return userRepository.findAll(spec != null ? spec : (root, query, cb) -> cb.conjunction())
+	public UserDto assignRolesToUser(Long userId, List<Long> roleIds) {
+		UserEntity user = userRepository.findById(userId)
+				.orElseThrow(() -> new IllegalArgumentException("User not found"));
+		Set<RoleEntity> roles = roleRepository.findAllById(roleIds)
 				.stream()
-				.map(UserMapper::toModel)
-				.toList();
+				.collect(Collectors.toSet());
+		user.setRoles(roles);
+		return userMapper.toDto(userRepository.save(user));
 	}
 
 	@Override
-	public User findUserById(Long id) {
-		UserEntity entity = userRepository.findById(id)
-				.orElseThrow(() -> new IllegalArgumentException("User with id " + id + " does not exist"));
-		return UserMapper.toModel(entity);
-	}
-
-	@Override
-	public User findUserByEmail(String email) {
-		if (email == null || email.isEmpty()) {
-			throw new IllegalArgumentException("Email cannot be null or empty");
+	public UserDto findByUsernameOrEmail(String identifier) {
+		UserEntity user = userRepository.findByUsernameOrEmail(identifier);
+		if (user == null) {
+			throw new IllegalArgumentException("User not found with identifier: " + identifier);
 		}
-		UserEntity entity = userRepository.findByEmail(email);
-		return UserMapper.toModel(entity);
-	}
-
-	@Override
-	public User createUser(User user) {
-		if (user.getId() != null && userRepository.existsById(user.getId())) {
-			throw new IllegalArgumentException("User with id " + user.getId() + " already exists");
-		}
-		UserEntity entity = UserMapper.toEntity(user);
-		UserEntity saved = userRepository.save(entity);
-		return UserMapper.toModel(saved);
-	}
-
-	@Override
-	public User updateUser(Long id, User user) {
-		if (!userRepository.existsById(id)) {
-			throw new IllegalArgumentException("User with id " + id + " does not exist");
-		}
-		UserEntity entity = UserMapper.toEntity(user);
-		UserEntity saved = userRepository.save(entity);
-		return UserMapper.toModel(saved);
-	}
-
-	@Override
-	public User partialUpdateUser(Long id, Map<String, Object> fields) {
-		UserEntity entity = userRepository.findById(id)
-				.orElseThrow(() -> new IllegalArgumentException("User with id " + id + " does not exist"));
-		UserMapper.updateEntityFromMap(objectMapper, fields, entity);
-		UserEntity saved = userRepository.save(entity);
-		return UserMapper.toModel(saved);
-	}
-
-	@Override
-	public void deleteUserById(Long id) {
-		if (!userRepository.existsById(id)) {
-			throw new IllegalArgumentException("User with id " + id + " does not exist");
-		}
-		userRepository.deleteById(id);
+		return userMapper.toDto(user);
 	}
 
 }

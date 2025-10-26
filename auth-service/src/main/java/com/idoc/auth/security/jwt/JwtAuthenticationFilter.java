@@ -1,6 +1,7 @@
 package com.idoc.auth.security.jwt;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -46,14 +47,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 		Optional<String> tokenOpt = extractToken(request);
 		if (tokenOpt.isPresent()) {
-        DecodedJWT jwt = jwtTokenProvider.decodeToken(tokenOpt.get());
-        if (jwt != null) {
-            UsernamePasswordAuthenticationToken authentication = buildAuthentication(jwt);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        } else {
-            SecurityContextHolder.clearContext(); // Token không hợp lệ, clear context
-        }
-    }
+			DecodedJWT jwt = jwtTokenProvider.decodeToken(tokenOpt.get());
+			if (jwt != null) {
+				UsernamePasswordAuthenticationToken authentication = buildAuthentication(jwt);
+				SecurityContextHolder.getContext().setAuthentication(authentication);
+			} else {
+				SecurityContextHolder.clearContext(); // Token không hợp lệ, clear context
+			}
+		}
 		extractToken(request)
 				.map(jwtTokenProvider::decodeToken)
 				.filter(jwt -> jwt != null)
@@ -84,13 +85,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	 *         user
 	 */
 	private UsernamePasswordAuthenticationToken buildAuthentication(DecodedJWT jwt) {
-		Long userId = jwt.getClaim("userId").asLong();
+		Long userId = Long.valueOf(jwt.getSubject());
 		String username = jwt.getClaim("username").asString();
 		String email = jwt.getClaim("email").asString();
 		List<String> roles = jwt.getClaim("roles").asList(String.class);
-		List<SimpleGrantedAuthority> authorities = roles != null
-				? roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())
-				: List.of();
+		List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+		if (roles != null) {
+			authorities.addAll(roles.stream()
+					.map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+					.collect(Collectors.toList()));
+		}
+		System.out.println("Authorities in JwtFiter: " + authorities);
 		JwtTokenRequest principal = new JwtTokenRequest(userId, username, email, roles);
 		return new UsernamePasswordAuthenticationToken(principal, null, authorities);
 	}

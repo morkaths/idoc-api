@@ -3,6 +3,8 @@ package com.idoc.auth.entity;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -20,6 +22,7 @@ public class PermissionEntity {
 	private String name;
 
 	@ManyToMany(mappedBy = "permissions")
+	@JsonIgnore
 	private Set<RoleEntity> roles = new HashSet<>();
 
 	public PermissionEntity() {
