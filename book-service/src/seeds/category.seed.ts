@@ -3,9 +3,12 @@ import { Category } from '../models/category.model';
 export async function seedCategories() {
   await Category.deleteMany({});
   await Category.create([
-    { slug: 'van-hoc', },
-    { slug: 'kinh-te', },
-    { slug: 'thieu-nhi', },
+    { slug: 'literature' },
+    { slug: 'economics' },
+    { slug: 'children' },
+    { slug: 'novel' },
+    { slug: 'fantasy' },
+    { slug: 'dystopia' }
   ]);
   console.log('Seed category data success!');
 }

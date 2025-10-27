@@ -11,6 +11,8 @@
     "types": ["node"],
     "paths": {
       "src/*": ["src/*"]
-    }
+    },
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
   }
 }

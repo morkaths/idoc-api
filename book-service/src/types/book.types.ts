@@ -33,16 +33,10 @@ export interface Book {
   currency?: string; // e.g., USD, EUR
   stock?: number;
   coverUrl?: string;
+  tags?: string[];
   createdAt?: Date;
   updatedAt?: Date;
-  createdBy?: string;
-}
-
-export interface Language {
-  code: string; // e.g., "en", "vi"
-  name: string;
-  creeatedAt?: Date;
-  updatedAt?: Date;
+  updatedBy?: string;
 }
 
 export interface BaseTranslation {
@@ -67,4 +61,14 @@ export interface BookTranslation extends BaseTranslation {
   title: string;
   subtitle?: string;
   description?: string;
+}
+
+export interface Comment {
+  _id: string;
+  bookId: string;
+  userId: string;
+  content: string;
+  rating?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

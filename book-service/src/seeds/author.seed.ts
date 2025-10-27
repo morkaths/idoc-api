@@ -20,6 +20,24 @@ export async function seedAuthors() {
       nationality: 'Japanese',
       birthDate: new Date('1949-01-12'),
       avatarUrl: 'https://example.com/avatars/haruki-murakami.jpg'
+    },
+    {
+      name: 'Isabel Allende',
+      nationality: 'Chilean',
+      birthDate: new Date('1942-08-02'),
+      avatarUrl: 'https://example.com/avatars/isabel-allende.jpg'
+    },
+    {
+      name: 'Gabriel García Márquez',
+      nationality: 'Colombian',
+      birthDate: new Date('1927-03-06'),
+      avatarUrl: 'https://example.com/avatars/gabriel-garcia-marquez.jpg'
+    },
+    {
+      name: 'George Orwell',
+      nationality: 'British',
+      birthDate: new Date('1903-06-25'),
+      avatarUrl: 'https://example.com/avatars/george-orwell.jpg'
     }
   ]);
   console.log('Seed author data success!');

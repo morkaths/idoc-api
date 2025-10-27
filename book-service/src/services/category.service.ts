@@ -1,36 +1,23 @@
-import { Category, ICategory } from "src/models/category.model";
-import { FilterQuery } from "mongoose";
+import CategoryRepository from "../repositories/category.repository";
+import CategoryTransRepository from "../repositories/categoryTrans.repository";
+import { mapToCategoryDto } from "../mappers/category.mapper";
+import { ICategory } from "../models/category.model";
+import { ICategoryTranslation } from "../models/categoryTranslation.model";
+import { CategoryDto } from "../dtos/category.dto";
+import { Types } from "mongoose";
+import { joinWithTranslation } from "../core/join.helper";
 
-const CategoryService = {
-    getAll: async (): Promise<ICategory[]> => {
-        return Category.find().exec();
-    },
+class CategoryService {
+    async findAll(lang: string): Promise<CategoryDto[]> {
+        const categories = await CategoryRepository.findAll();
+        return joinWithTranslation<ICategory, ICategoryTranslation, CategoryDto>(
+            categories,
+            (ids) => CategoryTransRepository.find({ categoryId: { $in: ids }, lang }),
+            (cat) => (cat._id as Types.ObjectId).toString(),
+            (trans) => (trans.categoryId as Types.ObjectId).toString(),
+            (cat, trans) => mapToCategoryDto(cat, trans, lang)
+        );
+    }
+}
 
-    getById: async (id: string): Promise<ICategory | null> => {
-        return Category.findById(id).exec();
-    },
-
-    search: async (query: FilterQuery<ICategory>): Promise<ICategory[]> => {
-        return Category.find(query).exec();
-    },
-
-    searchOne: async (query: FilterQuery<ICategory>): Promise<ICategory | null> => {
-        return Category.findOne(query).exec();
-    },
-
-    create: async (data: Partial<ICategory>): Promise<ICategory> => {
-        const category = new Category(data);
-        return category.save();
-    },
-
-    update: async (id: string, data: Partial<ICategory>): Promise<ICategory | null> => {
-        return Category.findByIdAndUpdate(id, data, { new: true }).exec();
-    },
-
-    delete: async (id: string): Promise<ICategory | null> => {
-        return Category.findByIdAndDelete(id).exec();
-    },
-};
-
-export default CategoryService;
-;
+export default new CategoryService();

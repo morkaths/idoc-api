@@ -15,9 +15,10 @@ export interface IBook extends Document {
   currency?: string;
   stock?: number;
   coverUrl?: string;
+  tags?: string[];
   createdAt?: Date;
   updatedAt?: Date;
-  createdBy?: mongoose.Types.ObjectId;
+  updatedBy?: mongoose.Types.ObjectId;
 }
 
 const BookSchema: Schema = new Schema(
@@ -36,7 +37,8 @@ const BookSchema: Schema = new Schema(
     currency: { type: String },
     stock: { type: Number },
     coverUrl: { type: String },
-    createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    tags: [{ type: String, index: true }],
+    updatedBy: { type: Schema.Types.ObjectId, ref: 'User' },
   },
   { timestamps: true }
 );

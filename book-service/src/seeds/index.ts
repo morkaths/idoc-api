@@ -3,7 +3,6 @@ import { MONGODB_URI } from '../config/env.config';
 import { seedAuthors } from './author.seed';
 import { seedCategories } from './category.seed';
 import { seedBooks } from './book.seed';
-import { seedLanguages } from './language.seed';
 import { seedCategoryTranslations } from './categoryTrans.seed';
 import { seedBookTranslations } from './bookTrans.seed';
 import { seedAuthorTranslations } from './authorTrans.seed';
@@ -16,7 +15,6 @@ async function seed() {
     await seedAuthors();
     await seedCategories();
     await seedBooks();
-    await seedLanguages();
     await seedCategoryTranslations();
     await seedBookTranslations();
     await seedAuthorTranslations();
@@ -30,4 +28,4 @@ async function seed() {
 
 seed();
 
-// npx ts-node src/seeds/index.ts
+// npm run seed

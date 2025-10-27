@@ -44,10 +44,10 @@ app.use(passport.initialize());
 // 7. Định nghĩa route gốc (trang chủ API)
 app.get('/', (req, res) => {
   res.json({
-    message: 'Studeck API',
+    message: 'iDoc API',
     version: '1.0.0',
     endpoints: {
-      profile: '/api/profiles',
+      category: '/api/categories',
     }
   });
 });

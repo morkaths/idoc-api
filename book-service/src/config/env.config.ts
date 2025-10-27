@@ -11,18 +11,6 @@ export const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 export const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:8080';
 
 // ────────────────────────────────────────────────────────────────────────────────
-// JWT
-// ────────────────────────────────────────────────────────────────────────────────
-export const JWT_SECRET = process.env.JWT_SECRET
-	? process.env.JWT_SECRET
-	: (() => {
-		throw new Error('JWT_SECRET chưa được định nghĩa trong file .env');
-	})();
-export const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN
-	? process.env.JWT_EXPIRES_IN
-	: '1d';
-
-// ────────────────────────────────────────────────────────────────────────────────
 // Database (Mongo DB)
 // ────────────────────────────────────────────────────────────────────────────────
 export const MONGODB_URI = process.env.MONGODB_URI
