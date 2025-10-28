@@ -16,6 +16,9 @@ export async function seedBooks() {
 
   await Book.create([
     {
+      title: 'Mắt Biếc',
+      subtitle: 'Tiểu thuyết nổi tiếng',
+      description: 'Tác phẩm của Nguyễn Nhật Ánh về tuổi thơ và tình yêu.',
       slug: 'mat-biec',
       authorIds: [getAuthorId('Nguyễn Nhật Ánh')].filter(Boolean),
       categoryIds: [getCategoryId('novel')].filter(Boolean),
@@ -29,9 +32,13 @@ export async function seedBooks() {
       price: 120000,
       currency: 'VND',
       stock: 100,
-      coverUrl: 'https://example.com/covers/mat-biec.jpg'
+      coverUrl: 'https://example.com/covers/mat-biec.jpg',
+      tags: ['tuổi thơ', 'tình yêu', 'văn học', 'nguyễn nhật ánh', 'mat biec']
     },
     {
+      title: 'Harry Potter and the Philosopher\'s Stone',
+      subtitle: 'Harry Potter #1',
+      description: 'Cuốn đầu tiên trong bộ truyện Harry Potter.',
       slug: 'harry-potter-1',
       authorIds: [getAuthorId('J.K. Rowling')].filter(Boolean),
       categoryIds: [getCategoryId('fantasy')].filter(Boolean),
@@ -45,9 +52,13 @@ export async function seedBooks() {
       price: 250000,
       currency: 'VND',
       stock: 50,
-      coverUrl: 'https://example.com/covers/harry-potter-1.jpg'
+      coverUrl: 'https://example.com/covers/harry-potter-1.jpg',
+      tags: ['magic', 'wizard', 'fantasy', 'harry potter', 'j.k. rowling']
     },
     {
+      title: 'Norwegian Wood',
+      subtitle: 'Rừng Na Uy',
+      description: 'Tiểu thuyết nổi tiếng của Haruki Murakami.',
       slug: 'norwegian-wood',
       authorIds: [getAuthorId('Haruki Murakami')].filter(Boolean),
       categoryIds: [getCategoryId('novel')].filter(Boolean),
@@ -61,9 +72,13 @@ export async function seedBooks() {
       price: 180000,
       currency: 'VND',
       stock: 30,
-      coverUrl: 'https://example.com/covers/norwegian-wood.jpg'
+      coverUrl: 'https://example.com/covers/norwegian-wood.jpg',
+      tags: ['murakami', 'rừng na uy', 'norwegian wood', 'tiểu thuyết nhật', 'tình yêu']
     },
     {
+      title: 'Cien años de soledad',
+      subtitle: 'Trăm năm cô đơn',
+      description: 'Tác phẩm nổi tiếng của Gabriel García Márquez.',
       slug: 'cien-anos-de-soledad',
       authorIds: [getAuthorId('Gabriel García Márquez')].filter(Boolean),
       categoryIds: [getCategoryId('novel')].filter(Boolean),
@@ -77,9 +92,13 @@ export async function seedBooks() {
       price: 220000,
       currency: 'VND',
       stock: 20,
-      coverUrl: 'https://example.com/covers/cien-anos-de-soledad.jpg'
+      coverUrl: 'https://example.com/covers/cien-anos-de-soledad.jpg',
+      tags: ['marquez', 'trăm năm cô đơn', 'cien años de soledad', 'tiểu thuyết', 'colombia']
     },
     {
+      title: '1984',
+      subtitle: 'Nineteen Eighty-Four',
+      description: 'Tiểu thuyết phản địa đàng của George Orwell.',
       slug: '1984',
       authorIds: [getAuthorId('George Orwell')].filter(Boolean),
       categoryIds: [getCategoryId('dystopia')].filter(Boolean),
@@ -93,7 +112,8 @@ export async function seedBooks() {
       price: 150000,
       currency: 'VND',
       stock: 40,
-      coverUrl: 'https://example.com/covers/1984.jpg'
+      coverUrl: 'https://example.com/covers/1984.jpg',
+      tags: ['orwell', '1984', 'dystopia', 'phản địa đàng', 'classic']
     }
   ]);
   console.log('Seed book data success!');

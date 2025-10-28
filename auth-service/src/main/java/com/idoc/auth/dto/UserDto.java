@@ -36,6 +36,16 @@ public class UserDto {
 		this.status = status;
 	}
 
+	public UserDto(Long id, String username, String password, String email, int status, Set<UserRoleDto> roles) {
+		super();
+		this.id = id;
+		this.username = username;
+		this.password = password;
+		this.email = email;
+		this.status = status;
+		this.roles = roles;
+	}
+
 	public Long getId() {
 		return id;
 	}

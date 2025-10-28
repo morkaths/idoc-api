@@ -4,8 +4,6 @@ import { seedAuthors } from './author.seed';
 import { seedCategories } from './category.seed';
 import { seedBooks } from './book.seed';
 import { seedCategoryTranslations } from './categoryTrans.seed';
-import { seedBookTranslations } from './bookTrans.seed';
-import { seedAuthorTranslations } from './authorTrans.seed';
 
 async function seed() {
   try {
@@ -16,8 +14,6 @@ async function seed() {
     await seedCategories();
     await seedBooks();
     await seedCategoryTranslations();
-    await seedBookTranslations();
-    await seedAuthorTranslations();
 
   } catch (err) {
     console.error('Seed error:', err);

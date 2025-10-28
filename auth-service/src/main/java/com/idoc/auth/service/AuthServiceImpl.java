@@ -1,6 +1,7 @@
 package com.idoc.auth.service;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.idoc.auth.constant.RoleConstants;
 import com.idoc.auth.dto.UserDto;
+import com.idoc.auth.dto.UserRoleDto;
 import com.idoc.auth.entity.RoleEntity;
 import com.idoc.auth.entity.UserEntity;
 import com.idoc.auth.repository.RoleRepository;
@@ -103,7 +105,10 @@ public class AuthServiceImpl implements AuthService {
 				user.getUsername(),
 				null,
 				user.getEmail(),
-				user.getStatus());
+				user.getStatus(),
+				user.getRoles().stream()
+						.map(role -> new UserRoleDto(role.getId(), role.getCode(), role.getName()))
+						.collect(Collectors.toSet()));
 	}
 
 	@Override

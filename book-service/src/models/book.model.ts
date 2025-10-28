@@ -1,6 +1,9 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IBook extends Document {
+  title: string;
+  subtitle?: string;
+  description?: string;
   slug?: string;
   authorIds: mongoose.Types.ObjectId[];
   categoryIds: mongoose.Types.ObjectId[];
@@ -16,13 +19,16 @@ export interface IBook extends Document {
   stock?: number;
   coverUrl?: string;
   tags?: string[];
+  updatedBy?: number;
   createdAt?: Date;
   updatedAt?: Date;
-  updatedBy?: mongoose.Types.ObjectId;
 }
 
 const BookSchema: Schema = new Schema(
   {
+    title: { type: String, required: true },
+    subtitle: { type: String },
+    description: { type: String },
     slug: { type: String, index: true },
     authorIds: [{ type: Schema.Types.ObjectId, ref: 'Author' }],
     categoryIds: [{ type: Schema.Types.ObjectId, ref: 'Category' }],
@@ -38,7 +44,7 @@ const BookSchema: Schema = new Schema(
     stock: { type: Number },
     coverUrl: { type: String },
     tags: [{ type: String, index: true }],
-    updatedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    updatedBy: { type: Number },
   },
   { timestamps: true }
 );

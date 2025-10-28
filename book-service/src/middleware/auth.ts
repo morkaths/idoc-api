@@ -56,7 +56,7 @@ export const authorizeRole = (roleName: string) => {
       }
 
       // Check if user has the required role
-      const hasRole = await AuthClient.verifyRole(user.roleId, roleName);
+      const hasRole = user.roles?.some(role => role.code === roleName);
       if (!hasRole) {
         return res.status(403).json({ success: false, message: 'Access denied: insufficient permissions' });
       }

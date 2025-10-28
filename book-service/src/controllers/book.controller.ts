@@ -7,11 +7,10 @@ import * as response from '../utils/response.util';
 const BookController = {
   getAll: asyncHandler(async (req: Request, res: Response) => {
     const { lang } = req.query;
-    if (!lang || typeof lang !== 'string') {
-      return response.sendErrorResponse(res, 'Invalid language parameter');
-    }
-    const books = await BookService.getAll(lang);
-    if (!books) {
+    const books = await BookService.findAllWithCategoryTrans(
+      typeof lang === 'string' ? lang : undefined
+    );
+    if (!books || books.length === 0) {
       return response.sendNotFoundResponse(res, 'No books found');
     }
     response.sendSuccessResponse(res, 'Get all books successfully', books);
@@ -20,73 +19,75 @@ const BookController = {
   getById: asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     const { lang } = req.query;
-    if (!lang || typeof lang !== 'string') {
-      return response.sendErrorResponse(res, 'Invalid language parameter');
-    }
-    const book = await BookService.getById(id, lang);
+    const book = await BookService.findByIdWithCategoryTrans(
+      id,
+      typeof lang === 'string' ? lang : undefined
+    );
     if (!book) {
       return response.sendNotFoundResponse(res, 'Book not found');
     }
-    response.sendSuccessResponse(res, 'Get book by ID successfully', book);
+    response.sendSuccessResponse(res, 'Get book successfully', book);
+  }),
+
+  getByCategory: asyncHandler(async (req: Request, res: Response) => {
+    const { categoryName } = req.params;
+    const { lang } = req.query;
+    const books = await BookService.findByCategoryNameWithCategoryTrans(
+      categoryName,
+      typeof lang === 'string' ? lang : undefined
+    );
+    if (!books || books.length === 0) {
+      return response.sendNotFoundResponse(res, 'No books found for this category');
+    }
+    response.sendSuccessResponse(res, 'Get books by category successfully', books);
   }),
 
   search: asyncHandler(async (req: Request, res: Response) => {
-    const { lang, ...searchParams } = req.query;
-    if (!lang || typeof lang !== 'string') {
-      return response.sendErrorResponse(res, 'Invalid language parameter');
+    const { query, lang } = req.query;
+    if (!query || typeof query !== 'string') {
+      return response.sendErrorResponse(res, 'Invalid search query parameter');
     }
-    const books = await BookService.search(searchParams, lang);
-    if (!books) {
-      return response.sendNotFoundResponse(res, 'No books found');
+    const books = await BookService.searchWithCategoryTrans(
+      query,
+      typeof lang === 'string' ? lang : undefined
+    );
+    if (!books || books.length === 0) {
+      return response.sendNotFoundResponse(res, 'No books found for this search query');
     }
     response.sendSuccessResponse(res, 'Search books successfully', books);
   }),
 
   create: asyncHandler(async (req: AuthRequest, res: Response) => {
     const bookDto = req.body;
-    const userId = req.user?._id;
-    if (userId) {
-      bookDto.updatedBy = userId.toString();
+    if (req.user && req.user.id) {
+      bookDto.updatedBy = req.user.id;
     }
-    const createdBook = await BookService.create(bookDto);
-    response.sendSuccessResponse(res, 'Create book successfully', createdBook);
+    const book = await BookService.create(bookDto);
+    response.sendSuccessResponse(res, 'Book created successfully', book);
   }),
 
-  updateBook: asyncHandler(async (req: AuthRequest, res: Response) => {
+  update: asyncHandler(async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const bookDto = req.body;
-    const { lang } = req.query;
-    if (!lang || typeof lang !== 'string') {
-      return response.sendErrorResponse(res, 'Invalid language parameter');
+    if (req.user && req.user.id) {
+      bookDto.updatedBy = req.user.id;
     }
-    const userId = req.user?._id;
-    if (userId) {
-      bookDto.updatedBy = userId.toString();
+    const book = await BookService.update(id, bookDto);
+    if (!book) {
+      return response.sendNotFoundResponse(res, 'Book not found');
     }
-    const updatedBook = await BookService.updateBook(id, lang, bookDto);
-    response.sendSuccessResponse(res, 'Update book successfully', updatedBook);
-  }),
-
-  updateTranslation: asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { id } = req.params;
-    const bookDto = req.body;
-    const { lang } = req.query;
-    if (!lang || typeof lang !== 'string') {
-      return response.sendErrorResponse(res, 'Invalid language parameter');
-    }
-    const userId = req.user?._id;
-    if (userId) {
-      bookDto.updatedBy = userId.toString();
-    }
-    const updatedTrans = await BookService.updateTranslation(id, lang, bookDto);
-    response.sendSuccessResponse(res, 'Update book translation successfully', updatedTrans);
+    response.sendSuccessResponse(res, 'Book updated successfully', book);
   }),
 
   delete: asyncHandler(async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
-    await BookService.delete(id);
-    response.sendSuccessResponse(res, 'Delete book successfully', null);
+    const result = await BookService.delete(id);
+    if (!result) {
+      return response.sendNotFoundResponse(res, 'Book not found');
+    }
+    response.sendSuccessResponse(res, 'Book deleted successfully');
   }),
+
 };
 
 export default BookController;

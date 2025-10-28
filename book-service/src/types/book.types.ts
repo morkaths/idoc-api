@@ -1,8 +1,15 @@
-
 export interface Category {
   _id: string;
   slug?: string;
   parentId?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+export interface CategoryTranslation {
+  categoryId: string;
+  lang: string;
+  name: string;
+  description?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -13,12 +20,16 @@ export interface Author {
   avatarUrl?: string;
   birthDate?: Date;
   nationality?: string;
+  bio?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 export interface Book {
   _id: string;
+  title: string;
+  subtitle?: string;
+  description?: string;
   slug?: string;
   authorIds: string[];
   categoryIds: string[];
@@ -26,41 +37,17 @@ export interface Book {
   publishedDate?: Date;
   edition?: string;
   isbn?: string;
-  language?: string; // ngôn ngữ gốc
+  language?: string;
   pages?: number;
-  format?: string; // e.g., Hardcover, Paperback, eBook, Audiobook
+  format?: string;
   price?: number;
-  currency?: string; // e.g., USD, EUR
+  currency?: string;
   stock?: number;
   coverUrl?: string;
   tags?: string[];
-  createdAt?: Date;
-  updatedAt?: Date;
   updatedBy?: string;
-}
-
-export interface BaseTranslation {
-  lang: string;
   createdAt?: Date;
   updatedAt?: Date;
-}
-
-export interface CategoryTranslation extends BaseTranslation {
-  categoryId: string;
-  name: string;
-  description?: string;
-}
-
-export interface AuthorTranslation extends BaseTranslation {
-  authorId: string;
-  bio?: string;
-}
-
-export interface BookTranslation extends BaseTranslation {
-  bookId: string;
-  title: string;
-  subtitle?: string;
-  description?: string;
 }
 
 export interface Comment {

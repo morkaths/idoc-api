@@ -13,7 +13,7 @@ export async function seedAuthors() {
       name: 'J.K. Rowling',
       nationality: 'British',
       birthDate: new Date('1965-07-31'),
-      avatarUrl: 'https://example.com/avatars/jk-rowling.jpg'
+      avatarUrl: 'https://example.com/avatars/jk-rowling.jpg',
     },
     {
       name: 'Haruki Murakami',
