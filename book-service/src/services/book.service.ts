@@ -6,7 +6,7 @@ import { Types } from "mongoose";
 import { joinWithTranslation } from "src/core/join.helper";
 
 const BookService = {
-  async findAll(lang: string): Promise<BookDto[]> {
+  async getAll(lang: string): Promise<BookDto[]> {
     const books = await BookRepository.findAll();
     return joinWithTranslation(
       books,
@@ -70,7 +70,7 @@ const BookService = {
     return mapToBookDto(book, trans, lang);
   },
 
-  async updateBook(id: string, data: Partial<BookDto>, lang: string): Promise<BookDto | null> {
+  async updateBook(id: string, lang: string, data: Partial<BookDto>): Promise<BookDto | null> {
     const { authorIds, categoryIds, updatedBy, ...bookData } = data;
     const updateData = {
       ...bookData,
