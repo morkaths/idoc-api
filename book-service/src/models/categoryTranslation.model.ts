@@ -9,11 +9,11 @@ export interface ICategoryTranslation extends Document {
   updatedAt?: Date;
 }
 
-const CategoryTranslationSchema: Schema = new Schema(
+const CategoryTranslationSchema = new Schema<ICategoryTranslation>(
   {
     categoryId: { type: Schema.Types.ObjectId, ref: 'Category', required: true, index: true },
-    lang: { type: String, required: true, index: true },
-    name: { type: String, required: true },
+    lang: { type: String, required: true, index: true, trim: true },
+    name: { type: String, required: true, trim: true },
     description: { type: String },
   },
   { timestamps: true }

@@ -9,12 +9,12 @@ export interface IAuthor extends Document {
   updatedAt?: Date;
 }
 
-const AuthorSchema: Schema = new Schema(
+const AuthorSchema = new Schema<IAuthor>(
   {
-    name: { type: String, required: true },
-    avatarUrl: { type: String },
+    name: { type: String, required: true, index:true, trim: true },
+    avatarUrl: { type: String, trim: true },
     birthDate: { type: Date },
-    nationality: { type: String },
+    nationality: { type: String, trim: true },
   },
   { timestamps: true }
 );

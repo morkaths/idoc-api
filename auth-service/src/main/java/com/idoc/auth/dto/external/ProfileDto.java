@@ -3,20 +3,31 @@ package com.idoc.auth.dto.external;
 import java.util.Date;
 
 public class ProfileDto {
-  private String userId;
+  private Long userId;
   private String fullName;
   private Date birthday;
   private String avatar;
   private String bio;
   private String location;
-  private Date updatedAt;
 
-  // Getters and setters
-  public String getUserId() {
+  public ProfileDto() {
+    super();
+  }
+
+  public ProfileDto(Long userId, String fullName, Date birthday, String avatar, String bio, String location) {
+    this.userId = userId;
+    this.fullName = fullName;
+    this.birthday = birthday;
+    this.avatar = avatar;
+    this.bio = bio;
+    this.location = location;
+  }
+
+  public Long getUserId() {
     return userId;
   }
 
-  public void setUserId(String userId) {
+  public void setUserId(Long userId) {
     this.userId = userId;
   }
 
@@ -59,12 +70,5 @@ public class ProfileDto {
   public void setLocation(String location) {
     this.location = location;
   }
-
-  public Date getUpdatedAt() {
-    return updatedAt;
-  }
-
-  public void setUpdatedAt(Date updatedAt) {
-    this.updatedAt = updatedAt;
-  }
+  
 }

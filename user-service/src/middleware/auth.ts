@@ -2,6 +2,7 @@
 import { AuthClient } from '../integrations/auth.client';
 import { Request, Response, NextFunction } from 'express';
 import { AuthRequest } from '../types';
+import * as response from '../utils/response.util';
 
 /**
  * Middleware to authenticate JWT token from Authorization header
@@ -11,7 +12,7 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
     // Get token from Authorization header
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(' ')[1]; // Format: "Bearer TOKEN"
-    if (!token) return res.status(401).json({ success: false, message: 'No authentication token provided' });
+    if (!token) return response.unauthorized(res, 'No authentication token provided');
 
     // Verify token using AuthClient
     const user = await AuthClient.verifyToken(token);

@@ -12,8 +12,10 @@ import org.springframework.stereotype.Service;
 import com.idoc.auth.constant.RoleConstants;
 import com.idoc.auth.dto.UserDto;
 import com.idoc.auth.dto.UserRoleDto;
+import com.idoc.auth.dto.external.ProfileDto;
 import com.idoc.auth.entity.RoleEntity;
 import com.idoc.auth.entity.UserEntity;
+import com.idoc.auth.integration.ProfileClient;
 import com.idoc.auth.repository.RoleRepository;
 import com.idoc.auth.repository.UserRepository;
 import com.idoc.auth.security.jwt.JwtTokenProvider;
@@ -26,13 +28,15 @@ public class AuthServiceImpl implements AuthService {
 
 	private final UserRepository userRepository;
 	private final RoleRepository roleRepository;
+	private final ProfileClient profileClient;
 	private final JwtTokenProvider jwtTokenProvider;
 	private final AuthenticationManager authenticationManager;
 
-	public AuthServiceImpl(UserRepository userRepository, RoleRepository roleRepository,
+	public AuthServiceImpl(UserRepository userRepository, RoleRepository roleRepository, ProfileClient profileClient,
 			JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager) {
 		this.userRepository = userRepository;
 		this.roleRepository = roleRepository;
+		this.profileClient = profileClient;
 		this.jwtTokenProvider = jwtTokenProvider;
 		this.authenticationManager = authenticationManager;
 	}
@@ -87,6 +91,17 @@ public class AuthServiceImpl implements AuthService {
 		if (token == null) {
 			throw new IllegalStateException("Failed to generate token");
 		}
+
+		ProfileDto profile = new ProfileDto(
+				newUser.getId(),
+				"User " + newUser.getUsername(),
+				null,
+				null,
+				null,
+				null);
+
+		profileClient.createProfile(token, profile);
+
 		return token;
 	}
 

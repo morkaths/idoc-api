@@ -7,9 +7,9 @@ export interface ICategory extends Document {
   updatedAt?: Date;
 }
 
-const CategorySchema: Schema = new Schema(
+const CategorySchema = new Schema<ICategory>(
   {
-    slug: { type: String, index: true },
+    slug: { type: String, index: true, trim: true },
     parentId: { type: Schema.Types.ObjectId, ref: 'Category' },
   },
   { timestamps: true }

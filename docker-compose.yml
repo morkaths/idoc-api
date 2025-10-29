@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  # API Gateway using Kong in DB-less mode
+  kong:
+    image: kong:3.6
+    container_name: kong
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
+      KONG_PROXY_LISTEN: 0.0.0.0:8000
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+    volumes:
+      - ./kong.yml:/usr/local/kong/declarative/kong.yml
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+    restart: unless-stopped
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./auth-service/.env
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    ports:
+      - "5001:5001"
+    env_file:
+      - ./user-service/.env
+  book-service:
+    build: ./book-service
+    container_name: book-service
+    ports:
+      - "5002:5002"
+    env_file:
+      - ./book-service/.env

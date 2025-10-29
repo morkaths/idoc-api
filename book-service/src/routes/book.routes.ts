@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import BookController from '../controllers/book.controller';
 import { authenticateToken, authorizeRole } from '../middleware/auth';
-import { RoleConstants } from '../constants/security/role';
+import { RoleEnum } from '../constants/security/role';
 
 const router = Router();
 
@@ -37,7 +37,7 @@ router.get('/:id', BookController.getById);
  * @access  Private
  * @body    BookDto - Book data transfer object
  */
-router.post('/', authenticateToken, authorizeRole(RoleConstants.ADMIN), BookController.create);
+router.post('/', authenticateToken, authorizeRole([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]), BookController.create);
 
 /**
  * @route   PUT /api/books/:id?lang=...
@@ -47,7 +47,7 @@ router.post('/', authenticateToken, authorizeRole(RoleConstants.ADMIN), BookCont
  * @query   lang - Language code for translations
  * @body    Partial<BookDto> - Partial book data transfer object
  */
-router.put('/:id', authenticateToken, authorizeRole(RoleConstants.ADMIN), BookController.update);
+router.put('/:id', authenticateToken, authorizeRole([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]), BookController.update);
 
 /**
  * @route   DELETE /api/books/:id
@@ -55,6 +55,6 @@ router.put('/:id', authenticateToken, authorizeRole(RoleConstants.ADMIN), BookCo
  * @access  Private
  * @param   id - Book ID
  */
-router.delete('/:id', authenticateToken, authorizeRole(RoleConstants.ADMIN), BookController.delete);
+router.delete('/:id', authenticateToken, authorizeRole([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]), BookController.delete);
 
 export default router;
