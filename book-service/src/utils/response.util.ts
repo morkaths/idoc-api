@@ -1,97 +1,58 @@
 import { Response } from 'express';
 
-export const sendResponse = (
-    res: Response,
-    message: string = 'Success',
-    data?: any,
-    error?: any,
-    statusCode: number = 200
-) => {
-    const payload: Record<string, any> = { success: !error, message };
-    if (data !== undefined && data !== null) payload.data = data;
-    if (error !== undefined && error !== null) payload.error = error;
-    res.status(statusCode).json(payload);
-};
+export const success = (res: Response, message = 'Success', data?: any) =>
+  res.status(200).json({ success: true, message, ...(data !== undefined ? { data } : {}) });
 
-export const sendSuccessResponse = (
-    res: Response,
-    message: string = 'Success',
-    data?: any
-) => {
-    const payload: Record<string, any> = { success: true, message };
-    if (data !== undefined && data !== null) payload.data = data;
-    res.status(200).json(payload);
-};
+export const created = (res: Response, message = 'Created', data?: any) =>
+  res.status(201).json({ success: true, message, ...(data !== undefined ? { data } : {}) });
 
-export const sendCreatedResponse = (
-    res: Response,
-    message: string = 'Created successfully',
-    data?: any,
-) => {
-    const payload: Record<string, any> = { success: true, message };
-    if (data !== undefined && data !== null) payload.data = data;
-    res.status(201).json(payload);
-};
+export const updated = (res: Response, message = 'Updated', data?: any) =>
+  res.status(200).json({ success: true, message, ...(data !== undefined ? { data } : {}) });
 
-export const sendUpdatedResponse = (
-    res: Response,
-    message: string = 'Updated successfully',
-    data: any = null,
-) => {
-    const payload: Record<string, any> = { success: true, message };
-    if (data !== undefined && data !== null) payload.data = data;
-    res.status(200).json(payload);
-}
+export const deleted = (res: Response, message = 'Deleted') =>
+  res.status(200).json({ success: true, message });
 
-export const sendDeletedResponse = (
-    res: Response,
-    message: string = 'Deleted successfully'
-) => {
-    res.status(200).json({ success: true, message });
-};
+export const noContent = (res: Response) => res.status(204).send();
 
-export const sendNoContentResponse = (res: Response) => {
-    res.status(204).send();
-};
+export const error = (res: Response, message = 'Bad Request', statusCode = 400, err?: any) =>
+  res.status(statusCode).json({ success: false, message, ...(err ? { error: err } : {}) });
 
-export const sendErrorResponse = (
-    res: Response,
-    message: string = 'Bad Request',
-    error?: any
-) => {
-    const payload: Record<string, any> = { success: false, message };
-    if (error) payload.error = error;
-    res.status(400).json(payload);
-};
+export const unauthorized = (res: Response, message = 'Unauthorized') =>
+  res.status(401).json({ success: false, message });
 
-export const sendUnauthorizedResponse = (
-    res: Response,
-    message: string = 'Unauthorized'
-) => {
-    res.status(401).json({ success: false, message });
-};
+export const forbidden = (res: Response, message = 'Forbidden') =>
+  res.status(403).json({ success: false, message });
 
-export const sendForbiddenResponse = (
-    res: Response,
-    message: string = 'Forbidden'
-) => {
-    res.status(403).json({ success: false, message });
-};
+export const notFound = (res: Response, message = 'Not found') =>
+  res.status(404).json({ success: false, message });
 
-export const sendNotFoundResponse = (
-    res: Response,
-    message: string = 'Resource not found'
-) => {
-    res.status(404).json({ success: false, message });
-};
+export const methodNotAllowed = (res: Response, message = 'Method Not Allowed') =>
+  res.status(405).json({ success: false, message });
 
-export const sendInternalServerErrorResponse = (
-    res: Response,
-    message: string = 'Internal server error',
-    error?: any
-) => {
-    const payload: Record<string, any> = { success: false, message };
-    if (error) payload.error = error;
-    res.status(500).json(payload);
-}
+export const requestTimeout = (res: Response, message = 'Request Timeout') =>
+  res.status(408).json({ success: false, message });
+
+export const duplicate = (res: Response, message = 'Duplicate resource', err?: any) =>
+  res.status(409).json({ success: false, message, ...(err ? { error: err } : {}) });
+
+export const gone = (res: Response, message = 'Gone') =>
+  res.status(410).json({ success: false, message });
+
+export const unsupportedMediaType = (res: Response, message = 'Unsupported Media Type') =>
+  res.status(415).json({ success: false, message });
+
+export const unprocessable = (res: Response, message = 'Unprocessable Entity', err?: any) =>
+  res.status(422).json({ success: false, message, ...(err ? { error: err } : {}) });
+
+export const tooManyRequests = (res: Response, message = 'Too Many Requests') =>
+  res.status(429).json({ success: false, message });
+
+export const internalError = (res: Response, message = 'Internal server error', err?: any) =>
+  res.status(500).json({ success: false, message, ...(err ? { error: err } : {}) });
+
+export const notImplemented = (res: Response, message = 'Not Implemented') =>
+  res.status(501).json({ success: false, message });
+
+export const serviceUnavailable = (res: Response, message = 'Service Unavailable') =>
+  res.status(503).json({ success: false, message });
 

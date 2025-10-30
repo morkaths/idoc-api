@@ -11,6 +11,11 @@ import CategoryRepository from "src/repositories/category.repository";
 import { Types } from "mongoose";
 
 class BookService extends BaseService<IBook, BookDto> {
+
+  constructor() {
+    super(BookRepository, BookMapper);
+  }
+
   async findAllWithCategoryTrans(lang?: string): Promise<BookDto[]> {
     const books = await BookRepository.findAll(lang);
     return books.map(book =>
@@ -83,4 +88,4 @@ class BookService extends BaseService<IBook, BookDto> {
   }
 };
 
-export default new BookService(BookRepository, BookMapper);
+export default new BookService();

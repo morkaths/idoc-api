@@ -2,6 +2,7 @@ import * as ApiRequest from './index';
 import type { User, Role } from 'src/types/auth.types';
 import { API_CONFIG } from 'src/config/api.config';
 import { verify } from 'crypto';
+import { API_KEY } from 'src/config/env.config';
 
 const SERVICE: ApiRequest.ApiService = 'auth';
 

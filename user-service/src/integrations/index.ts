@@ -1,6 +1,7 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios';
 import type { ApiResponse } from 'src/types';
 import { API_CONFIG } from 'src/config/api.config';
+import { API_KEY } from 'src/config/env.config';
 
 // ────────────────────────────────────────────────────────────────────────────────
 // API Instances
@@ -28,7 +29,13 @@ function createApiInstance(baseURL: string, withCredentials = false) {
     timeout: API_CONFIG.timeout,
     withCredentials
   });
-  
+
+  instance.interceptors.request.use((config) => {
+    config.headers = config.headers || {};
+    config.headers['x-api-key'] = API_KEY;
+    return config;
+  });
+
   instance.interceptors.response.use(
     (res) => res,
     (error) => Promise.reject(handleError(error))

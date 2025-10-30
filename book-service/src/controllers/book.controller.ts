@@ -11,9 +11,9 @@ const BookController = {
       typeof lang === 'string' ? lang : undefined
     );
     if (!books || books.length === 0) {
-      return response.sendNotFoundResponse(res, 'No books found');
+      return response.notFound(res, 'No books found');
     }
-    response.sendSuccessResponse(res, 'Get all books successfully', books);
+    response.success(res, 'Get all books successfully', books);
   }),
 
   getById: asyncHandler(async (req: Request, res: Response) => {
@@ -24,9 +24,9 @@ const BookController = {
       typeof lang === 'string' ? lang : undefined
     );
     if (!book) {
-      return response.sendNotFoundResponse(res, 'Book not found');
+      return response.notFound(res, 'Book not found');
     }
-    response.sendSuccessResponse(res, 'Get book successfully', book);
+    response.success(res, 'Get book successfully', book);
   }),
 
   getByCategory: asyncHandler(async (req: Request, res: Response) => {
@@ -37,24 +37,24 @@ const BookController = {
       typeof lang === 'string' ? lang : undefined
     );
     if (!books || books.length === 0) {
-      return response.sendNotFoundResponse(res, 'No books found for this category');
+      return response.notFound(res, 'No books found for this category');
     }
-    response.sendSuccessResponse(res, 'Get books by category successfully', books);
+    response.success  (res, 'Get books by category successfully', books);
   }),
 
   search: asyncHandler(async (req: Request, res: Response) => {
     const { query, lang } = req.query;
     if (!query || typeof query !== 'string') {
-      return response.sendErrorResponse(res, 'Invalid search query parameter');
+      return response.error(res, 'Invalid search query parameter');
     }
     const books = await BookService.searchWithCategoryTrans(
       query,
       typeof lang === 'string' ? lang : undefined
     );
     if (!books || books.length === 0) {
-      return response.sendNotFoundResponse(res, 'No books found for this search query');
+      return response.notFound(res, 'No books found for this search query');
     }
-    response.sendSuccessResponse(res, 'Search books successfully', books);
+    response.success(res, 'Search books successfully', books);
   }),
 
   create: asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -63,7 +63,7 @@ const BookController = {
       bookDto.updatedBy = req.user.id;
     }
     const book = await BookService.create(bookDto);
-    response.sendSuccessResponse(res, 'Book created successfully', book);
+    response.success(res, 'Book created successfully', book);
   }),
 
   update: asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -74,18 +74,18 @@ const BookController = {
     }
     const book = await BookService.update(id, bookDto);
     if (!book) {
-      return response.sendNotFoundResponse(res, 'Book not found');
+      return response.notFound(res, 'Book not found');
     }
-    response.sendSuccessResponse(res, 'Book updated successfully', book);
+    response.success(res, 'Book updated successfully', book);
   }),
 
   delete: asyncHandler(async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const result = await BookService.delete(id);
     if (!result) {
-      return response.sendNotFoundResponse(res, 'Book not found');
+      return response.notFound(res, 'Book not found');
     }
-    response.sendSuccessResponse(res, 'Book deleted successfully');
+    response.success(res, 'Book deleted successfully');
   }),
 
 };

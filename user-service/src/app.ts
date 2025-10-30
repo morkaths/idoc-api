@@ -44,7 +44,7 @@ app.use(passport.initialize());
 // 7. Định nghĩa route gốc (trang chủ API)
 app.get('/', (req, res) => {
   res.json({
-    message: 'Studeck API',
+    message: 'Welcome to User Service API',
     version: '1.0.0',
     endpoints: {
       profile: '/api/profiles',

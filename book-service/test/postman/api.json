@@ -12,6 +12,9 @@
           "name": "Get all books (no lang)",
           "request": {
             "method": "GET",
+            "header": [
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
             "url": "{{api_url}}/books"
           }
         },
@@ -19,6 +22,9 @@
           "name": "Get all books (with lang)",
           "request": {
             "method": "GET",
+            "header": [
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
             "url": "{{api_url}}/books?lang=vi"
           }
         },
@@ -26,6 +32,9 @@
           "name": "Get book by ID (no lang)",
           "request": {
             "method": "GET",
+            "header": [
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
             "url": "{{api_url}}/books/{{bookId}}"
           }
         },
@@ -33,6 +42,9 @@
           "name": "Get book by ID (with lang)",
           "request": {
             "method": "GET",
+            "header": [
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
             "url": "{{api_url}}/books/{{bookId}}?lang=vi"
           }
         },
@@ -40,6 +52,9 @@
           "name": "Search books (no lang)",
           "request": {
             "method": "GET",
+            "header": [
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
             "url": "{{api_url}}/books/search?query=Harry"
           }
         },
@@ -47,6 +62,9 @@
           "name": "Search books (with lang)",
           "request": {
             "method": "GET",
+            "header": [
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
             "url": "{{api_url}}/books/search?lang=vi&query=Harry"
           }
         },
@@ -54,6 +72,9 @@
           "name": "Get books by category name (no lang)",
           "request": {
             "method": "GET",
+            "header": [
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
             "url": "{{api_url}}/books/category/{{categoryName}}"
           }
         },
@@ -61,6 +82,9 @@
           "name": "Get books by category name (with lang)",
           "request": {
             "method": "GET",
+            "header": [
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
             "url": "{{api_url}}/books/category/{{categoryName}}?lang=vi"
           }
         },
@@ -70,7 +94,8 @@
             "method": "POST",
             "header": [
               { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-api-key", "value": "{{api_key}}" }
             ],
             "body": {
               "mode": "raw",
@@ -85,7 +110,8 @@
             "method": "PUT",
             "header": [
               { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-api-key", "value": "{{api_key}}" }
             ],
             "body": {
               "mode": "raw",
@@ -99,7 +125,8 @@
           "request": {
             "method": "DELETE",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" }
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "x-api-key", "value": "{{api_key}}" }
             ],
             "url": "{{api_url}}/books/{{bookId}}"
           }

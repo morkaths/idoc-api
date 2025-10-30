@@ -99,9 +99,7 @@ public class AuthServiceImpl implements AuthService {
 				null,
 				null,
 				null);
-
-		profileClient.createProfile(token, profile);
-
+		profileClient.createProfile(profile, token);
 		return token;
 	}
 

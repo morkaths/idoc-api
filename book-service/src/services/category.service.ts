@@ -4,7 +4,6 @@ import { CategoryDto } from "../dtos/category.dto";
 import { BaseService } from "src/core/base.service";
 import { CategoryMapper } from "src/mappers/category.mapper";
 import { CategoryTranslation } from "src/models/categoryTranslation.model";
-import CategoryTransRepository from "src/repositories/categoryTrans.repository";
 
 class CategoryService extends BaseService<ICategory, CategoryDto> {
     async findAllWithTrans(lang: string): Promise<CategoryDto[]> {

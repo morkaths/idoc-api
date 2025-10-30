@@ -12,6 +12,9 @@
           "name": "getAll",
           "request": {
             "method": "GET",
+            "header": [
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
             "url": "{{api_url}}/profiles"
           }
         },
@@ -20,7 +23,8 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" }
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "x-api-key", "value": "{{api_key}}" }
             ],
             "url": "{{api_url}}/profiles/me"
           }
@@ -29,6 +33,9 @@
           "name": "search",
           "request": {
             "method": "GET",
+            "header": [
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
             "url": "{{api_url}}/profiles/search?query=test"
           }
         },
@@ -36,6 +43,9 @@
           "name": "getById",
           "request": {
             "method": "GET",
+            "header": [
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
             "url": "{{api_url}}/profiles/{{profileId}}"
           }
         },
@@ -45,7 +55,8 @@
             "method": "POST",
             "header": [
               { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-api-key", "value": "{{api_key}}" }
             ],
             "body": {
               "mode": "raw",
@@ -60,7 +71,8 @@
             "method": "PATCH",
             "header": [
               { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-api-key", "value": "{{api_key}}" }
             ],
             "body": {
               "mode": "raw",
@@ -75,7 +87,8 @@
             "method": "PATCH",
             "header": [
               { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-api-key", "value": "{{api_key}}" }
             ],
             "body": {
               "mode": "raw",
@@ -89,7 +102,8 @@
           "request": {
             "method": "DELETE",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" }
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "x-api-key", "value": "{{api_key}}" }
             ],
             "url": "{{api_url}}/profiles/{{profileId}}"
           }

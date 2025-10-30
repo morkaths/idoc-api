@@ -28,10 +28,6 @@ class CategoryRepositoryClass extends BaseRepository<ICategory> {
     ]);
     return result;
   }
-
-  
-
-
   
 }
 

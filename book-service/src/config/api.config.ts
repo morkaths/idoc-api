@@ -4,7 +4,7 @@ import * as ENV from './env.config';
 export const API_CONFIG = {
   timeout: 10000,
   baseURLs: {
-    auth: ENV.AUTH_SERVICE_URL,
+    auth: ENV.API_URL,
   },
   endpoints: {
     auth: {
