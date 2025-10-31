@@ -38,11 +38,10 @@ public class UserController {
 		if (data.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No users found");
 		}
-		return ResponseUtil.buildSuccessResponse("Users retrieved successfully", data);
+		return ResponseUtil.success("Users retrieved successfully", data);
 	}
 
 	@GetMapping("/{id}")
-	@PreAuthorize("hasRole('admin')")
 	public ResponseEntity<Map<String, Object>> getUserById(@PathVariable Long id) {
 		if (id == null || id <= 0) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid user ID");
@@ -51,7 +50,7 @@ public class UserController {
 		if (data == null) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + id);
 		}
-		return ResponseUtil.buildSuccessResponse("User retrieved successfully", data);
+		return ResponseUtil.success("User retrieved successfully", data);
 	}
 
 	@GetMapping("/search")
@@ -66,7 +65,7 @@ public class UserController {
 		if (data.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No users found matching the criteria");
 		}
-		return ResponseUtil.buildSuccessResponse("Users retrieved successfully", data);
+		return ResponseUtil.success("Users retrieved successfully", data);
 	}
 
 	@PostMapping
@@ -76,10 +75,9 @@ public class UserController {
 		if (data == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to create user");
 		}
-		return ResponseUtil.buildCreatedResponse("User created successfully", data);
+		return ResponseUtil.created("User created successfully", data);
 	}
 
-	//TODO: Update method to support partial updates
 	@PatchMapping("/{id}")
 	@PreAuthorize("hasRole('admin')")
 	public ResponseEntity<Map<String, Object>> updateUser(@PathVariable Long id,
@@ -91,11 +89,11 @@ public class UserController {
 		if (data == null) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + id);
 		}
-		return ResponseUtil.buildSuccessResponse("User updated successfully", data);
+		return ResponseUtil.updated("User updated successfully", data);
 	}
 
 	@DeleteMapping("/{id}")
-	@PreAuthorize("hasAuthority('user.delete')")
+	@PreAuthorize("hasRole('admin')")
 	public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable Long id) {
 		if (id == null || id <= 0) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid user ID");
@@ -104,6 +102,6 @@ public class UserController {
 		if (!deleted) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + id);
 		}
-		return ResponseUtil.buildNoContentResponse();
+		return ResponseUtil.deleted("User deleted successfully");
 	}
 }

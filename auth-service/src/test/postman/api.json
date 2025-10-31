@@ -58,15 +58,32 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"identifier\": \"testuser@email.com\",\n  \"password\": \"123456\"\n}"
+              "raw": "{\n  \"identifier\": \"user\",\n  \"password\": \"123456\"\n}"
             },
             "url": "{{api_url}}/auth/login"
           }
         },
         {
+          "name": "verify",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "x-api-key",
+                "value": "{{api_key}}"
+              }
+            ],
+            "url": "{{api_url}}/auth/verify"
+          }
+        },
+        {
           "name": "update",
           "request": {
-            "method": "PUT",
+            "method": "PATCH",
             "header": [
               {
                 "key": "Authorization",
@@ -135,7 +152,7 @@
         {
           "name": "updateUser",
           "request": {
-            "method": "PUT",
+            "method": "PATCH",
             "header": [
               {
                 "key": "Authorization",
@@ -185,6 +202,10 @@
             "method": "GET",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
                 "key": "x-api-key",
                 "value": "{{api_key}}"
               }
@@ -198,6 +219,10 @@
             "method": "GET",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
                 "key": "x-api-key",
                 "value": "{{api_key}}"
               }
@@ -210,6 +235,10 @@
           "request": {
             "method": "GET",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
               {
                 "key": "x-api-key",
                 "value": "{{api_key}}"
@@ -246,7 +275,7 @@
         {
           "name": "update",
           "request": {
-            "method": "PUT",
+            "method": "PATCH",
             "header": [
               {
                 "key": "Authorization",
@@ -296,6 +325,10 @@
             "method": "GET",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
                 "key": "x-api-key",
                 "value": "{{api_key}}"
               }
@@ -309,6 +342,10 @@
             "method": "GET",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
                 "key": "x-api-key",
                 "value": "{{api_key}}"
               }
@@ -321,6 +358,10 @@
           "request": {
             "method": "GET",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
               {
                 "key": "x-api-key",
                 "value": "{{api_key}}"
@@ -357,7 +398,7 @@
         {
           "name": "update",
           "request": {
-            "method": "PUT",
+            "method": "PATCH",
             "header": [
               {
                 "key": "Authorization",

@@ -95,7 +95,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 					.map(role -> new SimpleGrantedAuthority("ROLE_" + role))
 					.collect(Collectors.toList()));
 		}
-		System.out.println("Authorities in JwtFiter: " + authorities);
 		JwtTokenRequest principal = new JwtTokenRequest(userId, username, email, roles);
 		return new UsernamePasswordAuthenticationToken(principal, null, authorities);
 	}

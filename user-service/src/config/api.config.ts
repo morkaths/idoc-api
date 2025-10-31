@@ -7,7 +7,7 @@ export const API_CONFIG = {
   },
   endpoints: {
     auth: {
-      verifyToken: '/auth/me',
+      verifyToken: '/auth/verify',
       verifyRole: (id: string) => `/auth/roles/${id}`,
     },
     user: {

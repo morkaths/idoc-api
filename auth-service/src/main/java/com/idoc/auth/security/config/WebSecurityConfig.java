@@ -62,8 +62,8 @@ public class WebSecurityConfig {
 		// Configure route authorization
 		http.authorizeHttpRequests(registry -> registry
 				.requestMatchers(SecurityConstants.PUBLIC_ROUTES).permitAll()
+				.requestMatchers("/api/roles/**").authenticated()
 				.requestMatchers("/api/permissions/**").hasRole(RoleConstants.ADMIN)
-				.requestMatchers("/api/**").authenticated()
 				.anyRequest().denyAll());
 
 		return http.build();

@@ -1,7 +1,6 @@
 package com.idoc.auth.service;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,8 +9,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
 import com.idoc.auth.constant.RoleConstants;
-import com.idoc.auth.dto.UserDto;
-import com.idoc.auth.dto.UserRoleDto;
 import com.idoc.auth.dto.external.ProfileDto;
 import com.idoc.auth.entity.RoleEntity;
 import com.idoc.auth.entity.UserEntity;
@@ -102,38 +99,4 @@ public class AuthServiceImpl implements AuthService {
 		profileClient.createProfile(profile, token);
 		return token;
 	}
-
-	@Override
-	public UserDto validateToken(String token) {
-		if (!jwtTokenProvider.isValidToken(token)) {
-			throw new IllegalArgumentException("Invalid token");
-		}
-		String subject = jwtTokenProvider.getSubjectFromToken(token);
-		UserEntity user = userRepository.findById(Long.valueOf(subject)).orElse(null);
-		if (user == null) {
-			throw new IllegalArgumentException("User not found for the given token");
-		}
-		return new UserDto(
-				user.getId(),
-				user.getUsername(),
-				null,
-				user.getEmail(),
-				user.getStatus(),
-				user.getRoles().stream()
-						.map(role -> new UserRoleDto(role.getId(), role.getCode(), role.getName()))
-						.collect(Collectors.toSet()));
-	}
-
-	@Override
-	public boolean changePassword(String email, String oldPassword, String newPassword) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean logout(String token) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 }
