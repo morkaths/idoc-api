@@ -8,4 +8,4 @@
 
 start cmd /k "cd /d %~dp0user-service && npm run seed"
 
-start cmd /k "cd /d %~dp0book-service && npm run seed"
+start cmd /k "cd /d %~document-service && npm run seed"

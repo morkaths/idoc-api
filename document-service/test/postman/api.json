@@ -1,6 +1,6 @@
 {
   "info": {
-    "name": "Book Service #microservice",
+    "name": "Document Service #microservice",
     "description": "API collection for Book service",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
