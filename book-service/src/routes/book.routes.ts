@@ -23,6 +23,15 @@ router.get('/', BookController.getAll);
 router.get('/search', BookController.search);
 
 /**
+ * @route   GET /api/books/category/:categoryName?lang=...
+ * @desc    Get all books by category ID with translations
+ * @access  Public
+ * @param   categorySlug - Category slug
+ * @query   lang - Language code for translations
+ */
+router.get('/category/:categorySlug', BookController.getByCategory);
+
+/**
  * @route   GET /api/books/:id?lang=...
  * @desc    Get a book by ID with translation based on language query
  * @access  Public
@@ -40,7 +49,7 @@ router.get('/:id', BookController.getById);
 router.post('/', authenticateToken, authorizeRole([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]), BookController.create);
 
 /**
- * @route   PUT /api/books/:id?lang=...
+ * @route   PUT /api/books/:id
  * @desc    Update a book and its translation based on language query
  * @access  Private
  * @param   id - Book ID

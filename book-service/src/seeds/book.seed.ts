@@ -1,6 +1,60 @@
 import { Author } from 'src/models/author.model';
 import { Book } from '../models/book.model';
 import { Category } from 'src/models/category.model';
+import { BookFormat, FileType } from 'src/types';
+import {
+  randomItem,
+  randomInt,
+  randomBoolean,
+  randomItems,
+  randomDate,
+  createSlug,
+  generateISBN,
+  randomImageUrl
+} from '../utils/seed.util';
+
+// Dữ liệu mock cụ thể cho books
+const BOOK_TITLE_ADJECTIVES = [
+  'Amazing', 'Wonderful', 'Great', 'Fantastic', 'Brilliant', 
+  'Incredible', 'Spectacular', 'Marvelous', 'Extraordinary', 'Magnificent',
+  'Captivating', 'Enchanting', 'Mysterious', 'Epic', 'Legendary'
+];
+
+const BOOK_TITLE_NOUNS = [
+  'Adventure', 'Journey', 'Story', 'Tale', 'Legacy', 
+  'Quest', 'Legend', 'Mystery', 'Odyssey', 'Saga',
+  'Chronicle', 'Discovery', 'Revelation', 'Destiny', 'Horizon'
+];
+
+const PUBLISHERS = [
+  'NXB Trẻ',
+  'Bloomsbury',
+  'Kodansha',
+  'Editorial Sudamericana',
+  'Penguin Random House',
+  'HarperCollins',
+  'Simon & Schuster',
+  'Macmillan Publishers',
+  'Hachette Livre',
+  'Scholastic Corporation',
+  'Oxford University Press',
+  'Cambridge University Press'
+];
+
+const LANGUAGES = [
+  'Vietnamese', 'English', 'Japanese', 'Spanish', 'French', 'German', 'Chinese', 'Korean', 'Portuguese', 'Russian'
+];
+
+const BOOK_SUBTITLES = [
+  'A Journey Through Time',
+  'The Complete Guide',
+  'An Epic Story',
+  'The Definitive Edition',
+  'A Modern Classic',
+  'The Essential Collection',
+  'Volume One',
+  'The First Chapter'
+];
 
 export async function seedBooks() {
   await Book.deleteMany({});
@@ -8,113 +62,63 @@ export async function seedBooks() {
   const authors = await Author.find();
   const categories = await Category.find();
 
-  const getAuthorId = (name: string) =>
-    authors.find(a => a.name === name)?._id;
+  // Kiểm tra có authors và categories không
+  if (authors.length === 0) {
+    console.warn('No authors found. Please seed authors first.');
+    return;
+  }
+  if (categories.length === 0) {
+    console.warn('No categories found. Please seed categories first.');
+    return;
+  }
 
-  const getCategoryId = (slug: string) =>
-    categories.find(c => c.slug === slug)?._id;
+  const mockBooks = [];
+  const bookCount = 20; // Số lượng books
+  const fileTypes = Object.values(FileType);
+  const formats = Object.values(BookFormat);
 
-  await Book.create([
-    {
-      title: 'Mắt Biếc',
-      subtitle: 'Tiểu thuyết nổi tiếng',
-      description: 'Tác phẩm của Nguyễn Nhật Ánh về tuổi thơ và tình yêu.',
-      slug: 'mat-biec',
-      authorIds: [getAuthorId('Nguyễn Nhật Ánh')].filter(Boolean),
-      categoryIds: [getCategoryId('novel')].filter(Boolean),
-      publisher: 'NXB Trẻ',
-      publishedDate: new Date('1990-01-01'),
-      edition: '1',
-      isbn: '9786041123456',
-      language: 'vi',
-      pages: 300,
-      format: 'HARDCOVER',
-      price: 120000,
-      currency: 'VND',
-      stock: 100,
-      coverUrl: 'https://example.com/covers/mat-biec.jpg',
-      tags: ['tuổi thơ', 'tình yêu', 'văn học', 'nguyễn nhật ánh', 'mat biec']
-    },
-    {
-      title: 'Harry Potter and the Philosopher\'s Stone',
-      subtitle: 'Harry Potter #1',
-      description: 'Cuốn đầu tiên trong bộ truyện Harry Potter.',
-      slug: 'harry-potter-1',
-      authorIds: [getAuthorId('J.K. Rowling')].filter(Boolean),
-      categoryIds: [getCategoryId('fantasy')].filter(Boolean),
-      publisher: 'Bloomsbury',
-      publishedDate: new Date('1997-06-26'),
-      edition: '1',
-      isbn: '9780747532699',
-      language: 'en',
-      pages: 223,
-      format: 'HARDCOVER',
-      price: 250000,
-      currency: 'VND',
-      stock: 50,
-      coverUrl: 'https://example.com/covers/harry-potter-1.jpg',
-      tags: ['magic', 'wizard', 'fantasy', 'harry potter', 'j.k. rowling']
-    },
-    {
-      title: 'Norwegian Wood',
-      subtitle: 'Rừng Na Uy',
-      description: 'Tiểu thuyết nổi tiếng của Haruki Murakami.',
-      slug: 'norwegian-wood',
-      authorIds: [getAuthorId('Haruki Murakami')].filter(Boolean),
-      categoryIds: [getCategoryId('novel')].filter(Boolean),
-      publisher: 'Kodansha',
-      publishedDate: new Date('1987-09-04'),
-      edition: '1',
-      isbn: '9784061860257',
-      language: 'ja',
-      pages: 296,
-      format: 'PAPERBACK',
-      price: 180000,
-      currency: 'VND',
-      stock: 30,
-      coverUrl: 'https://example.com/covers/norwegian-wood.jpg',
-      tags: ['murakami', 'rừng na uy', 'norwegian wood', 'tiểu thuyết nhật', 'tình yêu']
-    },
-    {
-      title: 'Cien años de soledad',
-      subtitle: 'Trăm năm cô đơn',
-      description: 'Tác phẩm nổi tiếng của Gabriel García Márquez.',
-      slug: 'cien-anos-de-soledad',
-      authorIds: [getAuthorId('Gabriel García Márquez')].filter(Boolean),
-      categoryIds: [getCategoryId('novel')].filter(Boolean),
-      publisher: 'Editorial Sudamericana',
-      publishedDate: new Date('1967-05-30'),
-      edition: '1',
-      isbn: '9789500728677',
-      language: 'es',
-      pages: 417,
-      format: 'HARDCOVER',
-      price: 220000,
-      currency: 'VND',
-      stock: 20,
-      coverUrl: 'https://example.com/covers/cien-anos-de-soledad.jpg',
-      tags: ['marquez', 'trăm năm cô đơn', 'cien años de soledad', 'tiểu thuyết', 'colombia']
-    },
-    {
-      title: '1984',
-      subtitle: 'Nineteen Eighty-Four',
-      description: 'Tiểu thuyết phản địa đàng của George Orwell.',
-      slug: '1984',
-      authorIds: [getAuthorId('George Orwell')].filter(Boolean),
-      categoryIds: [getCategoryId('dystopia')].filter(Boolean),
-      publisher: 'Secker & Warburg',
-      publishedDate: new Date('1949-06-08'),
-      edition: '1',
-      isbn: '9780451524935',
-      language: 'en',
-      pages: 328,
-      format: 'PAPERBACK',
-      price: 150000,
-      currency: 'VND',
-      stock: 40,
-      coverUrl: 'https://example.com/covers/1984.jpg',
-      tags: ['orwell', '1984', 'dystopia', 'phản địa đàng', 'classic']
-    }
-  ]);
-  console.log('Seed book data success!');
+  for (let i = 0; i < bookCount; i++) {
+    // Random title
+    const adjective = randomItem(BOOK_TITLE_ADJECTIVES);
+    const noun = randomItem(BOOK_TITLE_NOUNS);
+    const title = `${adjective} ${noun} ${i + 1}`;
+    
+    // Random các giá trị khác
+    const subtitle = randomItem(BOOK_SUBTITLES);
+    const slug = createSlug(title);
+    const hasEbook = randomBoolean(); // Random có ebook hay không
+    const randomAuthor = randomItem(authors);
+    const randomCategories = randomItems(categories, 1, 2); // Random 1-2 categories
+    const randomLanguage = randomItem(LANGUAGES);
+    const randomPublisher = randomItem(PUBLISHERS);
+    const randomFileType = randomItem(fileTypes);
+
+    mockBooks.push({
+      title,
+      subtitle,
+      description: `Description for ${title}. ${subtitle}. This is a randomly generated book for testing purposes.`,
+      slug: `${slug}-${i + 1}`,
+      authorIds: [randomAuthor?._id].filter(Boolean),
+      categoryIds: randomCategories.map(c => c._id).filter(Boolean),
+      publisher: randomPublisher,
+      publishedDate: randomDate(1990, 2023),
+      edition: randomInt(1, 5).toString(),
+      isbn: generateISBN(),
+      language: randomLanguage,
+      pages: randomInt(100, 500),
+      price: randomInt(1, 999),
+      stock: randomInt(10, 100),
+      coverUrl: randomImageUrl('covers', title),
+      // Random ebook (có hoặc không)
+      ...(hasEbook && {
+        fileUrl: randomImageUrl('ebooks', title, randomFileType),
+        fileType: randomFileType,
+        fileSize: randomInt(1048576, 10485760), // Random 1MB-10MB
+      }),
+      tags: [`tag${i + 1}`, 'mock', 'test', randomCategories[0]?.slug].filter(Boolean)
+    });
+  }
+
+  await Book.create(mockBooks);
+  console.log(`Seed ${mockBooks.length} book(s) success!`);
 }

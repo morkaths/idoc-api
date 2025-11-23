@@ -8,6 +8,10 @@ class CategoryRepositoryClass extends BaseRepository<ICategory> {
     super(Category);
   }
 
+  async findAllWithAllLangs() {
+    return Category.aggregate(constants.CATEGORY_TRANS_AGGREGATION(undefined));
+  }
+
   async findAll(lang?: string) {
     return Category.aggregate(constants.CATEGORY_TRANS_AGGREGATION(lang));
   }

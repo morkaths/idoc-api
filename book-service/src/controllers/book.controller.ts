@@ -30,10 +30,10 @@ const BookController = {
   }),
 
   getByCategory: asyncHandler(async (req: Request, res: Response) => {
-    const { categoryName } = req.params;
+    const { categorySlug } = req.params;
     const { lang } = req.query;
-    const books = await BookService.findByCategoryNameWithCategoryTrans(
-      categoryName,
+    const books = await BookService.findByCategoryWithCategoryTrans(
+      categorySlug,
       typeof lang === 'string' ? lang : undefined
     );
     if (!books || books.length === 0) {

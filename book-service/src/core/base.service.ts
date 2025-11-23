@@ -21,7 +21,7 @@ export class BaseService<E extends Document, D> {
     return entity ? this.mapper.toDto(entity) : null;
   }
 
-  async create(dto: D): Promise<D> {
+  async create(dto: D): Promise<D | null> {
     const entity = this.mapper.toEntity(dto);
     const createdEntity = await this.repository.create(entity);
     return this.mapper.toDto(createdEntity);

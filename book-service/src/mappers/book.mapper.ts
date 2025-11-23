@@ -22,11 +22,12 @@ export const BookMapper = {
       isbn: book.isbn,
       language: book.language,
       pages: book.pages,
-      format: book.format,
       price: book.price,
-      currency: book.currency,
       stock: book.stock,
       coverUrl: book.coverUrl,
+      fileUrl: book.fileUrl,
+      fileType: book.fileType,
+      fileSize: book.fileSize,
       tags: book.tags ?? [],
       createdAt: book.createdAt,
       updatedAt: book.updatedAt,
@@ -35,7 +36,6 @@ export const BookMapper = {
       authors: authors ?? [],
     }
   },
-  
   toEntity(dto: BookDto): IBook {
     return {
       title: dto.title ?? "",
@@ -48,15 +48,16 @@ export const BookMapper = {
       isbn: dto.isbn,
       language: dto.language,
       pages: dto.pages,
-      format: dto.format,
       price: dto.price,
-      currency: dto.currency,
       stock: dto.stock,
       coverUrl: dto.coverUrl,
+      fileUrl: dto.fileUrl,
+      fileType: dto.fileType,
+      fileSize: dto.fileSize,
       tags: dto.tags,
       updatedBy: dto.updatedBy,
-      authorIds: dto.authors?.map(a => new Types.ObjectId(a._id)) ?? [],
-      categoryIds: dto.categories?.map(c => new Types.ObjectId(c._id)) ?? [],
+      authorIds: dto.authorIds?.map(id => new Types.ObjectId(id)) ?? [],
+      categoryIds: dto.categoryIds?.map(id => new Types.ObjectId(id)) ?? [],
     } as IBook;
   },
   toDtos(books: IBook[]): BookDto[] {

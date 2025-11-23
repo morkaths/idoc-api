@@ -1,3 +1,5 @@
+import { FileType } from "./enum.types";
+
 export interface Category {
   _id: string;
   slug?: string;
@@ -39,23 +41,32 @@ export interface Book {
   isbn?: string;
   language?: string;
   pages?: number;
-  format?: string;
   price?: number;
-  currency?: string;
   stock?: number;
   coverUrl?: string;
+  fileUrl?: string; 
+  fileType?: FileType;
+  fileSize?: number;
   tags?: string[];
-  updatedBy?: string;
+  updatedBy?: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-export interface Comment {
+export interface Document {
   _id: string;
-  bookId: string;
-  userId: string;
-  content: string;
-  rating?: number;
+  title: string;
+  subtitle?: string;
+  description?: string;
+  categoryIds: string[];
+  tags?: string[];
+  language?: string;
+  publishedDate?: Date;
+  fileUrl?: string;
+  fileType?: FileType;
+  fileSize?: number;
+  uploadedBy?: number;
+  updatedBy?: number;
   createdAt?: Date;
   updatedAt?: Date;
 }

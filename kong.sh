@@ -44,4 +44,5 @@ curl -i -X POST http://localhost:8001/services/user-service/routes \
 
 curl -i -X POST http://localhost:8001/services/book-service/routes \
   --data "name=book-route" \
-  --data "paths[]=/api/books"
+  --data "paths[]=/api/books" \
+  --data "strip_path=false"

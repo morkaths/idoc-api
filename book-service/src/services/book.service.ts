@@ -41,8 +41,8 @@ class BookService extends BaseService<IBook, BookDto> {
     );
   }
 
-  async findByCategoryNameWithCategoryTrans(categoryName: string, lang?: string): Promise<BookDto[]> {
-    const category = await CategoryRepository.findOne({ name: categoryName }) as ICategory | null;
+  async findByCategoryWithCategoryTrans(categorySlug: string, lang?: string): Promise<BookDto[]> {
+    const category = await CategoryRepository.findOne({ slug: categorySlug }) as ICategory | null;
     if (!category) return [];
     const categoryId = (category._id as Types.ObjectId).toString();
     const books = await BookRepository.findByCategory(categoryId, lang);

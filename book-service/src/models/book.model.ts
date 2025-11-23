@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { FileType } from '../types';
 
 export interface IBook extends Document {
   title: string;
@@ -13,11 +14,12 @@ export interface IBook extends Document {
   isbn?: string;
   language?: string;
   pages?: number;
-  format?: string;
   price?: number;
-  currency?: string;
   stock?: number;
   coverUrl?: string;
+  fileUrl?: string;
+  fileType?: FileType;
+  fileSize?: number;
   tags?: string[];
   updatedBy?: number;
   createdAt?: Date;
@@ -38,11 +40,17 @@ const BookSchema = new Schema<IBook>(
     isbn: { type: String, index: true, trim: true },
     language: { type: String, trim: true },
     pages: { type: Number, min: 0 },
-    format: { type: String, trim: true },
     price: { type: Number, min: 0 },
-    currency: { type: String, trim: true },
     stock: { type: Number, min: 0 },
     coverUrl: { type: String, trim: true },
+    fileUrl: { type: String, trim: true },
+    fileType: {
+      type: String,
+      enum: Object.values(FileType),
+      trim: true,
+      lowercase: true
+    },
+    fileSize: { type: Number, min: 0 },
     tags: [{ type: String, index: true, trim: true }],
     updatedBy: { type: Number },
   },

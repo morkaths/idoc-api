@@ -6,7 +6,7 @@ import { RoleEnum } from '../constants/security/role';
 const router = Router();
 
 /**
- * @route   GET /api/categories
+ * @route   GET /api/categories?lang=...
  * @desc    Get all categories with translations based on language query
  * @access  Public
  * @query   lang - Language code for translations
@@ -14,7 +14,7 @@ const router = Router();
 router.get('/', CategoryController.getAll);
 
 /**
- * @route   GET /api/categories/search
+ * @route   GET /api/categories/search?lang=...&query=...
  * @desc    Search categories by query and language
  * @access  Public
  * @query   query - Search keyword
@@ -23,7 +23,7 @@ router.get('/', CategoryController.getAll);
 router.get('/search', CategoryController.search);
 
 /**
- * @route   GET /api/categories/:id
+ * @route   GET /api/categories/:id?lang=...
  * @desc    Get category by ID and language
  * @access  Public
  * @param   id - Category ID

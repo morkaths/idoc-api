@@ -102,4 +102,13 @@ export class BaseRepository<T extends Document> {
     return result.deletedCount ?? 0;
   }
 
+  /**
+   * Bulk write operations (update, insert, delete nhiều bản ghi với điều kiện khác nhau)
+   * @param operations - Array of bulk operations (updateOne, insertOne, deleteOne, etc.)
+   * @returns result of bulkWrite
+   */
+  async bulkWrite(operations: any[]): Promise<any> {
+    return this.model.bulkWrite(operations, { ordered: false });
+  }
+
 }

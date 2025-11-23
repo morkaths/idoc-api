@@ -7,15 +7,22 @@ import { CategoryTransMapper } from "./categoryTrans.mapper";
 export const CategoryMapper = {
   toDto(
     category: ICategory,
-    translation?: ICategoryTranslation
+    translation?: ICategoryTranslation | ICategoryTranslation[]
   ): CategoryDto {
+    let translationsArray: ICategoryTranslation[] = [];
+
+    if (Array.isArray(translation)) {
+      translationsArray = translation;
+    } else if (translation) {
+      translationsArray = [translation];
+    }
     return {
       _id: (category._id as Types.ObjectId).toString(),
       slug: category.slug,
       parentId: category.parentId ? (category.parentId as Types.ObjectId).toString() : undefined,
       createdAt: category?.createdAt,
       updatedAt: category?.updatedAt,
-      translation: translation ? CategoryTransMapper.toDto(translation) : undefined,
+      translations: translationsArray.map(t => CategoryTransMapper.toDto(t)),
     };
   },
   toEntity(dto: CategoryDto): ICategory {

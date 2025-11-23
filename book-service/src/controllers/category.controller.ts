@@ -7,10 +7,9 @@ import * as response from '../utils/response.util';
 const CategoryController = {
   getAll: asyncHandler(async (req: Request, res: Response) => {
     const { lang } = req.query;
-    if (!lang || typeof lang !== 'string') {
-      return response.error(res, 'Invalid language parameter');
-    }
-    const categories = await CategoryService.findAllWithTrans(lang);
+    const categories = await CategoryService.findAllWithTrans(
+      typeof lang === 'string' ? lang : undefined
+    );
     if (!categories) {
       return response.notFound(res, 'No categories found');
     }
@@ -20,10 +19,10 @@ const CategoryController = {
   getById: asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     const { lang } = req.query;
-    if (!lang || typeof lang !== 'string') {
-      return response.error(res, 'Invalid language parameter');
-    }
-    const category = await CategoryService.findByIdWithTrans(id, lang);
+    const category = await CategoryService.findByIdWithTrans(
+      id,
+      typeof lang === 'string' ? lang : undefined
+    );
     if (!category) {
       return response.notFound(res, 'Category not found');
     }
@@ -35,10 +34,10 @@ const CategoryController = {
     if (!query || typeof query !== 'string') {
       return response.error(res, 'Invalid search query parameter');
     }
-    if (!lang || typeof lang !== 'string') {
-      return response.error(res, 'Invalid language parameter');
-    }
-    const categories = await CategoryService.searchWithTrans(query, lang);
+    const categories = await CategoryService.searchWithTrans(
+      query,
+      typeof lang === 'string' ? lang : undefined
+    );
     if (!categories || categories.length === 0) {
       return response.notFound(res, 'No categories found for this search query');
     }

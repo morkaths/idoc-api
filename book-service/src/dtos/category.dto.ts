@@ -7,5 +7,5 @@ export class CategoryDto {
   @Expose() parentId?: string;
   @Expose() createdAt?: Date;
   @Expose() updatedAt?: Date;
-  @Expose() translation?: CategoryTranslationDto;
+  @Expose() translations?: CategoryTranslationDto[];
 }

@@ -1,6 +1,5 @@
 import { Category } from 'src/models/category.model';
 import { CategoryTranslation } from '../models/categoryTranslation.model';
-import mongoose from 'mongoose';
 
 export async function seedCategoryTranslations() {
   await CategoryTranslation.deleteMany({});
