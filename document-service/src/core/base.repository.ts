@@ -8,6 +8,24 @@ export class BaseRepository<T extends Document> {
   }
 
   /**
+   * Count documents matching the query
+   * @param query - FilterQuery<T>
+   * @returns number
+   */
+  async count(query: FilterQuery<T>): Promise<number> {
+    return this.model.countDocuments(query).exec();
+  }
+
+  /**
+   * Check if a document exists matching the query
+   * @param query - FilterQuery<T>
+   * @returns boolean
+   */
+  async exists(query: FilterQuery<T>): Promise<boolean> {
+    return (await this.model.exists(query)) !== null;
+  }
+
+  /**
    * Find all documents
    * @returns T[]
    */
@@ -68,7 +86,17 @@ export class BaseRepository<T extends Document> {
    * @returns T | null
    */
   async update(id: string, data: Partial<T>): Promise<T | null> {
-    return this.model.findByIdAndUpdate(id, data, { new: true }).exec();
+    return this.model.findByIdAndUpdate(id, { $set: data }, { new: true, runValidators: true }).exec();
+  }
+
+  /**
+   * Update one document matching the query
+   * @param query - FilterQuery<T>
+   * @param data - UpdateQuery<T>
+   * @returns T | null
+   */
+  async findOneAndUpdate(query: FilterQuery<T>, data: UpdateQuery<T>): Promise<T | null> {
+    return this.model.findOneAndUpdate(query, { $set: data }, { new: true, runValidators: true }).exec();
   }
 
   /**
@@ -90,6 +118,15 @@ export class BaseRepository<T extends Document> {
   async delete(id: string): Promise<boolean> {
     const result = await this.model.findByIdAndDelete(id).exec();
     return !!result;
+  }
+
+  /**
+   * Delete one document matching the query
+   * @param query - FilterQuery<T>
+   * @returns T | null
+   */
+  async findOneAndDelete(query: FilterQuery<T>): Promise<T | null> {
+    return this.model.findOneAndDelete(query).exec();
   }
 
   /**

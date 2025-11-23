@@ -45,13 +45,13 @@ router.post(
 );
 
 /**
- * @route   PUT /api/categories/:id
+ * @route   PATCH /api/categories/:id
  * @desc    Update a category by ID
  * @access  Private
  * @param   id - Category ID
  * @body    CategoryDto - Category data
  */
-router.put(
+router.patch(
   '/:id',
   authenticateToken,
   authorizeRole([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]),

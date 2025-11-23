@@ -3,38 +3,34 @@ import { CategoryDto } from "../dtos/category.dto";
 import { ICategory } from "../models/category.model";
 import { ICategoryTranslation } from "../models/categoryTranslation.model";
 import { CategoryTransMapper } from "./categoryTrans.mapper";
+import { BaseMapper, createClassTransformerMapper } from "src/core/base.mapper";
 
-export const CategoryMapper = {
+const baseCategoryMapper = createClassTransformerMapper<ICategory, CategoryDto>(CategoryDto);
+
+export const CategoryMapper: BaseMapper<ICategory, CategoryDto> & {
+  toDto(category: ICategory, translation?: ICategoryTranslation[]): CategoryDto;
+} = {
   toDto(
     category: ICategory,
-    translation?: ICategoryTranslation | ICategoryTranslation[]
+    translation?: ICategoryTranslation[]
   ): CategoryDto {
-    let translationsArray: ICategoryTranslation[] = [];
+    const baseDto = baseCategoryMapper.toDto(category);
 
+    let translationsArray: ICategoryTranslation[] = [];
     if (Array.isArray(translation)) {
       translationsArray = translation;
     } else if (translation) {
       translationsArray = [translation];
     }
     return {
-      _id: (category._id as Types.ObjectId).toString(),
-      slug: category.slug,
-      parentId: category.parentId ? (category.parentId as Types.ObjectId).toString() : undefined,
-      createdAt: category?.createdAt,
-      updatedAt: category?.updatedAt,
+      ...baseDto,
       translations: translationsArray.map(t => CategoryTransMapper.toDto(t)),
     };
   },
-  toEntity(dto: CategoryDto): ICategory {
-    return {
-      slug: dto.slug,
-      parentId: dto.parentId ? new Types.ObjectId(dto.parentId) : undefined,
-    } as ICategory;
-  },
-  toDtos(categories: ICategory[]): CategoryDto[] {
-    return categories.map(category => CategoryMapper.toDto(category));
-  },
-  toEntities(dtos: CategoryDto[]): ICategory[] {
-    return dtos.map(dto => CategoryMapper.toEntity(dto));
+  toEntity(dto: Partial<CategoryDto>): Partial<ICategory> {
+    const { translations, ...cleanDto } = dto;
+    const baseEntity = baseCategoryMapper.toEntity(cleanDto);
+    const result: Partial<ICategory> = { ...baseEntity };
+    return result;
   }
 };

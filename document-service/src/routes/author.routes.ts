@@ -42,13 +42,13 @@ router.post(
 );
 
 /**
- * @route   PUT /api/authors/:id
+ * @route   PATCH /api/authors/:id
  * @desc    Update an author by ID
  * @access  Private
  * @param   id - Author ID
  * @body    AuthorDto - Author data
  */
-router.put(
+router.patch(
   '/:id',
   authenticateToken,
   authorizeRole([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]),

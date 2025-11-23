@@ -15,7 +15,7 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
     if (!token) return response.unauthorized(res, 'No authentication token provided');
 
     // Verify token using AuthClient
-    const user = await AuthClient.verifyToken(token);
+    const user = await AuthClient.verify(token);
     if (!user) return res.status(401).json({ success: false, message: 'Invalid token' });
     
     (req as AuthRequest).user = user;
@@ -31,7 +31,7 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(' ')[1];
     if (token) {
-      const user = await AuthClient.verifyToken(token);
+      const user = await AuthClient.verify(token);
       if (user) {
         (req as AuthRequest).user = user;
       }

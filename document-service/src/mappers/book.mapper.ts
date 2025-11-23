@@ -3,67 +3,36 @@ import { BookDto } from "src/dtos/book.dto";
 import { IBook } from "src/models/book.model";
 import { CategoryDto } from "src/dtos/category.dto";
 import { AuthorDto } from "src/dtos/author.dto";
+import { BaseMapper, createClassTransformerMapper } from "src/core/base.mapper";
 
-export const BookMapper = {
+const baseBookMapper = createClassTransformerMapper<IBook, BookDto>(BookDto);
+
+export const BookMapper: BaseMapper<IBook, BookDto> & {
+  toDto(book: IBook, categories?: CategoryDto[], authors?: AuthorDto[]): BookDto;
+} = {
   toDto(
     book: IBook,
     categories?: CategoryDto[],
     authors?: AuthorDto[]
   ): BookDto {
+    const baseDto = baseBookMapper.toDto(book);
+    const { authorIds, categoryIds, ...cleanDto } = baseDto;
     return {
-      _id: (book._id as Types.ObjectId).toString(),
-      title: book.title,
-      subtitle: book.subtitle,
-      description: book.description,
-      slug: book.slug,
-      publisher: book.publisher,
-      publishedDate: book.publishedDate,
-      edition: book.edition,
-      isbn: book.isbn,
-      language: book.language,
-      pages: book.pages,
-      price: book.price,
-      stock: book.stock,
-      coverUrl: book.coverUrl,
-      fileUrl: book.fileUrl,
-      fileType: book.fileType,
-      fileSize: book.fileSize,
-      tags: book.tags ?? [],
-      createdAt: book.createdAt,
-      updatedAt: book.updatedAt,
-      updatedBy: book.updatedBy,
+      ...cleanDto,
       categories: categories ?? [],
       authors: authors ?? [],
     }
   },
-  toEntity(dto: BookDto): IBook {
-    return {
-      title: dto.title ?? "",
-      subtitle: dto.subtitle,
-      description: dto.description,
-      slug: dto.slug,
-      publisher: dto.publisher,
-      publishedDate: dto.publishedDate,
-      edition: dto.edition,
-      isbn: dto.isbn,
-      language: dto.language,
-      pages: dto.pages,
-      price: dto.price,
-      stock: dto.stock,
-      coverUrl: dto.coverUrl,
-      fileUrl: dto.fileUrl,
-      fileType: dto.fileType,
-      fileSize: dto.fileSize,
-      tags: dto.tags,
-      updatedBy: dto.updatedBy,
-      authorIds: dto.authorIds?.map(id => new Types.ObjectId(id)) ?? [],
-      categoryIds: dto.categoryIds?.map(id => new Types.ObjectId(id)) ?? [],
-    } as IBook;
-  },
-  toDtos(books: IBook[]): BookDto[] {
-    return books.map(book => BookMapper.toDto(book));
-  },
-  toEntities(dtos: BookDto[]): IBook[] {
-    return dtos.map(dto => BookMapper.toEntity(dto));
+  toEntity(dto: Partial<BookDto>): Partial<IBook> {
+    const { categories, authors, ...cleanDto } = dto;
+    const baseEntity = baseBookMapper.toEntity(cleanDto);
+    const result: Partial<IBook> = { ...baseEntity };
+    if (dto.authorIds !== undefined) {
+      result.authorIds = dto.authorIds?.map(id => new Types.ObjectId(id)) ?? [];
+    }
+    if (dto.categoryIds !== undefined) {
+      result.categoryIds = dto.categoryIds?.map(id => new Types.ObjectId(id)) ?? [];
+    }
+    return result;
   }
 };

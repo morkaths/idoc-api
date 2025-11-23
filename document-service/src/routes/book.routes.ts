@@ -49,14 +49,14 @@ router.get('/:id', BookController.getById);
 router.post('/', authenticateToken, authorizeRole([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]), BookController.create);
 
 /**
- * @route   PUT /api/books/:id
+ * @route   PATCH /api/books/:id
  * @desc    Update a book and its translation based on language query
  * @access  Private
  * @param   id - Book ID
  * @query   lang - Language code for translations
  * @body    Partial<BookDto> - Partial book data transfer object
  */
-router.put('/:id', authenticateToken, authorizeRole([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]), BookController.update);
+router.patch('/:id', authenticateToken, authorizeRole([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]), BookController.update);
 
 /**
  * @route   DELETE /api/books/:id

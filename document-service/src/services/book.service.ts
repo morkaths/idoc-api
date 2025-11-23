@@ -16,12 +16,12 @@ class BookService extends BaseService<IBook, BookDto> {
     super(BookRepository, BookMapper);
   }
 
-  async findAllWithCategoryTrans(lang?: string): Promise<BookDto[]> {
+  async findAll(lang?: string): Promise<BookDto[]> {
     const books = await BookRepository.findAll(lang);
     return books.map(book =>
       BookMapper.toDto(
         book,
-        book.categories.map((category: ICategory & { translation?: ICategoryTranslation }) =>
+        book.categories.map((category: ICategory & { translation?: ICategoryTranslation[] }) =>
           CategoryMapper.toDto(category, category.translation)
         ),
         book.authors ? book.authors.map(AuthorMapper.toDto) : []
@@ -29,19 +29,19 @@ class BookService extends BaseService<IBook, BookDto> {
     );
   }
 
-  async findByIdWithCategoryTrans(id: string, lang?: string): Promise<BookDto | null> {
+  async findById(id: string, lang?: string): Promise<BookDto | null> {
     const book = await BookRepository.findById(id, lang);
     if (!book) return null;
     return BookMapper.toDto(
       book,
-      book.categories.map((category: ICategory & { translation?: ICategoryTranslation }) =>
+      book.categories.map((category: ICategory & { translation?: ICategoryTranslation[] }) =>
         CategoryMapper.toDto(category, category.translation)
       ),
       book.authors ? book.authors.map(AuthorMapper.toDto) : []
     );
   }
 
-  async findByCategoryWithCategoryTrans(categorySlug: string, lang?: string): Promise<BookDto[]> {
+  async findByCategory(categorySlug: string, lang?: string): Promise<BookDto[]> {
     const category = await CategoryRepository.findOne({ slug: categorySlug }) as ICategory | null;
     if (!category) return [];
     const categoryId = (category._id as Types.ObjectId).toString();
@@ -49,7 +49,7 @@ class BookService extends BaseService<IBook, BookDto> {
     return books.map(book =>
       BookMapper.toDto(
         book,
-        book.categories.map((category: ICategory & { translation?: ICategoryTranslation }) =>
+        book.categories.map((category: ICategory & { translation?: ICategoryTranslation[] }) =>
           CategoryMapper.toDto(category, category.translation)
         ),
         book.authors ? book.authors.map(AuthorMapper.toDto) : []
@@ -57,12 +57,12 @@ class BookService extends BaseService<IBook, BookDto> {
     );
   }
 
-  async searchWithCategoryTrans(query: string, lang?: string): Promise<BookDto[]> {
-    const books = await BookRepository.search(query, lang);
+  async search(params: { [key: string]: any }): Promise<BookDto[]> {
+    const books = await BookRepository.search(params);
     return books.map(book =>
       BookMapper.toDto(
         book,
-        book.categories.map((category: ICategory & { translation?: ICategoryTranslation }) =>
+        book.categories.map((category: ICategory & { translation?: ICategoryTranslation[] }) =>
           CategoryMapper.toDto(category, category.translation)
         ),
         book.authors ? book.authors.map(AuthorMapper.toDto) : []

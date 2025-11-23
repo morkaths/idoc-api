@@ -5,13 +5,6 @@ class AuthorRepositoryClass extends BaseRepository<IAuthor> {
     constructor() {
         super(Author);
     }
-    async search(query: string) {
-        const regex = new RegExp(query, "i");
-        return Author.find({ 
-            name: regex, 
-            nationality: regex
-        });
-    }
 }
 
 const AuthorRepository = new AuthorRepositoryClass();

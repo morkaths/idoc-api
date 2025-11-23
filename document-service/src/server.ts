@@ -1,4 +1,5 @@
 import http from 'http';
+import 'reflect-metadata';
 import mongoose from 'mongoose';
 
 import app from './app';

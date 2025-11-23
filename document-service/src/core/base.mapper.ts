@@ -2,24 +2,19 @@ import { plainToInstance } from "class-transformer";
 
 export interface BaseMapper<Entity, Dto> {
   toDto(entity: Entity): Dto;
-  toEntity(dto: Dto): Entity;
-  toDtos(entities: Entity[]): Dto[];
-  toEntities(dtos: Dto[]): Entity[];
+  toEntity(dto: Partial<Dto>): Partial<Entity>;
 }
 
 export function createClassTransformerMapper<Entity, Dto>(dtoClass: new () => Dto): BaseMapper<Entity, Dto> {
   return {
     toDto(entity: Entity): Dto {
-      return plainToInstance(dtoClass, entity, { excludeExtraneousValues: true }) as Dto;
+      return plainToInstance(dtoClass, entity, {
+        excludeExtraneousValues: true, // Exclude properties not defined in the DTO class
+        enableImplicitConversion: true, // Allow implicit type conversion
+      });
     },
-    toEntity(dto: Dto): Entity {
-      return dto as unknown as Entity;
-    },
-    toDtos(entities: Entity[]): Dto[] {
-      return plainToInstance(dtoClass, entities, { excludeExtraneousValues: true }) as Dto[];
-    },
-    toEntities(dtos: Dto[]): Entity[] {
-      return dtos as unknown as Entity[];
+    toEntity(dto: Partial<Dto>): Partial<Entity> {
+      return JSON.parse(JSON.stringify(dto)) as Partial<Entity>;
     }
   };
 }

@@ -6,10 +6,8 @@ import * as response from '../utils/response.util';
 
 const BookController = {
   getAll: asyncHandler(async (req: Request, res: Response) => {
-    const { lang } = req.query;
-    const books = await BookService.findAllWithCategoryTrans(
-      typeof lang === 'string' ? lang : undefined
-    );
+    const lang = typeof req.query.lang === 'string' ? req.query.lang : undefined;
+    const books = await BookService.findAll(lang);
     if (!books || books.length === 0) {
       return response.notFound(res, 'No books found');
     }
@@ -18,11 +16,8 @@ const BookController = {
 
   getById: asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { lang } = req.query;
-    const book = await BookService.findByIdWithCategoryTrans(
-      id,
-      typeof lang === 'string' ? lang : undefined
-    );
+    const lang = typeof req.query.lang === 'string' ? req.query.lang : undefined;
+    const book = await BookService.findById(id, lang);
     if (!book) {
       return response.notFound(res, 'Book not found');
     }
@@ -31,11 +26,8 @@ const BookController = {
 
   getByCategory: asyncHandler(async (req: Request, res: Response) => {
     const { categorySlug } = req.params;
-    const { lang } = req.query;
-    const books = await BookService.findByCategoryWithCategoryTrans(
-      categorySlug,
-      typeof lang === 'string' ? lang : undefined
-    );
+    const lang = typeof req.query.lang === 'string' ? req.query.lang : undefined;
+    const books = await BookService.findByCategory( categorySlug, lang);
     if (!books || books.length === 0) {
       return response.notFound(res, 'No books found for this category');
     }
@@ -43,14 +35,7 @@ const BookController = {
   }),
 
   search: asyncHandler(async (req: Request, res: Response) => {
-    const { query, lang } = req.query;
-    if (!query || typeof query !== 'string') {
-      return response.error(res, 'Invalid search query parameter');
-    }
-    const books = await BookService.searchWithCategoryTrans(
-      query,
-      typeof lang === 'string' ? lang : undefined
-    );
+    const books = await BookService.search(req.query);
     if (!books || books.length === 0) {
       return response.notFound(res, 'No books found for this search query');
     }
@@ -63,7 +48,7 @@ const BookController = {
       bookDto.updatedBy = req.user.id;
     }
     const book = await BookService.create(bookDto);
-    response.success(res, 'Book created successfully', book);
+    response.created(res, 'Book created successfully', book);
   }),
 
   update: asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -76,7 +61,7 @@ const BookController = {
     if (!book) {
       return response.notFound(res, 'Book not found');
     }
-    response.success(res, 'Book updated successfully', book);
+    response.updated(res, 'Book updated successfully', book);
   }),
 
   delete: asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -85,7 +70,7 @@ const BookController = {
     if (!result) {
       return response.notFound(res, 'Book not found');
     }
-    response.success(res, 'Book deleted successfully');
+    response.deleted(res, 'Book deleted successfully');
   }),
 
 };

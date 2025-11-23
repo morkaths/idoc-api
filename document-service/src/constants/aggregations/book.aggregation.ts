@@ -1,6 +1,6 @@
 import { PipelineStage } from "mongoose";
 
-export const BOOKS_WITH_CATEGORY_TRANS_AGGREGATION = (
+export const BOOKS_CATEGORY_AGGREGATION = (
   lang?: string
 ): PipelineStage[] => [
     {
@@ -104,11 +104,11 @@ export const BOOKS_WITH_CATEGORY_TRANS_AGGREGATION = (
     }
   ];
 
-export const BOOK_WITH_CATEGORY_TRANS_AGGREGATION = (
+export const BOOK_AGGREGATION = (
   lang?: string,
   match: Record<string, any> = {}
 ): PipelineStage[] =>
 ([
   Object.keys(match).length > 0 ? { $match: match } : undefined,
-  ...BOOKS_WITH_CATEGORY_TRANS_AGGREGATION(lang)
+  ...BOOKS_CATEGORY_AGGREGATION(lang)
 ].filter(Boolean) as PipelineStage[]);

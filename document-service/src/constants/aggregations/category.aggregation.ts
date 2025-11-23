@@ -42,7 +42,7 @@ export const CATEGORY_TRANS_AGGREGATION = (lang?: string): PipelineStage[] => [
   }
 ];
 
-export const CATEGORY_TRAN_AGGREGATION = (
+export const CATEGORY_AGGREGATION = (
   lang?: string,
   match: Record<string, any> = {}
 ): PipelineStage[] => ([

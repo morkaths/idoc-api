@@ -86,7 +86,7 @@ export class BaseRepository<T extends Document> {
    * @returns T | null
    */
   async update(id: string, data: Partial<T>): Promise<T | null> {
-    return this.model.findByIdAndUpdate(id, data, { new: true }).exec();
+    return this.model.findByIdAndUpdate(id, { $set: data }, { new: true, runValidators: true }).exec();
   }
 
   /**
@@ -96,7 +96,7 @@ export class BaseRepository<T extends Document> {
    * @returns T | null
    */
   async findOneAndUpdate(query: FilterQuery<T>, data: UpdateQuery<T>): Promise<T | null> {
-    return this.model.findOneAndUpdate(query, data, { new: true, runValidators: true }).exec();
+    return this.model.findOneAndUpdate(query, { $set: data }, { new: true, runValidators: true }).exec();
   }
 
   /**
@@ -137,6 +137,15 @@ export class BaseRepository<T extends Document> {
   async deleteMany(query: FilterQuery<T>): Promise<number> {
     const result = await this.model.deleteMany(query).exec();
     return result.deletedCount ?? 0;
+  }
+
+  /**
+   * Bulk write operations (update, insert, delete nhiều bản ghi với điều kiện khác nhau)
+   * @param operations - Array of bulk operations (updateOne, insertOne, deleteOne, etc.)
+   * @returns result of bulkWrite
+   */
+  async bulkWrite(operations: any[]): Promise<any> {
+    return this.model.bulkWrite(operations, { ordered: false });
   }
 
 }

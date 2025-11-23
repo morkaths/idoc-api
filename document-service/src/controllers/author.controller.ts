@@ -23,11 +23,7 @@ const AuthorController = {
   }),
 
   search: asyncHandler(async (req: Request, res: Response) => {
-    const { query } = req.query;
-    if (!query || typeof query !== 'string') {
-      return response.error(res, 'Invalid search query parameter');
-    }
-    const authors = await AuthorService.search(query);
+    const authors = await AuthorService.search(req.query);
     if (!authors || authors.length === 0) {
       return response.notFound(res, 'No authors found for this search query');
     }
@@ -40,7 +36,7 @@ const AuthorController = {
       authorDto.updatedBy = req.user.id;
     }
     const author = await AuthorService.create(authorDto);
-    response.success(res, 'Author created successfully', author);
+    response.created(res, 'Author created successfully', author);
   }),
 
   update: asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -53,7 +49,7 @@ const AuthorController = {
     if (!author) {
       return response.notFound(res, 'Author not found');
     }
-    response.success(res, 'Author updated successfully', author);
+    response.updated(res, 'Author updated successfully', author);
   }),
 
   delete: asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -62,7 +58,7 @@ const AuthorController = {
     if (!result) {
       return response.notFound(res, 'Author not found');
     }
-    response.success(res, 'Author deleted successfully');
+    response.deleted(res, 'Author deleted successfully');
   }),
 };
 

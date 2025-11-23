@@ -27,10 +27,6 @@ const ProfileController = {
   }),
 
   search: asyncHandler(async (req: Request, res: Response) => {
-    const { query } = req.query;
-    if (!query || typeof query !== 'string') {
-      return response.error(res, "Query parameter is required", 400);
-    }
     const profiles = await ProfileService.search(req.query);
     if (!profiles || profiles.length === 0) return response.notFound(res, "No profiles found");
     response.success(res, "Profiles retrieved successfully", profiles);

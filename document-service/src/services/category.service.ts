@@ -9,34 +9,38 @@ import { CategoryTransMapper } from "src/mappers/categoryTrans.mapper";
 
 class CategoryService extends BaseService<ICategory, CategoryDto> {
 
-    async findAllWithAllTrans(): Promise<CategoryDto[]> {
-        const categories = await CategoryRepository.findAllWithAllLangs();
+    constructor() {
+        super(CategoryRepository, CategoryMapper);
+    }
+
+    async findAllTrans(): Promise<CategoryDto[]> {
+        const categories = await CategoryRepository.findAllTrans();
         return categories.map(category =>
             CategoryMapper.toDto(category, category.translation)
         );
     }
 
-    async findAllWithTrans(lang?: string): Promise<CategoryDto[]> {
+    async findAll(lang?: string): Promise<CategoryDto[]> {
         const categories = await CategoryRepository.findAll(lang);
         return categories.map(category =>
             CategoryMapper.toDto(category, category.translation)
         );
     }
 
-    async findByIdWithTrans(id: string, lang?: string): Promise<CategoryDto | null> {
+    async findById(id: string, lang?: string): Promise<CategoryDto | null> {
         const category = await CategoryRepository.findById(id, lang);
         if (!category) return null;
         return CategoryMapper.toDto(category, category.translation);
     }
 
-    async searchWithTrans(query: string, lang?: string): Promise<CategoryDto[]> {
-        const categories = await CategoryRepository.search(query, lang);
+    async search(params: { [key: string]: any }): Promise<CategoryDto[]> {
+        const categories = await CategoryRepository.search(params);
         return categories.map(category =>
             CategoryMapper.toDto(category, category.translation)
         );
     }
 
-    async create(categoryDto: CategoryDto): Promise<CategoryDto | null> {
+    async create(categoryDto: CategoryDto): Promise<CategoryDto> {
         const entity = CategoryMapper.toEntity(categoryDto);
         const category = await CategoryRepository.create(entity);
 
@@ -73,4 +77,4 @@ class CategoryService extends BaseService<ICategory, CategoryDto> {
     }
 }
 
-export default new CategoryService(CategoryRepository, CategoryMapper);
+export default new CategoryService();

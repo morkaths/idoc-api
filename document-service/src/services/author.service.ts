@@ -10,9 +10,25 @@ class AuthorService extends BaseService<IAuthor, AuthorDto> {
         super(AuthorRepository, AuthorMapper);
     }
 
-    async search(query: string): Promise<AuthorDto[]> {
-        const authors = await AuthorRepository.search(query);
-        return authors.map(AuthorMapper.toDto);
+    async search(params: { [key: string]: any }): Promise<AuthorDto[]> {
+        const { query, ...rest } = params;
+        const regex = new RegExp(query, "i");
+        const conditions: any[] = [];
+        if (query) {
+            conditions.push({
+                $or: [
+                    { name: regex },
+                    { nationality: regex }
+                ]
+            });
+        }
+        Object.entries(rest).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                conditions.push({ [key]: value });
+            }
+        });
+        const match = conditions.length > 0 ? { $and: conditions } : {};
+        return this.find(match);
     }
 }
 
