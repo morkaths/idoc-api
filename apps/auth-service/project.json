@@ -1,0 +1,49 @@
+{
+  "name": "auth-service",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/auth-service/src",
+  "targets": {
+    "build": {
+      "executor": "@jnxplus/nx-boot-maven:run-task",
+      "outputs": [
+        "{projectRoot}/target"
+      ],
+      "options": {
+        "task": "package spring-boot:repackage -DskipTests=true"
+      }
+    },
+    "build-image": {
+      "executor": "@jnxplus/nx-boot-maven:run-task",
+      "options": {
+        "task": "spring-boot:build-image"
+      }
+    },
+    "serve": {
+      "executor": "@jnxplus/nx-boot-maven:run-task",
+      "options": {
+        "task": "spring-boot:run",
+        "keepItRunning": true
+      },
+      "dependsOn": [
+        "build"
+      ]
+    },
+    "lint": {
+      "executor": "@jnxplus/nx-boot-maven:lint",
+      "options": {
+        "linter": "checkstyle"
+      }
+    },
+    "test": {
+      "executor": "@jnxplus/nx-boot-maven:run-task",
+      "options": {
+        "task": "test"
+      },
+      "dependsOn": [
+        "build"
+      ]
+    }
+  },
+  "tags": []
+}

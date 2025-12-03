@@ -1,0 +1,137 @@
+{
+  "info": {
+    "name": "Document Service #microservice",
+    "description": "API collection for Book service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Book",
+      "item": [
+        {
+          "name": "Get all books (no lang)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
+            "url": "{{api_url}}/books"
+          }
+        },
+        {
+          "name": "Get all books (with lang)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
+            "url": "{{api_url}}/books?lang=vi"
+          }
+        },
+        {
+          "name": "Get book by ID (no lang)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
+            "url": "{{api_url}}/books/{{bookId}}"
+          }
+        },
+        {
+          "name": "Get book by ID (with lang)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
+            "url": "{{api_url}}/books/{{bookId}}?lang=vi"
+          }
+        },
+        {
+          "name": "Search books (no lang)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
+            "url": "{{api_url}}/books/search?query=Harry"
+          }
+        },
+        {
+          "name": "Search books (with lang)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
+            "url": "{{api_url}}/books/search?lang=vi&query=Harry"
+          }
+        },
+        {
+          "name": "Get books by category name (no lang)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
+            "url": "{{api_url}}/books/category/{{categoryName}}"
+          }
+        },
+        {
+          "name": "Get books by category name (with lang)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
+            "url": "{{api_url}}/books/category/{{categoryName}}?lang=vi"
+          }
+        },
+        {
+          "name": "Create book",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"JavaScript Basics\",\n  \"subtitle\": \"Learn JS\",\n  \"description\": \"A book about JS\",\n  \"authorIds\": [\"{{authorId}}\"],\n  \"categoryIds\": [\"{{categoryId}}\"]\n}"
+            },
+            "url": "{{api_url}}/books"
+          }
+        },
+        {
+          "name": "Update book",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Title\",\n  \"description\": \"Updated description\"\n}"
+            },
+            "url": "{{api_url}}/books/{{bookId}}"
+          }
+        },
+        {
+          "name": "Delete book",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
+            "url": "{{api_url}}/books/{{bookId}}"
+          }
+        }
+      ]
+    }
+  ]
+}

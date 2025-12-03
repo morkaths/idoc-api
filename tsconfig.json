@@ -4,10 +4,13 @@
   "files": [],
   "references": [
     {
-      "path": "./apps/file-service-e2e"
+      "path": "./apps/auth-service"
     },
     {
-      "path": "./apps/file-service"
+      "path": "./apps/catalog-service"
+    },
+    {
+      "path": "./apps/user-service"
     }
   ]
 }

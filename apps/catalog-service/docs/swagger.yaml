@@ -1,0 +1,331 @@
+openapi: 3.0.0
+info:
+  title: iDoc Book Service API
+  version: 1.0.0
+  description: API for Book, Author, Category
+servers:
+  - url: /api
+paths:
+  /books:
+    get:
+      summary: Get all books
+      tags: [Book]
+      parameters:
+        - name: lang
+          in: query
+          schema:
+            type: string
+          description: Language code for translations
+      responses:
+        '200':
+          description: List of books
+    post:
+      summary: Create a new book
+      tags: [Book]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookDto'
+      responses:
+        '201':
+          description: Book created
+  /books/search:
+    get:
+      summary: Search books
+      tags: [Book]
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+          required: true
+          description: Search keyword
+        - name: lang
+          in: query
+          schema:
+            type: string
+          description: Language code for translations
+      responses:
+        '200':
+          description: List of books
+  /books/{id}:
+    get:
+      summary: Get book by ID
+      tags: [Book]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: lang
+          in: query
+          schema:
+            type: string
+          description: Language code for translations
+      responses:
+        '200':
+          description: Book detail
+    put:
+      summary: Update book by ID
+      tags: [Book]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: lang
+          in: query
+          schema:
+            type: string
+          description: Language code for translations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookDto'
+      responses:
+        '200':
+          description: Book updated
+    delete:
+      summary: Delete book by ID
+      tags: [Book]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Book deleted
+  /authors:
+    get:
+      summary: Get all authors
+      tags: [Author]
+      responses:
+        '200':
+          description: List of authors
+    post:
+      summary: Create a new author
+      tags: [Author]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorDto'
+      responses:
+        '201':
+          description: Author created
+  /authors/search:
+    get:
+      summary: Search authors
+      tags: [Author]
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+          required: true
+          description: Search keyword
+      responses:
+        '200':
+          description: List of authors
+  /authors/{id}:
+    get:
+      summary: Get author by ID
+      tags: [Author]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Author detail
+    put:
+      summary: Update author by ID
+      tags: [Author]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorDto'
+      responses:
+        '200':
+          description: Author updated
+    delete:
+      summary: Delete author by ID
+      tags: [Author]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Author deleted
+  /categories:
+    get:
+      summary: Get all categories
+      tags: [Category]
+      parameters:
+        - name: lang
+          in: query
+          schema:
+            type: string
+          description: Language code for translations
+      responses:
+        '200':
+          description: List of categories
+    post:
+      summary: Create a new category
+      tags: [Category]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryDto'
+      responses:
+        '201':
+          description: Category created
+  /categories/search:
+    get:
+      summary: Search categories
+      tags: [Category]
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+          required: true
+          description: Search keyword
+        - name: lang
+          in: query
+          schema:
+            type: string
+          description: Language code for translations
+      responses:
+        '200':
+          description: List of categories
+  /categories/{id}:
+    get:
+      summary: Get category by ID
+      tags: [Category]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: lang
+          in: query
+          schema:
+            type: string
+          description: Language code for translations
+      responses:
+        '200':
+          description: Category detail
+    put:
+      summary: Update category by ID
+      tags: [Category]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryDto'
+      responses:
+        '200':
+          description: Category updated
+    delete:
+      summary: Delete category by ID
+      tags: [Category]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Category deleted
+components:
+  schemas:
+    BookDto:
+      type: object
+      properties:
+        title:
+          type: string
+        subtitle:
+          type: string
+        description:
+          type: string
+        authorIds:
+          type: array
+          items:
+            type: string
+        categoryIds:
+          type: array
+          items:
+            type: string
+    AuthorDto:
+      type: object
+      properties:
+        fullName:
+          type: string
+        bio:
+          type: string
+        birthDate:
+          type: string
+          format: date
+    CategoryDto:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer

@@ -1,0 +1,15 @@
+{
+  "name": "@idoc-api/catalog-service",
+  "version": "1.0.0",
+  "main": "dist/server.js",
+  "scripts": {
+    "start": "node dist/server.js",
+    "dev": "ts-node-dev --respawn --transpile-only --project tsconfig.json -r tsconfig-paths/register src/server.ts",
+    "build": "tsc",
+    "seed": "ts-node -r tsconfig-paths/register src/seeds/index.ts"
+  },
+  "keywords": [],
+  "author": "Morkath",
+  "license": "ISC",
+  "description": ""
+}
