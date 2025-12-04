@@ -1,6 +1,6 @@
 #!/bin/bash
+# CMD: bash tools/scripts/kong-init.sh
 
-# Wait for Kong to be fully started
 sleep 15
 
 # Import service

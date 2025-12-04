@@ -1,10 +1,9 @@
-@REM Seed Script for IDoc API Services
-@REM CMD: seed.bat
-@REM PowerShell: .\seed.bat
+@REM CMD: tools\scripts\seed-db.bat
+@REM PowerShell: .\tools\scripts\seed-db.bat
 
 @echo off
 
-REM Auth service (example)
+REM Auth service seeder
 @REM start "Auth Service" cmd /k "cd /d "%~dp0auth-service" && mvn spring-boot:run -Dspring-boot.run.profiles=mock"
 
 REM User service seeder
