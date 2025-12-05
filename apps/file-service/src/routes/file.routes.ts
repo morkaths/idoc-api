@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import FileController from '../controllers/file.controller';
-import { singleFileUpload } from '../middleware/upload-file.middleware';
+import { authenticateToken } from '../middleware/auth.middleware';
+import { multipleFilesUpload, singleFileUpload } from '../middleware/upload-file.middleware';
 
 const router = Router();
 
@@ -9,21 +10,21 @@ const router = Router();
  * @desc    Get files by user
  * @access  Private
  */
-router.get('/user', FileController.getByUser);
+router.get('/user', authenticateToken, FileController.getByUser);
 
 /**
  * @route   GET /api/files/type?mimeType=...&limit=...&skip=...
  * @desc    Get files by mimeType
  * @access  Private
  */
-router.get('/type', FileController.getByMimeType);
+router.get('/type', authenticateToken, FileController.getByMimeType);
 
 /**
  * @route   GET /api/files/search?filename=...&limit=...&skip=...
  * @desc    Search files by filename
  * @access  Private
  */
-router.get('/search', FileController.getByFilename);
+router.get('/search', authenticateToken, FileController.getByFilename);
 
 /**
  * @route   GET /api/files/:fileId
@@ -44,13 +45,20 @@ router.get('/:fileId/download', FileController.download);
  * @desc    Upload a file
  * @access  Private
  */
-router.post('/upload', singleFileUpload, FileController.upload);
+router.post('/upload', authenticateToken, singleFileUpload, FileController.upload);
+
+/**
+ * @route   POST /api/files/upload-multiple
+ * @desc    Upload multiple files
+ * @access  Private
+ */
+router.post('/upload-multiple', authenticateToken, multipleFilesUpload, FileController.uploadMultiple);
 
 /**
  * @route   DELETE /api/files/:fileId
  * @desc    Delete file
  * @access  Private
  */
-router.delete('/:fileId', FileController.delete);
+router.delete('/:fileId', authenticateToken, FileController.delete);
 
 export default router;

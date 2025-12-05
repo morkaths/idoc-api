@@ -5,8 +5,8 @@ dotenv.config();
 // ────────────────────────────────────────────────────────────────────────────────
 // URLs
 // ────────────────────────────────────────────────────────────────────────────────
-export const PORT = process.env.PORT || 5002;
-export const BASE_URL = process.env.BASE_URL || 'http://localhost:5002';
+export const PORT = process.env.PORT || 5003;
+export const BASE_URL = process.env.BASE_URL || 'http://localhost:5003';
 export const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 export const API_URL = process.env.API_URL || 'http://localhost:8080/api';
 
@@ -41,7 +41,7 @@ export const MINIO_ACCESS_KEY = process.env.MINIO_ACCESS_KEY
 export const MINIO_SECRET_KEY = process.env.MINIO_SECRET_KEY
   ? process.env.MINIO_SECRET_KEY
   : (() => { throw new Error('MINIO_SECRET_KEY is not defined in environment variables'); })();
-export const MINIO_BUCKET = process.env.MINIO_BUCKET || 'idoc';
+export const MINIO_BUCKET = process.env.MINIO_BUCKET || '';
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Redis Config

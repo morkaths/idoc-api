@@ -1,5 +1,5 @@
 import MinioClient from '../config/minio.config';
-import { MINIO_BUCKET, MINIO_ENDPOINT, MINIO_USE_SSL } from '../config/env.config';
+import { MINIO_BUCKET, MINIO_ENDPOINT, MINIO_PORT, MINIO_USE_SSL } from '../config/env.config';
 
 MinioClient.connect();
 
@@ -21,11 +21,12 @@ export const MinioService = {
 
     const protocol = MINIO_USE_SSL ? 'https' : 'http';
     const endpoint = MINIO_ENDPOINT.replace(/^https?:\/\//, '');
+    const port = MINIO_PORT ? `:${MINIO_PORT}` : '';
 
     return {
       bucket: MINIO_BUCKET,
       fileName: objectName,
-      url: `${protocol}://${endpoint}/${MINIO_BUCKET}/${objectName}`,
+      url: `${protocol}://${endpoint}${port}/${MINIO_BUCKET}/${objectName}`
     };
   },
 
@@ -46,7 +47,17 @@ export const MinioService = {
     await client.removeObject(MINIO_BUCKET, objectName);
   },
 
-  async getUrl(objectName: string, expirySeconds = 3600): Promise<string> {
+  async exists(objectName: string): Promise<boolean> {
+    try {
+      const client = MinioClient.get();
+      await client.statObject(MINIO_BUCKET, objectName);
+      return true;
+    } catch {
+      return false;
+    }
+  },
+
+  async getPresignedUrl(objectName: string, expirySeconds = 3600): Promise<string> {
     const client = MinioClient.get();
     return await client.presignedGetObject(MINIO_BUCKET, objectName, expirySeconds);
   },

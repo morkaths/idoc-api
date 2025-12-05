@@ -1,9 +1,9 @@
 import DocumentService from '../services/document.service';
-import { asyncHandler } from '../middleware/error-handler';
+import { asyncHandler } from '../middleware/error-handler.middleware';
 import { AuthRequest } from '../types/request';
 import * as response from '../utils/response.util';
 
-const FileController = {
+const DocumentController = {
   getAll: asyncHandler(async (req, res) => {
     const lang = typeof req.query.lang === 'string' ? req.query.lang : undefined;
     const { data, pagination } = await DocumentService.search({ ...req.query, lang });
@@ -76,4 +76,4 @@ const FileController = {
   }),
 };
 
-export default FileController;
+export default DocumentController;

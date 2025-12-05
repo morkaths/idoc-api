@@ -16,6 +16,10 @@ curl -i -X POST http://localhost:8001/services \
   --data "name=catalog-service" \
   --data "url=http://host.docker.internal:5002"
 
+curl -i -X POST http://localhost:8001/services \
+  --data "name=file-service" \
+  --data "url=http://host.docker.internal:5003"
+
 # Import route
 curl -i -X POST http://localhost:8001/services/auth-service/routes \
   --data "name=auth-route" \
@@ -55,4 +59,9 @@ curl -i -X POST http://localhost:8001/services/catalog-service/routes \
 curl -i -X POST http://localhost:8001/services/catalog-service/routes \
   --data "name=categories-route" \
   --data "paths[]=/api/categories" \
+  --data "strip_path=false"
+
+curl -i -X POST http://localhost:8001/services/file-service/routes \
+  --data "name=files-route" \
+  --data "paths[]=/api/files" \
   --data "strip_path=false"

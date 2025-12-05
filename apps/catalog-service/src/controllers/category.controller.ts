@@ -1,5 +1,5 @@
 import CategoryService from '../services/category.service';
-import { asyncHandler } from '../middleware/error-handler';
+import { asyncHandler } from '../middleware/error-handler.middleware';
 import { AuthRequest } from '../types/request';
 import * as response from '../utils/response.util';
 
@@ -29,9 +29,7 @@ const CategoryController = {
 
   create: asyncHandler<AuthRequest>(async (req, res) => {
     const categoryDto = req.body;
-    if (req.user && req.user.id) {
-      categoryDto.updatedBy = req.user.id;
-    }
+    categoryDto.updatedBy = req.user.id;
     const category = await CategoryService.create(categoryDto);
     response.created(res, 'Category created successfully', category);
   }),
@@ -39,9 +37,7 @@ const CategoryController = {
   update: asyncHandler<AuthRequest>(async (req, res) => {
     const { id } = req.params;
     const categoryDto = req.body;
-    if (req.user && req.user.id) {
-      categoryDto.updatedBy = req.user.id;
-    }
+    categoryDto.updatedBy = req.user.id;
     const category = await CategoryService.update(id, categoryDto);
     if (!category) {
       return response.notFound(res, 'Category not found');

@@ -6,7 +6,6 @@ export class FileDto {
   @Expose() originalName!: string;
   @Expose() mimeType!: string;
   @Expose() size!: number;
-  @Expose() path!: string;
   @Expose() url!: string;
   @Expose() provider?: string;
   @Expose() metadata?: Record<string, any>;

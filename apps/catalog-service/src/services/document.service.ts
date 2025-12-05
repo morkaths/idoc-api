@@ -5,16 +5,16 @@ import { categoryRepository } from "src/repositories/category.repository";
 import FileRepository from "src/repositories/document.repository";
 import { Pagination } from "src/types";
 import { FileDto } from "src/dtos/file.dto";
-import { FileMapper } from "src/mappers/file.mapper";
+import { DocumentMapper } from "src/mappers/document.mapper";
 import { CategoryMapper } from "src/mappers/category.mapper";
 
 class DocumentService extends BaseService<IDocument, FileDto> {
   constructor() {
-    super(FileRepository, FileMapper);
+    super(FileRepository, DocumentMapper);
   }
 
   private mapFileToDto(file: any): FileDto {
-    return FileMapper.toDto(
+    return DocumentMapper.toDto(
       file,
       file.categories?.map((category: any) =>
         CategoryMapper.toDto(category, category.translation)
@@ -53,20 +53,20 @@ class DocumentService extends BaseService<IDocument, FileDto> {
   }
 
   async create(fileDto: FileDto, lang?: string): Promise<FileDto> {
-    const entity = FileMapper.toEntity(fileDto);
+    const entity = DocumentMapper.toEntity(fileDto);
     const file = await FileRepository.create(entity);
 
     const fileWithRelations = await FileRepository.findById((file._id as Types.ObjectId).toString(), lang);
-    return fileWithRelations ? this.mapFileToDto(fileWithRelations) : FileMapper.toDto(file);
+    return fileWithRelations ? this.mapFileToDto(fileWithRelations) : DocumentMapper.toDto(file);
   }
 
   async update(id: string, fileDto: FileDto, lang?: string): Promise<FileDto | null> {
-    const entity = FileMapper.toEntity(fileDto);
+    const entity = DocumentMapper.toEntity(fileDto);
     const file = await FileRepository.update(id, entity);
     if (!file) return null;
 
     const fileWithRelations = await FileRepository.findById(id, lang);
-    return fileWithRelations ? this.mapFileToDto(fileWithRelations) : FileMapper.toDto(file);
+    return fileWithRelations ? this.mapFileToDto(fileWithRelations) : DocumentMapper.toDto(file);
   }
 
   async delete(id: string): Promise<boolean> {

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import ProfileController from '../controllers/profile.controller';
-import { authenticateToken, authorizeRole } from '../middleware/auth';
+import { authenticateToken, authorizeRole } from '../middleware/auth.middleware';
 import { RoleEnum } from 'src/constants/security/role';
 
 const router = Router();

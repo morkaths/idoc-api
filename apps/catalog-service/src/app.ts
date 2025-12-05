@@ -7,7 +7,7 @@ import passport from 'passport';
 
 import routes from './routes';
 import { FRONTEND_URL } from './config/env.config';
-import { errorHandler } from './middleware/error-handler';
+import { errorHandler } from './middleware/error-handler.middleware';
 
 
 const app = express();

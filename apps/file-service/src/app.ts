@@ -7,7 +7,7 @@ import passport from 'passport';
 
 import routes from './routes';
 import { FRONTEND_URL } from './config/env.config';
-import { errorHandler } from './middleware/error-handler';
+import { errorHandler } from './middleware/error-handler.middleware';
 
 
 const app = express();
@@ -47,7 +47,7 @@ app.get('/', (req, res) => {
     message: 'iDoc API',
     version: '1.0.0',
     endpoints: {
-      category: '/api/categories',
+      files: '/api/files',
     }
   });
 });
@@ -61,6 +61,15 @@ app.get('/healthcheck', (req, res) => {
 });
 
 // 10. Middleware xử lý lỗi tổng quát (luôn đặt cuối cùng)
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    status: 404,
+    message: 'Route not found',
+    data: null,
+    error: []
+  });
+});
 app.use(errorHandler);
 
 export default app;

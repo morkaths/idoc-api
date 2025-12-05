@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import FileController from '../controllers/file.controller';
-import { authenticateToken, authorizeRole } from '../middleware/auth';
+import DocumentController from '../controllers/document.controller';
+import { authenticateToken, authorizeRole } from '../middleware/auth.middleware';
 import { RoleEnum } from '../constants/security/role';
 
 const router = Router();
@@ -11,28 +11,28 @@ const router = Router();
  * @access  Public
  * @query   lang - Language code for translations
  */
-router.get('/', FileController.getAll);
+router.get('/', DocumentController.getAll);
 
 /**
  * @route   GET /api/files/search?lang=...&query=...
  * @desc    Search files
  * @access  Public
  */
-router.get('/search', FileController.search);
+router.get('/search', DocumentController.search);
 
 /**
  * @route   GET /api/files/category/:categorySlug?lang=...
  * @desc    Get files by category slug
  * @access  Public
  */
-router.get('/category/:categorySlug', FileController.getByCategory);
+router.get('/category/:categorySlug', DocumentController.getByCategory);
 
 /**
  * @route   GET /api/files/:id?lang=...
  * @desc    Get a file by id
  * @access  Public
  */
-router.get('/:id', FileController.getById);
+router.get('/:id', DocumentController.getById);
 
 /**
  * @route   POST /api/files
@@ -43,7 +43,7 @@ router.post(
   '/',
   authenticateToken,
   authorizeRole([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]),
-  FileController.create
+  DocumentController.create
 );
 
 /**
@@ -55,7 +55,7 @@ router.patch(
   '/:id',
   authenticateToken,
   authorizeRole([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]),
-  FileController.update
+  DocumentController.update
 );
 
 /**
@@ -67,7 +67,7 @@ router.delete(
   '/:id',
   authenticateToken,
   authorizeRole([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]),
-  FileController.delete
+  DocumentController.delete
 );
 
 export default router;

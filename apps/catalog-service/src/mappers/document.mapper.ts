@@ -4,13 +4,13 @@ import { IDocument } from "src/models/document.model";
 import { CategoryDto } from "src/dtos/category.dto";
 import { BaseMapper, createClassTransformerMapper } from "src/core/base.mapper";
 
-const baseFileMapper = createClassTransformerMapper<IDocument, FileDto>(FileDto);
+const baseDocumentMapper = createClassTransformerMapper<IDocument, FileDto>(FileDto);
 
-export const FileMapper: BaseMapper<IDocument, FileDto> & {
+export const DocumentMapper: BaseMapper<IDocument, FileDto> & {
   toDto(file: IDocument, categories?: CategoryDto[]): FileDto;
 } = {
   toDto(file: IDocument, categories?: CategoryDto[]): FileDto {
-    const baseDto = baseFileMapper.toDto(file);
+    const baseDto = baseDocumentMapper.toDto(file);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { categoryIds, ...cleanDto } = baseDto;
     return {
@@ -22,7 +22,7 @@ export const FileMapper: BaseMapper<IDocument, FileDto> & {
   toEntity(dto: Partial<FileDto>): Partial<IDocument> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { categories, ...cleanDto } = dto;
-    const baseEntity = baseFileMapper.toEntity(cleanDto);
+    const baseEntity = baseDocumentMapper.toEntity(cleanDto);
     const result: Partial<IDocument> = { ...baseEntity };
 
     if (dto.categoryIds !== undefined) {

@@ -1,5 +1,4 @@
 import mongoose, { Document, Schema } from "mongoose";
-import { MINIO_BUCKET, MINIO_ENDPOINT, MINIO_USE_SSL } from "src/config/env.config";
 
 export type StorageProvider = "local" | "s3" | "minio" | "gcs" | "azure";
 
@@ -31,7 +30,7 @@ const FileSchema = new Schema<IFile>(
       enum: ["local", "s3", "minio", "gcs", "azure"], 
       default: "minio" 
     },
-    checksum: { type: String, index: true },
+    checksum: { type: String },
     metadata: { type: Schema.Types.Mixed },
     uploadedBy: { type: String, trim: true }
   }, 
@@ -42,41 +41,5 @@ FileSchema.index({ provider: 1, bucket: 1, path: 1 }, { unique: true });
 FileSchema.index({ checksum: 1 });
 FileSchema.index({ uploadedBy: 1 });
 FileSchema.index({ createdAt: -1 });
-
-FileSchema.virtual("url").get(function (this: IFile) {
-  if (this.provider === "local") {
-    const base = process.env.FILE_BASE_URL || "http://localhost:3000/files";
-    return `${base}/${encodeURIComponent(this.filename)}`;
-  }
-  if (this.provider === "minio" || this.provider === "s3") {
-    const protocol = MINIO_USE_SSL ? 'https' : 'http';
-    const endpoint = MINIO_ENDPOINT.replace(/^https?:\/\//, '');
-    const bucket = this.bucket || MINIO_BUCKET || "idoc";
-    return `${protocol}://${endpoint}/${bucket}/${this.path}`;
-  }
-
-  if (this.provider === "gcs") {
-    return `gs://${this.bucket || "<bucket>"}/${this.path}`;
-  }
-  
-  if (this.provider === "azure") {
-    return `https://${this.bucket || "<storage>"}.blob.core.windows.net/${this.path}`;
-  }
-
-  return this.path || this.filename;
-});
-
-// Transform output
-const transform = (_doc: any, ret: any) => {
-  ret.id = ret._id;
-  delete ret.__v;
-  delete ret.checksum;
-  delete ret.path;
-  delete ret.bucket;
-  return ret;
-};
-
-FileSchema.set("toJSON", { virtuals: true, transform });
-FileSchema.set("toObject", { virtuals: true, transform });
 
 export const File = mongoose.model<IFile>("FileMetadata", FileSchema);

@@ -1,5 +1,5 @@
 import BookService from '../services/book.service';
-import { asyncHandler } from '../middleware/error-handler';
+import { asyncHandler } from '../middleware/error-handler.middleware';
 import { AuthRequest } from '../types/request';
 import * as response from '../utils/response.util';
 
@@ -39,9 +39,7 @@ const BookController = {
 
   create: asyncHandler<AuthRequest>(async (req, res) => {
     const bookDto = req.body;
-    if (req.user && req.user.id) {
-      bookDto.updatedBy = req.user.id;
-    }
+    bookDto.updatedBy = req.user.id;
     const book = await BookService.create(bookDto);
     response.created(res, 'Book created successfully', book);
   }),
@@ -49,9 +47,7 @@ const BookController = {
   update: asyncHandler<AuthRequest>(async (req, res) => {
     const { id } = req.params;
     const bookDto = req.body;
-    if (req.user && req.user.id) {
-      bookDto.updatedBy = req.user.id;
-    }
+    bookDto.updatedBy = req.user.id;
     const book = await BookService.update(id, bookDto);
     if (!book) {
       return response.notFound(res, 'Book not found');

@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { User, Pagination } from '../types';
+import { Pagination } from '../types';
 
 export interface PaginationMeta {
   total: number;
@@ -91,5 +91,13 @@ export const internalError = (res: Response, message = 'Internal server error', 
 export const notImplemented = (res: Response, message = 'Not Implemented') =>
   send(res, 501, false, message);
 
+export const badGateway = (res: Response, message = 'Bad Gateway') =>
+  send(res, 502, false, message);
+
 export const serviceUnavailable = (res: Response, message = 'Service Unavailable') =>
   send(res, 503, false, message);
+
+export const gatewayTimeout = (res: Response, message = 'Gateway Timeout') =>
+  send(res, 504, false, message);
+
+

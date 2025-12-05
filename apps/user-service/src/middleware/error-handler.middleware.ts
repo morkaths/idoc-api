@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, RequestHandler } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import * as response from '../utils/response.util';
 
 export interface AppError extends Error {
@@ -34,6 +34,9 @@ export const errorHandler = (err: AppError, req: Request, res: Response, next: N
   }
 
   // Default error
+  if (err.statusCode === 400) {
+    return response.badRequest(res, err.message || 'Bad Request');
+  }
   if (err.statusCode === 404) {
     return response.notFound(res, err.message || 'Not found');
   }
@@ -55,8 +58,14 @@ export const errorHandler = (err: AppError, req: Request, res: Response, next: N
   if (err.statusCode === 429) {
     return response.tooManyRequests(res, err.message || 'Too Many Requests');
   }
+  if (err.statusCode === 502) {
+    return response.badGateway(res, err.message || 'Bad Gateway');
+  }
   if (err.statusCode === 503) {
     return response.serviceUnavailable(res, err.message || 'Service Unavailable');
+  }
+  if (err.statusCode === 504) {
+    return response.gatewayTimeout(res, err.message || 'Gateway Timeout');
   }
 
   return response.internalError(
@@ -66,8 +75,9 @@ export const errorHandler = (err: AppError, req: Request, res: Response, next: N
   );
 };
 
-export const asyncHandler = (fn: (req: Request, res: Response, next: NextFunction) => Promise<any>): RequestHandler =>
-  (req, res, next) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
-  };
+export const asyncHandler = <Req = Request>(
+  fn: (req: Req, res: Response, next: NextFunction) => Promise<any>
+) => (req: Request, res: Response, next: NextFunction) => {
+  Promise.resolve(fn(req as Req, res, next)).catch(next);
+};
 

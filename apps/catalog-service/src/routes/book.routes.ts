@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import BookController from '../controllers/book.controller';
-import { authenticateToken, authorizeRole } from '../middleware/auth';
+import { authenticateToken, authorizeRole } from '../middleware/auth.middleware';
 import { RoleEnum } from '../constants/security/role';
 
 const router = Router();

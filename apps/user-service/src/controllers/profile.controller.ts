@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import ProfileService from '../services/profile.service';
-import { asyncHandler } from '../middleware/error-handler';
+import { asyncHandler } from '../middleware/error-handler.middleware';
 import { AuthRequest } from '../types/request';
 import * as response from '../utils/response.util';
 
