@@ -1,7 +1,7 @@
 // ...existing code...
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document as MongooseDocument } from 'mongoose';
 
-export interface IFile extends Document {
+export interface IDocument extends MongooseDocument {
   title: string;
   slug?: string;
   description?: string;
@@ -9,15 +9,15 @@ export interface IFile extends Document {
   language?: string;
   kind: string; // e.g., 'pdf', 'epub', 'audiobook'
   coverUrl?: string;
-  fileUrls?: string[];
+  fileIds: string[]; // Array of file URLs or IDs
   metadata?: any;
   access?: string; // e.g., 'free', 'premium', 'restricted'
-  updatedBy?: number;
+  updatedBy?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-const FileSchema = new Schema<IFile>(
+const DocumentSchema = new Schema<IDocument>(
   {
     title: { type: String, required: true, index: true, trim: true },
     slug: { type: String, index: true, trim: true },
@@ -26,12 +26,12 @@ const FileSchema = new Schema<IFile>(
     language: { type: String, trim: true },
     kind: { type: String, required: true, trim: true },
     coverUrl: { type: String, trim: true },
-    fileUrls: [{ type: String, trim: true }],
+    fileIds: [{ type: String, required: true }],
     metadata: { type: Schema.Types.Mixed },
     access: { type: String, trim: true },
-    updatedBy: { type: Number },
+    updatedBy: { type: String, trim: true },
   },
   { timestamps: true }
 );
 
-export const File = mongoose.model<IFile>('File', FileSchema);
+export const Document = mongoose.model<IDocument>('Document', DocumentSchema);

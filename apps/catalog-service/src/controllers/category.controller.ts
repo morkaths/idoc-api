@@ -1,37 +1,33 @@
-import { Request, Response } from 'express';
 import CategoryService from '../services/category.service';
 import { asyncHandler } from '../middleware/error-handler';
 import { AuthRequest } from '../types/request';
 import * as response from '../utils/response.util';
 
 const CategoryController = {
-  getAll: asyncHandler(async (req: Request, res: Response) => {
-    const {data, pagination} = await CategoryService.search(req.query);
+  getList: asyncHandler(async (req, res) => {
+    const { page = 1, limit = 10, ...filters } = req.query;
+    const { data, pagination } = await CategoryService.getList(
+      Number(page),
+      Number(limit),
+      filters
+    );
     if (!data || data.length === 0) {
       return response.notFound(res, 'No categories found');
     }
-    response.paginated(res, 'Get all categories successfully', data, pagination);
+    response.paginated(res, 'Get categories successfully', data, pagination);
   }),
 
-  getById: asyncHandler(async (req: Request, res: Response) => {
+  getById: asyncHandler(async (req, res) => {
     const { id } = req.params;
     const lang = typeof req.query.lang === 'string' ? req.query.lang : undefined;
-    const category = await CategoryService.findById(id, lang);
+    const category = await CategoryService.getById(id, lang);
     if (!category) {
       return response.notFound(res, 'Category not found');
     }
     response.success(res, 'Get category successfully', category);
   }),
-  
-  search: asyncHandler(async (req: Request, res: Response) => {
-    const {data, pagination} = await CategoryService.search(req.query);
-    if (!data || data.length === 0) {
-      return response.notFound(res, 'No categories found for this search query');
-    }
-    response.paginated(res, 'Search categories successfully', data, pagination);
-  }),
 
-  create: asyncHandler(async (req: AuthRequest, res: Response) => {
+  create: asyncHandler<AuthRequest>(async (req, res) => {
     const categoryDto = req.body;
     if (req.user && req.user.id) {
       categoryDto.updatedBy = req.user.id;
@@ -40,7 +36,7 @@ const CategoryController = {
     response.created(res, 'Category created successfully', category);
   }),
 
-  update: asyncHandler(async (req: AuthRequest, res: Response) => {
+  update: asyncHandler<AuthRequest>(async (req, res) => {
     const { id } = req.params;
     const categoryDto = req.body;
     if (req.user && req.user.id) {
@@ -53,7 +49,7 @@ const CategoryController = {
     response.updated(res, 'Category updated successfully', category);
   }),
 
-  delete: asyncHandler(async (req: AuthRequest, res: Response) => {
+  delete: asyncHandler<AuthRequest>(async (req, res) => {
     const { id } = req.params;
     const result = await CategoryService.delete(id);
     if (!result) {

@@ -1,18 +1,17 @@
 import http from 'http';
 import 'reflect-metadata';
-import mongoose from 'mongoose';
 
 import app from './app';
-import { connectDB } from './config/database.config';
+import MongoDBClient from './config/mongodb.config';
 import { PORT, BASE_URL } from './config/env.config';
 
 const server = http.createServer(app);
 
 // Kết nối đến MongoDB
-connectDB().then(() => {
+MongoDBClient.connect().then(() => {
   server.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-      console.log(`Server running on ${BASE_URL}`);
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on ${BASE_URL}`);
   });
 });
 
@@ -20,16 +19,16 @@ connectDB().then(() => {
 const gracefulShutdown = async () => {
   console.log("\n Gracefully shutting down...");
   try {
-      await mongoose.connection.close();
-      console.log("MongoDB connection closed");
+    await MongoDBClient.close();
+    console.log("MongoDB connection closed");
 
-      server.close(() => {
-          console.log("HTTP server closed");
-          process.exit(0);
-      });
+    server.close(() => {
+      console.log("HTTP server closed");
+      process.exit(0);
+    });
   } catch (err) {
-      console.error(" Error during shutdown:", err);
-      process.exit(1);
+    console.error(" Error during shutdown:", err);
+    process.exit(1);
   }
 };
 

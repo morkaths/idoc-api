@@ -1,20 +1,17 @@
-import BookRepository from "src/repositories/book.repository";
 import { BaseService } from "src/core/base.service";
 import { BookDto } from "src/dtos/book.dto";
 import { IBook } from "src/models/book.model";
 import { ICategory } from "src/models/category.model";
-import { ICategoryTranslation } from "src/models/category-translation.model";
 import { BookMapper } from "src/mappers/book.mapper";
 import { AuthorMapper } from "src/mappers/author.mapper";
 import { CategoryMapper } from "src/mappers/category.mapper";
-import CategoryRepository from "src/repositories/category.repository";
-import { Types } from "mongoose";
+import { bookRepository } from "src/repositories/book.repository";
+import { categoryRepository } from "src/repositories/category.repository";
 import { Pagination } from "src/types";
 
 class BookService extends BaseService<IBook, BookDto> {
-
   constructor() {
-    super(BookRepository, BookMapper);
+    super(bookRepository, BookMapper);
   }
 
   /**
@@ -30,39 +27,28 @@ class BookService extends BaseService<IBook, BookDto> {
     );
   }
 
-  async findAll(lang?: string): Promise<BookDto[]> {
-    const books = await BookRepository.findAll(lang);
-    return books.map(book => this.mapBookToDto(book));
+  async getList(
+    page: number,
+    limit: number,
+    filter: { [key: string]: any }
+  ): Promise<{ data: BookDto[]; pagination: Pagination }> {
+    const result = await bookRepository.findList(page, limit, filter);
+    const data = (result.items || []).map(book => this.mapBookToDto(book));
+
+    return { data, pagination: result.pagination };
   }
 
-  async findById(id: string, lang?: string): Promise<BookDto | null> {
-    const book = await BookRepository.findById(id, lang);
+  async getById(id: string, lang?: string): Promise<BookDto | null> {
+    const book = await bookRepository.findById(id, lang);
     if (!book) return null;
     return this.mapBookToDto(book);
   }
 
-  async findByCategory(categorySlug: string, lang?: string): Promise<BookDto[]> {
-    const category = await CategoryRepository.findOne({ slug: categorySlug }) as ICategory | null;
+  async getByCategory(slug: string, lang?: string): Promise<BookDto[]> {
+    const category = await categoryRepository.findOne({ slug }) as ICategory | null;
     if (!category) return [];
-    
-    const categoryId = (category._id as Types.ObjectId).toString();
-    const books = await BookRepository.findByCategory(categoryId, lang);
+    const books = await bookRepository.findByCategory(category._id.toString(), lang);
     return books.map(book => this.mapBookToDto(book));
-  }
-
-  async search(params: { [key: string]: any }): Promise<{ data: BookDto[]; pagination: Pagination }> {
-    const result = await BookRepository.search(params);
-    const data = (result.items || []).map(book => this.mapBookToDto(book));
-
-    return {
-      data,
-      pagination: {
-        total: result.total,
-        page: result.page,
-        limit: result.limit,
-        pages: result.pages
-      }
-    };
   }
 
   // async create(bookDto: BookDto): Promise<BookDto> {

@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface ICategory extends Document {
   slug?: string;
-  parentId?: mongoose.Types.ObjectId;
+  parentId?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

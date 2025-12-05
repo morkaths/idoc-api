@@ -6,30 +6,23 @@ import { RoleEnum } from '../constants/security/role';
 const router = Router();
 
 /**
- * @route   GET /api/books?lang=...
- * @desc    Get all books with translations based on language query
+ * @route   GET /api/books?page=...&limit=...&filter=...
+ * @desc    Get list books with translations based on filter parameters
  * @access  Public
- * @query   lang - Language code for translations
+ * @query   page - Page number (default: 1)
+ * @query   limit - Items per page (default: 10)
+ * @query   filter - Filter parameters
  */
-router.get('/', BookController.getAll);
+router.get('/', BookController.getList);
 
 /**
- * @route   GET /api/books/search?lang=...&query=...
- * @desc    Search books with translations based on language query and other search parameters
- * @access  Public
- * @query   lang - Language code for translations
- * @query   ... - Other search parameters (title, subtitle, description, etc.)
- */
-router.get('/search', BookController.search);
-
-/**
- * @route   GET /api/books/category/:categoryName?lang=...
+ * @route   GET /api/books/category/:slug?lang=...
  * @desc    Get all books by category ID with translations
  * @access  Public
- * @param   categorySlug - Category slug
+ * @param   slug - Category slug
  * @query   lang - Language code for translations
  */
-router.get('/category/:categorySlug', BookController.getByCategory);
+router.get('/category/:slug', BookController.getByCategory);
 
 /**
  * @route   GET /api/books/:id?lang=...

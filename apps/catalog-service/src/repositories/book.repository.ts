@@ -3,45 +3,23 @@ import { Book, IBook } from "src/models/book.model";
 import { BaseRepository } from "../core/base.repository";
 import { aggregateBook } from "src/constants/aggregations/book.aggregation";
 
-class BookRepositoryClass extends BaseRepository<IBook> {
+class BookRepository extends BaseRepository<IBook> {
   constructor() {
     super(Book);
   }
 
-  async findAll(lang?: string) {
-    return Book.aggregate(aggregateBook(lang));
-  }
-
-  async findById(id: string, lang?: string) {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new Error("Invalid ObjectId");
-    }
-    const result = await Book.aggregate(
-      aggregateBook(lang, { _id: new Types.ObjectId(id) })
-    );
-    return result[0] ?? null;
-  }
-
-  async findByCategory(categoryId: string, lang?: string) {
-    if (!Types.ObjectId.isValid(categoryId)) {
-      throw new Error("Invalid ObjectId");
-    }
-    const match = {
-      categoryIds: new Types.ObjectId(categoryId)
-    };
-    return Book.aggregate(aggregateBook(lang, match));
-  }
-
-  async search(params: { [key: string]: any }) {
+  async findList(
+    page: number,
+    limit: number,
+    filter: { [key: string]: any }
+  ) {
     const {
       query,
       lang,
-      page = 1,
-      limit = 10,
-      sortBy = 'createdAt',
+      sortBy = 'title',
       sortOrder = 'desc',
       ...rest
-    } = params;
+    } = filter;
 
     const p = Math.max(1, Number(page));
     const l = Math.max(1, Number(limit));
@@ -74,8 +52,26 @@ class BookRepositoryClass extends BaseRepository<IBook> {
     return this.paginateAggregate(pipeline, p, l);
   }
 
+  async findById(id: string, lang?: string) {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new Error("Invalid ObjectId");
+    }
+    const result = await Book.aggregate(
+      aggregateBook(lang, { _id: new Types.ObjectId(id) })
+    );
+    return result[0] ?? null;
+  }
+
+  async findByCategory(categoryId: string, lang?: string) {
+    if (!Types.ObjectId.isValid(categoryId)) {
+      throw new Error("Invalid ObjectId");
+    }
+    const match = {
+      categoryIds: new Types.ObjectId(categoryId)
+    };
+    return Book.aggregate(aggregateBook(lang, match));
+  }
+
 }
 
-const BookRepository = new BookRepositoryClass();
-
-export default BookRepository;
+export const bookRepository = new BookRepository();

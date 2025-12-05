@@ -6,19 +6,12 @@ import { RoleEnum } from '../constants/security/role';
 const router = Router();
 
 /**
- * @route   GET /api/authors
- * @desc    Get all authors
+ * @route   GET /api/authors?query=...page=...&limit=...
+ * @desc    Get list authors
  * @access  Public
+ * @filter  filter - Filter parameters   
  */
-router.get('/', AuthorController.getAll);
-
-/**
- * @route   GET /api/authors/search?query=...
- * @desc    Search authors by query
- * @access  Public
- * @query   query - Search keyword
- */
-router.get('/search', AuthorController.search);
+router.get('/', AuthorController.getList);
 
 /**
  * @route   GET /api/authors/:id

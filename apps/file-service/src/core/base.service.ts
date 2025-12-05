@@ -79,12 +79,7 @@ export class BaseService<E extends Document, D> {
     const data = (result.items || []).map(entity => this.mapper.toDto(entity as E));
     return {
       data,
-      pagination: {
-        total: result.total,
-        page: result.page,
-        limit: result.limit,
-        pages: result.pages
-      }
+      pagination: result.pagination
     };
   }
 
@@ -93,12 +88,7 @@ export class BaseService<E extends Document, D> {
     const data = (result.items || []).map(i => this.mapper.toDto(i as E));
     return {
       data,
-      pagination: {
-        total: result.total,
-        page: result.page,
-        limit: result.limit,
-        pages: result.pages
-      }
+      pagination: result.pagination
     };
   }
 

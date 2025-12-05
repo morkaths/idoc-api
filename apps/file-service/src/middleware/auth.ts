@@ -19,7 +19,7 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
     
     (req as AuthRequest).user = user;
     next();
-  } catch (error) {
+  } catch {
     return res.status(401).json({ success: false, message: 'Authentication failed' });
   }
 };
@@ -36,7 +36,7 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
       }
     }
     next();
-  } catch (error) {
+  } catch {
     next();
   }
 };
@@ -60,7 +60,7 @@ export const authorizeRole = (allowedRoles: string[]) => {
         return res.status(403).json({ success: false, message: 'Access denied: insufficient permissions' });
       }
       next();
-    } catch (error) {
+    } catch {
       return res.status(403).json({ success: false, message: 'Authorization failed' });
     }
   }

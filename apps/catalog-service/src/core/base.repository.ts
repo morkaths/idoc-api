@@ -1,12 +1,5 @@
 import { Model, Document, FilterQuery, UpdateQuery } from "mongoose";
-
-export interface PaginationResult<T> {
-  items: T[];      // nội dung
-  total: number;  // tổng số trang
-  page: number;   //trang hiện tại
-  limit: number;  // kích thước
-  pages: number;  // tổng số trang
-}
+import { Pagination } from "src/types";
 
 export class BaseRepository<T extends Document> {
   protected model: Model<T>;
@@ -174,7 +167,7 @@ export class BaseRepository<T extends Document> {
       lean?: boolean;
       select?: any;
     }
-  ): Promise<PaginationResult<Partial<T>>> {
+  ): Promise<{ items: Partial<T>[]; pagination: Pagination }> {
     const page = Math.max(1, Number(options?.page ?? 1));
     const limit = Math.max(1, Number(options?.limit ?? 10));
     const skip = (page - 1) * limit;
@@ -192,15 +185,21 @@ export class BaseRepository<T extends Document> {
     const pages = Math.max(1, Math.ceil(total / limit));
 
     return {
-      items: items as Partial<T>[],
-      total,
-      page,
-      limit,
-      pages
+      items,
+      pagination: {
+        total,
+        page,
+        limit,
+        pages
+      }
     };
   }
 
-  async paginateAggregate(pipeline: any[], page = 1, limit = 10): Promise<PaginationResult<any>> {
+  async paginateAggregate(
+    pipeline: any[], 
+    page = 1, 
+    limit = 10
+  ): Promise<{ items: Partial<any>[]; pagination: Pagination }> {
     const _page = Math.max(1, Number(page));
     const _limit = Math.max(1, Number(limit));
     const skip = (_page - 1) * _limit;
@@ -235,10 +234,12 @@ export class BaseRepository<T extends Document> {
 
     return {
       items,
-      total,
-      page: _page,
-      limit: _limit,
-      pages
+      pagination: {
+        total,
+        page: _page,
+        limit: _limit,
+        pages
+      }
     };
   }
 

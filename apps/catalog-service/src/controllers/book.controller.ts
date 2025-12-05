@@ -1,47 +1,43 @@
-import { Request, Response } from 'express';
 import BookService from '../services/book.service';
 import { asyncHandler } from '../middleware/error-handler';
 import { AuthRequest } from '../types/request';
 import * as response from '../utils/response.util';
 
 const BookController = {
-  getAll: asyncHandler(async (req: Request, res: Response) => {
-    const {data, pagination} = await BookService.search(req.query);
+  getList: asyncHandler(async (req, res) => {
+    const { page = 1, limit = 10, ...filters } = req.query;
+    const { data, pagination } = await BookService.getList(
+      Number(page),
+      Number(limit),
+      filters
+    );
     if (!data || data.length === 0) {
       return response.notFound(res, 'No books found');
     }
-    response.paginated(res, 'Get all books successfully', data, pagination);
+    response.paginated(res, 'Get books successfully', data, pagination);
   }),
 
-  getById: asyncHandler(async (req: Request, res: Response) => {
+  getById: asyncHandler(async (req, res) => {
     const { id } = req.params;
     const lang = typeof req.query.lang === 'string' ? req.query.lang : undefined;
-    const book = await BookService.findById(id, lang);
+    const book = await BookService.getById(id, lang);
     if (!book) {
       return response.notFound(res, 'Book not found');
     }
     response.success(res, 'Get book successfully', book);
   }),
 
-  getByCategory: asyncHandler(async (req: Request, res: Response) => {
-    const { categorySlug } = req.params;
+  getByCategory: asyncHandler(async (req, res) => {
+    const { slug } = req.params;
     const lang = typeof req.query.lang === 'string' ? req.query.lang : undefined;
-    const books = await BookService.findByCategory( categorySlug, lang);
+    const books = await BookService.getByCategory( slug, lang);
     if (!books || books.length === 0) {
       return response.notFound(res, 'No books found for this category');
     }
     response.success  (res, 'Get books by category successfully', books);
   }),
 
-  search: asyncHandler(async (req: Request, res: Response) => {
-    const {data, pagination} = await BookService.search(req.query);
-    if (!data || data.length === 0) {
-      return response.notFound(res, 'No books found for this search query');
-    }
-    response.paginated(res, 'Search books successfully', data, pagination);
-  }),
-
-  create: asyncHandler(async (req: AuthRequest, res: Response) => {
+  create: asyncHandler<AuthRequest>(async (req, res) => {
     const bookDto = req.body;
     if (req.user && req.user.id) {
       bookDto.updatedBy = req.user.id;
@@ -50,7 +46,7 @@ const BookController = {
     response.created(res, 'Book created successfully', book);
   }),
 
-  update: asyncHandler(async (req: AuthRequest, res: Response) => {
+  update: asyncHandler<AuthRequest>(async (req, res) => {
     const { id } = req.params;
     const bookDto = req.body;
     if (req.user && req.user.id) {
@@ -63,7 +59,7 @@ const BookController = {
     response.updated(res, 'Book updated successfully', book);
   }),
 
-  delete: asyncHandler(async (req: AuthRequest, res: Response) => {
+  delete: asyncHandler<AuthRequest>(async (req, res) => {
     const { id } = req.params;
     const result = await BookService.delete(id);
     if (!result) {

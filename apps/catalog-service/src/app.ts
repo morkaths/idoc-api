@@ -63,6 +63,15 @@ app.get('/healthcheck', (req, res) => {
 });
 
 // 10. Middleware xử lý lỗi tổng quát (luôn đặt cuối cùng)
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    status: 404,
+    message: 'Route not found',
+    data: null,
+    error: []
+  });
+});
 app.use(errorHandler);
 
 export default app;

@@ -6,21 +6,16 @@ import { RoleEnum } from '../constants/security/role';
 const router = Router();
 
 /**
- * @route   GET /api/categories?lang=...
+ * @route   GET /api/categories?page=...&limit=...&lang=...
  * @desc    Get all categories with translations based on language query
  * @access  Public
+ * @query   page - Page number (default: 1)
+ * @query   limit - Items per page (default: 10)
  * @query   lang - Language code for translations
- */
-router.get('/', CategoryController.getAll);
-
-/**
- * @route   GET /api/categories/search?query=...
- * @desc    Search categories by query and language
- * @access  Public
  * @query   query - Search keyword
- * @query   lang - Language code for translations
+ * @query   [other filters] - Any other filter fields
  */
-router.get('/search', CategoryController.search);
+router.get('/', CategoryController.getList);
 
 /**
  * @route   GET /api/categories/:id?lang=...

@@ -1,22 +1,22 @@
 import { Types } from "mongoose";
-import { File, IFile } from "src/models/file.model";
+import { Document, IDocument } from "src/models/document.model";
 import { BaseRepository } from "../core/base.repository";
 import { aggregateFile } from "src/constants/aggregations/file.aggregation";
 
-class FileRepositoryClass extends BaseRepository<IFile> {
+class FileRepositoryClass extends BaseRepository<IDocument> {
   constructor() {
-    super(File);
+    super(Document);
   }
 
   async findAll(lang?: string) {
-    return File.aggregate(aggregateFile(lang));
+    return Document.aggregate(aggregateFile(lang));
   }
 
   async findById(id: string, lang?: string) {
     if (!Types.ObjectId.isValid(id)) {
       throw new Error("Invalid ObjectId");
     }
-    const result = await File.aggregate(aggregateFile(lang, { _id: new Types.ObjectId(id) }));
+    const result = await Document.aggregate(aggregateFile(lang, { _id: new Types.ObjectId(id) }));
     return result[0] ?? null;
   }
 
@@ -25,7 +25,7 @@ class FileRepositoryClass extends BaseRepository<IFile> {
       throw new Error("Invalid ObjectId");
     }
     const match = { categoryIds: new Types.ObjectId(categoryId) };
-    return File.aggregate(aggregateFile(lang, match));
+    return Document.aggregate(aggregateFile(lang, match));
   }
 
   async search(params: { [key: string]: any }) {

@@ -20,7 +20,7 @@ export class BaseService<E extends Document, D> {
     return (entities as E[]).map(e => this.mapper.toDto(e));
   }
 
-  async findById(id: string): Promise<D | null> {
+  async getById(id: string): Promise<D | null> {
     const entity = await this.repository.findById(id);
     return entity ? this.mapper.toDto(entity) : null;
   }
@@ -79,26 +79,20 @@ export class BaseService<E extends Document, D> {
     const data = (result.items || []).map(entity => this.mapper.toDto(entity as E));
     return {
       data,
-      pagination: {
-        total: result.total,
-        page: result.page,
-        limit: result.limit,
-        pages: result.pages
-      }
+      pagination: result.pagination
     };
   }
 
-  async paginateAggregate(pipeline: any[], page = 1, limit = 10): Promise<{ data: D[]; pagination: Pagination }> {
+  async paginateAggregate(
+    pipeline: any[], 
+    page = 1, 
+    limit = 10
+  ): Promise<{ data: D[]; pagination: Pagination }> {
     const result = await this.repository.paginateAggregate(pipeline, page, limit);
     const data = (result.items || []).map(i => this.mapper.toDto(i as E));
     return {
       data,
-      pagination: {
-        total: result.total,
-        page: result.page,
-        limit: result.limit,
-        pages: result.pages
-      }
+      pagination: result.pagination
     };
   }
 

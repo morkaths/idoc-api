@@ -16,6 +16,7 @@ export const BookMapper: BaseMapper<IBook, BookDto> & {
     authors?: AuthorDto[]
   ): BookDto {
     const baseDto = baseBookMapper.toDto(book);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { authorIds, categoryIds, ...cleanDto } = baseDto;
     return {
       ...cleanDto,
@@ -24,6 +25,7 @@ export const BookMapper: BaseMapper<IBook, BookDto> & {
     }
   },
   toEntity(dto: Partial<BookDto>): Partial<IBook> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { categories, authors, ...cleanDto } = dto;
     const baseEntity = baseBookMapper.toEntity(cleanDto);
     const result: Partial<IBook> = { ...baseEntity };

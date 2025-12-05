@@ -1,14 +1,14 @@
-import FileRepository from "src/repositories/file.repository";
+import { Types } from "mongoose";
+import { IDocument } from "src/models/document.model";
 import { BaseService } from "src/core/base.service";
+import { categoryRepository } from "src/repositories/category.repository";
+import FileRepository from "src/repositories/document.repository";
+import { Pagination } from "src/types";
 import { FileDto } from "src/dtos/file.dto";
-import { IFile } from "src/models/file.model";
 import { FileMapper } from "src/mappers/file.mapper";
 import { CategoryMapper } from "src/mappers/category.mapper";
-import CategoryRepository from "src/repositories/category.repository";
-import { Types } from "mongoose";
-import { Pagination } from "src/types";
 
-class FileService extends BaseService<IFile, FileDto> {
+class DocumentService extends BaseService<IDocument, FileDto> {
   constructor() {
     super(FileRepository, FileMapper);
   }
@@ -27,14 +27,14 @@ class FileService extends BaseService<IFile, FileDto> {
     return files.map((f: any) => this.mapFileToDto(f));
   }
 
-  async findById(id: string, lang?: string): Promise<FileDto | null> {
+  async getById(id: string, lang?: string): Promise<FileDto | null> {
     const file = await FileRepository.findById(id, lang);
     if (!file) return null;
     return this.mapFileToDto(file);
   }
 
   async findByCategory(categorySlug: string, lang?: string): Promise<FileDto[]> {
-    const category = await CategoryRepository.findOne({ slug: categorySlug }) as any | null;
+    const category = await categoryRepository.findOne({ slug: categorySlug }) as any | null;
     if (!category) return [];
 
     const categoryId = (category._id as Types.ObjectId).toString();
@@ -48,12 +48,7 @@ class FileService extends BaseService<IFile, FileDto> {
 
     return {
       data,
-      pagination: {
-        total: result.total,
-        page: result.page,
-        limit: result.limit,
-        pages: result.pages
-      }
+      pagination: result.pagination
     };
   }
 
@@ -79,4 +74,4 @@ class FileService extends BaseService<IFile, FileDto> {
   }
 }
 
-export default new FileService();
+export default new DocumentService();
