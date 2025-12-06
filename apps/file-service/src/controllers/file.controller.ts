@@ -1,7 +1,8 @@
 import FileService from '../services/file.service';
 import { asyncHandler } from '../middleware/error-handler.middleware';
 import * as response from '../utils/response.util';
-import { AuthRequest, MultipleUploadRequest, UploadRequest } from 'src/types';
+import { AuthRequest, UploadRequest } from 'src/types';
+import FileStorageService from 'src/services/storage.service';
 
 const FileController = {
   getById: asyncHandler(async (req, res) => {
@@ -43,27 +44,51 @@ const FileController = {
     response.success(res, 'Files by filename', files);
   }),
 
-  download: asyncHandler(async (req, res) => {
-    const { fileId } = req.params;
-    const { buffer, metadata } = await FileService.download(fileId);
-    res.setHeader('Content-Type', metadata.mimeType);
-    res.setHeader('Content-Disposition', `attachment; filename="${metadata.originalName}"`);
-    res.setHeader('Content-Length', buffer.length);
-    return res.send(buffer);
-  }),
-
-  upload: asyncHandler<UploadRequest>(async (req, res) => {
+  uploadDirect: asyncHandler<UploadRequest>(async (req, res) => {
     const file = req.file;
     const userId = req.user.id;
-    const result = await FileService.upload(file, userId);
+    if (!file) {
+      return response.badRequest(res, 'No file uploaded');
+    }
+    const { bucket, objectName } = await FileStorageService.uploadDirect(userId, file);
+    const result = await FileService.create({
+      filename: file.originalname,
+      objectName,
+      mimeType: file.mimetype,
+      size: file.size,
+      bucket,
+      provider: 'minio',
+      uploadedBy: userId
+    });
     response.created(res, 'File uploaded successfully', result);
   }),
 
-  uploadMultiple: asyncHandler<MultipleUploadRequest>(async (req, res) => {
-    const files = req.files;
+  upload: asyncHandler<AuthRequest>(async (req, res) => {
     const userId = req.user.id;
-    const results = await FileService.uploadMultiple(files, userId);
-    response.created(res, `${results.length} files uploaded successfully`, results);
+    const { filename, type } = req.body;
+    const result = await FileStorageService.upload(userId, filename, type);
+    response.success(res, 'Upload URL generated', result);
+  }),
+
+  confirm: asyncHandler<AuthRequest>(async (req, res) => {
+    const userId = req.user.id;
+    const { uploadId } = req.body;
+    const metadata = await FileStorageService.confirm(userId, uploadId);
+    const result = await FileService.create(metadata);
+    response.created(res, 'Upload confirmed successfully', result);
+  }),
+
+  download: asyncHandler(async (req, res) => {
+    const { fileId } = req.params;
+    const metadata = await FileService.getRawById(fileId);
+    if (!metadata || !metadata.objectName) {
+      return response.notFound(res, 'File not found');
+    }
+    const buffer = await FileStorageService.download(metadata.objectName);
+    res.setHeader('Content-Type', metadata.mimeType);
+    res.setHeader('Content-Disposition', `attachment; filename="${metadata.filename}"`);
+    res.setHeader('Content-Length', buffer.length);
+    return res.send(buffer);
   }),
 
   delete: asyncHandler<AuthRequest>(async (req, res) => {

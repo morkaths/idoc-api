@@ -1,14 +1,15 @@
 import MinioClient from '../config/minio.config';
-import { MINIO_BUCKET, MINIO_ENDPOINT, MINIO_PORT, MINIO_USE_SSL } from '../config/env.config';
+import { MINIO_BUCKET } from '../config/env.config';
 
 MinioClient.connect();
 
 export const MinioService = {
+  // Upload file lên MinIO
   async upload(
     objectName: string,
     fileBuffer: Buffer,
     contentType: string,
-  ): Promise<{ bucket: string; fileName: string; url: string }> {
+  ): Promise<{ bucket: string; objectName: string }> {
     const client = MinioClient.get();
     const bucketExists = await client.bucketExists(MINIO_BUCKET);
     if (!bucketExists) {
@@ -19,21 +20,17 @@ export const MinioService = {
       'Content-Type': contentType,
     });
 
-    const protocol = MINIO_USE_SSL ? 'https' : 'http';
-    const endpoint = MINIO_ENDPOINT.replace(/^https?:\/\//, '');
-    const port = MINIO_PORT ? `:${MINIO_PORT}` : '';
-
     return {
       bucket: MINIO_BUCKET,
-      fileName: objectName,
-      url: `${protocol}://${endpoint}${port}/${MINIO_BUCKET}/${objectName}`
+      objectName
     };
   },
 
+  // Download file từ MinIO
   async download(objectName: string): Promise<Buffer> {
     const client = MinioClient.get();
     const stream = await client.getObject(MINIO_BUCKET, objectName);
-    
+
     const chunks: Buffer[] = [];
     return new Promise((resolve, reject) => {
       stream.on('data', (chunk) => chunks.push(chunk));
@@ -42,11 +39,13 @@ export const MinioService = {
     });
   },
 
+  // Xóa file khỏi MinIO
   async delete(objectName: string): Promise<void> {
     const client = MinioClient.get();
     await client.removeObject(MINIO_BUCKET, objectName);
   },
 
+  // Kiểm tra file có tồn tại trên MinIO không
   async exists(objectName: string): Promise<boolean> {
     try {
       const client = MinioClient.get();
@@ -57,9 +56,27 @@ export const MinioService = {
     }
   },
 
-  async getPresignedUrl(objectName: string, expirySeconds = 3600): Promise<string> {
+  async stat(objectName: string): Promise<{ size: number; etag: string; metaData: Record<string, any> }> {
     const client = MinioClient.get();
-    return await client.presignedGetObject(MINIO_BUCKET, objectName, expirySeconds);
+    return await client.statObject(MINIO_BUCKET, objectName);
+  },
+
+  // // Lấy stream của file từ MinIO
+  // async getObjectStream(objectName: string): Promise<NodeJS.ReadableStream> {
+  //   const client = MinioClient.get();
+  //   return client.getObject(MINIO_BUCKET, objectName);
+  // },
+
+  // Presigned URL để client upload trực tiếp lên MinIO
+  async getPresignedUploadUrl(objectName: string, expirySeconds = 600): Promise<string> {
+    const client = MinioClient.get();
+    return client.presignedPutObject(MINIO_BUCKET, objectName, expirySeconds);
+  },
+
+  // Presigned URL để client tải file về trực tiếp từ MinIO
+  async getPresignedDownloadUrl(objectName: string, expirySeconds = 3600): Promise<string> {
+    const client = MinioClient.get();
+    return client.presignedGetObject(MINIO_BUCKET, objectName, expirySeconds);
   },
 
 }

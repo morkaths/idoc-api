@@ -6,7 +6,7 @@ import { AuthRequest } from '../types';
 /**
  * Middleware to authenticate JWT token from Authorization header
  */
-export const authenticateToken = async (req: Request, res: Response, next: NextFunction) => {
+export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Get token from Authorization header
     const authHeader = req.headers.authorization;

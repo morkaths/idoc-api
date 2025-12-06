@@ -17,7 +17,7 @@ const fileFilter = (
     'image/gif',
     'image/webp',
     'image/svg+xml',
-    
+
     // Documents
     'application/pdf',
     'application/msword',
@@ -26,17 +26,25 @@ const fileFilter = (
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
     'application/vnd.ms-powerpoint',
     'application/vnd.openxmlformats-officedocument.presentationml.presentation', // .pptx
-    
+
     // Text
     'text/plain',
     'text/csv',
-    
+
+    // Video
+    'video/mp4',
+    'video/x-matroska', // .mkv
+    'video/quicktime',  // .mov
+    'video/x-msvideo',  // .avi
+    'video/webm',
+    'video/mpeg',
+
     // Archives
     'application/zip',
     'application/x-rar-compressed',
     'application/x-7z-compressed',
   ];
-  
+
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {

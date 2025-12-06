@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import FileController from '../controllers/file.controller';
-import { authenticateToken } from '../middleware/auth.middleware';
-import { multipleFilesUpload, singleFileUpload } from '../middleware/upload-file.middleware';
+import { authenticate } from '../middleware/auth.middleware';
+import { singleFileUpload } from '../middleware/upload-file.middleware';
 
 const router = Router();
 
@@ -10,21 +10,21 @@ const router = Router();
  * @desc    Get files by user
  * @access  Private
  */
-router.get('/user', authenticateToken, FileController.getByUser);
+router.get('/user', authenticate, FileController.getByUser);
 
 /**
  * @route   GET /api/files/type?mimeType=...&limit=...&skip=...
  * @desc    Get files by mimeType
  * @access  Private
  */
-router.get('/type', authenticateToken, FileController.getByMimeType);
+router.get('/type', authenticate, FileController.getByMimeType);
 
 /**
  * @route   GET /api/files/search?filename=...&limit=...&skip=...
  * @desc    Search files by filename
  * @access  Private
  */
-router.get('/search', authenticateToken, FileController.getByFilename);
+router.get('/search', authenticate, FileController.getByFilename);
 
 /**
  * @route   GET /api/files/:fileId
@@ -41,24 +41,31 @@ router.get('/:fileId', FileController.getById);
 router.get('/:fileId/download', FileController.download);
 
 /**
- * @route   POST /api/files/upload
- * @desc    Upload a file
+ * @route   POST /api/files/upload/direct
+ * @desc    Upload file directly
  * @access  Private
  */
-router.post('/upload', authenticateToken, singleFileUpload, FileController.upload);
+router.post('/upload/direct', authenticate, singleFileUpload, FileController.uploadDirect);
 
 /**
- * @route   POST /api/files/upload-multiple
- * @desc    Upload multiple files
+ * @route   POST /api/files/upload/confirm
+ * @desc    Confirm file upload
  * @access  Private
  */
-router.post('/upload-multiple', authenticateToken, multipleFilesUpload, FileController.uploadMultiple);
+router.post('/upload/confirm', authenticate, FileController.confirm);
+
+/**
+ * @route   POST /api/files/upload
+ * @desc    Get presigned upload URL
+ * @access  Private
+ */
+router.post('/upload', authenticate, FileController.upload);
 
 /**
  * @route   DELETE /api/files/:fileId
  * @desc    Delete file
  * @access  Private
  */
-router.delete('/:fileId', authenticateToken, FileController.delete);
+router.delete('/:fileId', authenticate, FileController.delete);
 
 export default router;

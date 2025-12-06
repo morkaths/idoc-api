@@ -11,7 +11,7 @@ export class FileRepository extends BaseRepository<IFile> {
   }
 
   async findByProviderAndPath(provider: string, path: string) {
-    return this.findOne({ provider, path });
+    return this.findOne({ provider, objectName: path });
   }
 
   async findByUser(userId: string, page = 1, limit = 20) {

@@ -3,11 +3,11 @@ import mongoose, { Document, Schema } from "mongoose";
 export type StorageProvider = "local" | "s3" | "minio" | "gcs" | "azure";
 
 export interface IFile extends Document {
-  filename: string;                   // tên file lưu trữ
-  originalName: string;               // tên file gốc khi upload
+  filename: string;                   // tên file gốc
+  objectName: string;                 // tên đối tượng/file trong hệ thống lưu trữ
   mimeType: string;                   // loại MIME của file
+  type: string;
   size: number;                       // kích thước file tính bằng byte
-  path: string;                       // đường dẫn lưu trữ file
   bucket?: string;                    // tên bucket trong MinIO/S3
   provider: StorageProvider;          // nhà cung cấp dịch vụ lưu trữ 
   checksum: string;                   // mã kiểm tra tính toàn vẹn của file
@@ -20,10 +20,14 @@ export interface IFile extends Document {
 const FileSchema = new Schema<IFile>(
   {
     filename: { type: String, required: true, trim: true },
-    originalName: { type: String, required: true, trim: true },
+    objectName: { type: String, required: true, unique: true, trim: true },
     mimeType: { type: String, required: true, trim: true },
+    type: { 
+      type: String, 
+      enum: ["ebook", "document", "image", "video", "audio", "archive", "other"], 
+      default: "other"
+    },
     size: { type: Number, required: true },
-    path: { type: String, required: true },
     bucket: { type: String, trim: true },
     provider: { 
       type: String, 
@@ -37,7 +41,7 @@ const FileSchema = new Schema<IFile>(
   { timestamps: true }
 );
 
-FileSchema.index({ provider: 1, bucket: 1, path: 1 }, { unique: true });
+FileSchema.index({ provider: 1, bucket: 1 });
 FileSchema.index({ checksum: 1 });
 FileSchema.index({ uploadedBy: 1 });
 FileSchema.index({ createdAt: -1 });
