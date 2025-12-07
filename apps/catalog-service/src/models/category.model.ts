@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface ICategory extends Document {
-  slug?: string;
+  slug: string;
   parentId?: string;
   createdAt?: Date;
   updatedAt?: Date;
@@ -14,6 +14,7 @@ const CategorySchema = new Schema<ICategory>(
       index: true, 
       trim: true,
       unique: true,
+      required: true,
       sparse: true
     },
     parentId: { 

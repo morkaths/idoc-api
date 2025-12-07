@@ -2,6 +2,7 @@ import { Expose } from "class-transformer";
 
 export class FileDto {
   @Expose() id!: string;
+  @Expose() key!: string;
   @Expose() filename!: string;
   @Expose() mimeType!: string;
   @Expose() size!: number;

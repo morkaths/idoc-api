@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import passport from 'passport';
+import swaggerUi from 'swagger-ui-express';
 
 import routes from './routes';
 import { FRONTEND_URL } from './config/env.config';
@@ -11,6 +12,7 @@ import { errorHandler } from './middleware/error-handler.middleware';
 
 
 const app = express();
+const swaggerSpec = require('../docs/config.swagger.js');
 
 // 1. CORS: Cho phép FE truy cập API, cấu hình domain, header, method
 app.use(
@@ -48,9 +50,13 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     endpoints: {
       files: '/api/files',
+      docs: '/api/docs',
     }
   });
 });
+
+// 7.1. Swagger UI
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // 8. Định nghĩa các route chính
 app.use('/api', routes);

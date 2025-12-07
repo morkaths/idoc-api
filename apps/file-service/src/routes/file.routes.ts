@@ -27,25 +27,25 @@ router.get('/type', authenticate, FileController.getByMimeType);
 router.get('/search', authenticate, FileController.getByFilename);
 
 /**
- * @route   GET /api/files/:fileId
- * @desc    Get file metadata
+ * @route   GET /api/files/:key
+ * @desc    Get file metadata by key
  * @access  Public
  */
-router.get('/:fileId', FileController.getById);
+router.get('/:key', FileController.getByKey);
 
 /**
- * @route   GET /api/files/:fileId/download
- * @desc    Download file
+ * @route   GET /api/files/:key/download
+ * @desc    Download file by key
  * @access  Public
  */
-router.get('/:fileId/download', FileController.download);
+router.get('/:key/download', FileController.download);
 
 /**
- * @route   POST /api/files/upload/direct
- * @desc    Upload file directly
+ * @route   POST /api/files/upload
+ * @desc    Get presigned upload URL
  * @access  Private
  */
-router.post('/upload/direct', authenticate, singleFileUpload, FileController.uploadDirect);
+router.post('/upload/url', authenticate, FileController.getUploadUrl);
 
 /**
  * @route   POST /api/files/upload/confirm
@@ -56,16 +56,16 @@ router.post('/upload/confirm', authenticate, FileController.confirm);
 
 /**
  * @route   POST /api/files/upload
- * @desc    Get presigned upload URL
+ * @desc    Upload file directly
  * @access  Private
  */
-router.post('/upload', authenticate, FileController.upload);
+router.post('/upload', authenticate, singleFileUpload, FileController.upload);
 
 /**
  * @route   DELETE /api/files/:fileId
  * @desc    Delete file
  * @access  Private
  */
-router.delete('/:fileId', authenticate, FileController.delete);
+router.delete('/:key', authenticate, FileController.delete);
 
 export default router;

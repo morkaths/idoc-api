@@ -6,6 +6,10 @@ export class FileRepository extends BaseRepository<IFile> {
     super(File);
   }
 
+  async findByKey(key: string) {
+    return this.findOne({ key });
+  }
+
   async findByChecksum(checksum: string) {
     return this.findOne({ checksum });
   }
@@ -33,6 +37,11 @@ export class FileRepository extends BaseRepository<IFile> {
       { filename: { $regex: keyword, $options: 'i' } },
       { page, limit, sort: { createdAt: -1 }, lean: true }
     );
+  }
+
+  override async delete(key: string): Promise<boolean> {
+    const result = await this.model.deleteOne({ key });
+    return result.deletedCount > 0;
   }
 }
 
