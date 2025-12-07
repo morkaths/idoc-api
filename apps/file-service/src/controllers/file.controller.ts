@@ -5,6 +5,16 @@ import { AuthRequest, UploadRequest } from 'src/types';
 import { MinioService } from '../services/minio.service';
 
 const FileController = {
+  getList: asyncHandler(async (req, res) => {
+    const { page = 1, limit = 20, ...filters } = req.query;
+    const { data, pagination } = await FileService.getList(
+      Number(page),
+      Number(limit),
+      filters
+    );
+    response.paginated(res, 'Get files successfully', data, pagination);
+  }),
+
   // Lấy metadata file theo key
   getByKey: asyncHandler(async (req, res) => {
     const { key } = req.params;
@@ -23,26 +33,6 @@ const FileController = {
     if (!userId) return response.badRequest(res, 'Missing userId');
     const files = await FileService.getByUser(userId, page, limit);
     response.success(res, 'Files by user', files);
-  }),
-
-  // Lấy danh sách file theo loại
-  getByMimeType: asyncHandler(async (req, res) => {
-    const mimeType = req.query.mimeType as string;
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 20;
-    if (!mimeType) return response.badRequest(res, 'Missing mimeType');
-    const files = await FileService.getByMimeType(mimeType, page, limit);
-    response.success(res, 'Files by mimeType', files);
-  }),
-
-  // Tìm kiếm file theo tên
-  getByFilename: asyncHandler(async (req, res) => {
-    const keyword = req.query.keyword as string;
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 20;
-    if (!keyword) return response.badRequest(res, 'Missing keyword');
-    const files = await FileService.getByFilename(keyword, page, limit);
-    response.success(res, 'Files by filename', files);
   }),
 
   getUploadUrl: asyncHandler<AuthRequest>(async (req, res) => {

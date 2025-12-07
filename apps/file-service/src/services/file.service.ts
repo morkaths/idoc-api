@@ -13,6 +13,17 @@ async function toDtoWithUrl(file: IFile | Partial<IFile>): Promise<FileDto> {
 }
 
 export const FileService = {
+
+  async getList(
+    page: number,
+    limit: number,
+    filter: { [key: string]: any }
+  ): Promise<{ data: FileDto[]; pagination: any }> {
+    const result = await fileRepository.findList(page, limit, filter);
+    const data = await Promise.all(result.items.map(toDtoWithUrl));
+    return { data, pagination: result.pagination };
+  },
+
   async getByKey(key: string): Promise<FileDto | null> {
     const cached = await RedisService.getCache<IFile>(`file:metadata:${key}`);
     const metadata = cached || await fileRepository.findByKey(key);
@@ -23,16 +34,6 @@ export const FileService = {
 
   async getByUser(userId: string, page = 1, limit = 20): Promise<FileDto[]> {
     const { items } = await fileRepository.findByUser(userId, page, limit);
-    return Promise.all(items.map(toDtoWithUrl));
-  },
-
-  async getByMimeType(mimeType: string, page = 1, limit = 20): Promise<FileDto[]> {
-    const { items } = await fileRepository.findByMimeType(mimeType, page, limit);
-    return Promise.all(items.map(toDtoWithUrl));
-  },
-
-  async getByFilename(keyword: string, page = 1, limit = 20): Promise<FileDto[]> {
-    const { items } = await fileRepository.findByFilename(keyword, page, limit);
     return Promise.all(items.map(toDtoWithUrl));
   },
 

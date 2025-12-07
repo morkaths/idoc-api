@@ -1,7 +1,6 @@
 import { Expose } from "class-transformer";
 import { CategoryDto } from "./category.dto";
 import { AuthorDto } from "./author.dto";
-import { FileType } from "src/types";
 
 export class BookDto {
   @Expose() _id!: string;
@@ -18,7 +17,7 @@ export class BookDto {
   @Expose() price?: number;
   @Expose() stock?: number;
   @Expose() coverUrl?: string;
-  @Expose() ebookId?: string;
+  @Expose() fileKey?: string;
   @Expose() tags?: string[];
   @Expose() createdAt?: Date;
   @Expose() updatedAt?: Date;

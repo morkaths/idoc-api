@@ -6,6 +6,54 @@ export class FileRepository extends BaseRepository<IFile> {
     super(File);
   }
 
+  async findList(
+    page: number,
+    limit: number,
+    filter: { [key: string]: any }
+  ) {
+    const {
+      query,
+      mimeType,
+      uploadedBy,
+      ...rest
+    } = filter;
+
+    const p = Math.max(1, Number(page));
+    const l = Math.max(1, Number(limit));
+    const conditions: any[] = [];
+
+    if (query) {
+      const regex = new RegExp(String(query), "i");
+      conditions.push({
+        $or: [
+          { filename: regex },
+          { key: regex },
+        ],
+      });
+    }
+    if (mimeType) {
+      conditions.push({ mimeType });
+    }
+    if (uploadedBy) {
+      conditions.push({ uploadedBy });
+    }
+    Object.entries(rest).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        conditions.push({ [key]: value });
+      }
+    });
+
+    const match = conditions.length > 0 ? { $and: conditions } : {};
+    const options = {
+      page: p,
+      limit: l,
+      sort: { createdAt: -1 },
+      lean: true,
+    };
+
+    return this.paginate(match, options);
+  }
+
   async findByKey(key: string) {
     return this.findOne({ key });
   }
@@ -14,27 +62,9 @@ export class FileRepository extends BaseRepository<IFile> {
     return this.findOne({ checksum });
   }
 
-  async findByProviderAndPath(provider: string, path: string) {
-    return this.findOne({ provider, objectName: path });
-  }
-
   async findByUser(userId: string, page = 1, limit = 20) {
     return this.paginate(
       { uploadedBy: userId },
-      { page, limit, sort: { createdAt: -1 }, lean: true }
-    );
-  }
-
-  async findByMimeType(mimeType: string, page = 1, limit = 20) {
-    return this.paginate(
-      { mimeType },
-      { page, limit, sort: { createdAt: -1 }, lean: true }
-    );
-  }
-
-  async findByFilename(keyword: string, page = 1, limit = 20) {
-    return this.paginate(
-      { filename: { $regex: keyword, $options: 'i' } },
       { page, limit, sort: { createdAt: -1 }, lean: true }
     );
   }

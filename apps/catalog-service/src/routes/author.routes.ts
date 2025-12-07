@@ -6,26 +6,79 @@ import { RoleEnum } from '../constants/security/role';
 const router = Router();
 
 /**
- * @route   GET /api/authors?query=...page=...&limit=...
- * @desc    Get list authors
- * @access  Public
- * @filter  filter - Filter parameters   
+ * @openapi
+ * /authors:
+ *   get:
+ *     summary: Lấy danh sách tác giả
+ *     tags:
+ *       - Author
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Trang hiện tại
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Số lượng mỗi trang
+ *       - in: query
+ *         name: query
+ *         schema:
+ *           type: string
+ *         description: Từ khóa tìm kiếm
+ *     responses:
+ *       200:
+ *         description: Danh sách tác giả
  */
 router.get('/', AuthorController.getList);
 
 /**
- * @route   GET /api/authors/:id
- * @desc    Get author by ID
- * @access  Public
- * @param   id - Author ID
+ * @openapi
+ * /authors/{id}:
+ *   get:
+ *     summary: Lấy tác giả theo ID
+ *     tags:
+ *       - Author
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Author ID
+ *     responses:
+ *       200:
+ *         description: Thông tin tác giả
+ *       404:
+ *         description: Không tìm thấy tác giả
  */
 router.get('/:id', AuthorController.getById);
 
 /**
- * @route   POST /api/authors
- * @desc    Create a new author
- * @access  Private
- * @body    AuthorDto - Author data
+ * @openapi
+ * /authors:
+ *   post:
+ *     summary: Tạo mới tác giả
+ *     tags:
+ *       - Author
+ *     security:
+ *       - bearerAuth: []
+ *       - apiKeyAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/AuthorDto'
+ *     responses:
+ *       201:
+ *         description: Tạo thành công
+ *       401:
+ *         description: Chưa đăng nhập hoặc không có API Key
+ *       403:
+ *         description: Không đủ quyền truy cập
  */
 router.post(
   '/',
@@ -35,11 +88,37 @@ router.post(
 );
 
 /**
- * @route   PATCH /api/authors/:id
- * @desc    Update an author by ID
- * @access  Private
- * @param   id - Author ID
- * @body    AuthorDto - Author data
+ * @openapi
+ * /authors/{id}:
+ *   patch:
+ *     summary: Cập nhật tác giả
+ *     tags:
+ *       - Author
+ *     security:
+ *       - bearerAuth: []
+ *       - apiKeyAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Author ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/AuthorDto'
+ *     responses:
+ *       200:
+ *         description: Cập nhật thành công
+ *       401:
+ *         description: Chưa đăng nhập hoặc không có API Key
+ *       403:
+ *         description: Không đủ quyền truy cập
+ *       404:
+ *         description: Không tìm thấy tác giả
  */
 router.patch(
   '/:id',
@@ -49,10 +128,31 @@ router.patch(
 );
 
 /**
- * @route   DELETE /api/authors/:id
- * @desc    Delete an author by ID
- * @access  Private
- * @param   id - Author ID
+ * @openapi
+ * /authors/{id}:
+ *   delete:
+ *     summary: Xóa tác giả
+ *     tags:
+ *       - Author
+ *     security:
+ *       - bearerAuth: []
+ *       - apiKeyAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Author ID
+ *     responses:
+ *       200:
+ *         description: Xóa thành công
+ *       401:
+ *         description: Chưa đăng nhập hoặc không có API Key
+ *       403:
+ *         description: Không đủ quyền truy cập
+ *       404:
+ *         description: Không tìm thấy tác giả
  */
 router.delete(
   '/:id',
