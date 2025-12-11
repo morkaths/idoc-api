@@ -96,7 +96,7 @@ app.get('/healthcheck', (req, res) => {
   res.status(200).send('OK');
 });
 
-// 10. Middleware xử lý lỗi tổng quát (luôn đặt cuối cùng)
+// 10. Middleware xử lý lỗi tổng quát
 app.use((req, res) => {
   res.status(404).json({
     success: false,
