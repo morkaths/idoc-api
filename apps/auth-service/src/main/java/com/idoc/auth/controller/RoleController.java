@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,8 +23,23 @@ public class RoleController {
   private RoleService roleService;
 
   @GetMapping
+  public ResponseEntity<Map<String, Object>> getList(
+      @RequestParam(defaultValue = "1") int page,
+      @RequestParam(defaultValue = "10") int limit,
+      @RequestParam Map<String, Object> filter
+  ) {
+    filter.remove("page");
+    filter.remove("limit");
+    var data = roleService.getList(PageRequest.of(page > 0 ? page - 1 : 0, limit), filter);
+    if (data.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No roles found");
+    }
+    return com.idoc.auth.util.ResponseUtil.paged("Roles retrieved successfully", data);
+  }
+
+  @GetMapping("/all")
   public ResponseEntity<Map<String, Object>> getAllRoles() {
-    List<RoleDto> data = roleService.findAll();
+    List<RoleDto> data = roleService.getAll();
     if (data.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No roles found");
     }
@@ -35,7 +51,7 @@ public class RoleController {
     if (id == null || id <= 0) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role ID");
     }
-    RoleDto data = roleService.findById(id);
+    RoleDto data = roleService.getById(id);
     if (data == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found with id: " + id);
     }
@@ -45,7 +61,7 @@ public class RoleController {
   @PostMapping
   @PreAuthorize("hasRole(T(com.idoc.auth.constant.RoleConstants).ADMIN)")
   public ResponseEntity<Map<String, Object>> createRole(@RequestBody RoleDto role) {
-    RoleDto data = roleService.create(role);
+    RoleDto data = roleService.save(role);
     if (data == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to create role");
     }
@@ -59,7 +75,7 @@ public class RoleController {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role ID");
     }
     role.setId(id);
-    RoleDto data = roleService.update(role);
+    RoleDto data = roleService.save(role);
     if (data == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found with id: " + id);
     }
@@ -73,7 +89,7 @@ public class RoleController {
     if (id == null || id <= 0) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role ID");
     }
-    RoleDto data = roleService.partialUpdate(id, updates);
+    RoleDto data = roleService.partial(id, updates);
     if (data == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found with id: " + id);
     }

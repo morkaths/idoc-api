@@ -6,6 +6,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,7 @@ import com.idoc.auth.entity.UserEntity;
 import com.idoc.auth.mapper.UserMapper;
 import com.idoc.auth.repository.RoleRepository;
 import com.idoc.auth.repository.UserRepository;
+import com.idoc.auth.spec.UserSpecification;
 import com.idoc.auth.util.SpecificationBuilder;
 
 @Service
@@ -24,14 +27,20 @@ public class UserServiceImpl extends BaseServiceImpl<UserDto, UserEntity, Long> 
 	private final UserRepository userRepository;
 	private final UserMapper userMapper;
 
+	@Autowired
+	private RoleRepository roleRepository;
+
 	public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
-		super(userRepository, userMapper);
+		super(userRepository, userRepository, userMapper);
 		this.userRepository = userRepository;
 		this.userMapper = userMapper;
 	}
 
-	@Autowired
-	private RoleRepository roleRepository;
+	@Override
+    public Page<UserDto> getList(Pageable pageable, Map<String, Object> filter) {
+        Specification<UserEntity> spec = UserSpecification.filter(filter);
+        return this.search(pageable, spec);
+    }
 
 	@Override
 	public List<UserDto> search(Map<String, Object> filter) {
@@ -59,7 +68,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserDto, UserEntity, Long> 
 	}
 
 	@Override
-	public UserDto findByUsernameOrEmail(String identifier) {
+	public UserDto getByUsernameOrEmail(String identifier) {
 		UserEntity user = userRepository.findByUsernameOrEmail(identifier);
 		if (user == null) {
 			throw new IllegalArgumentException("User not found with identifier: " + identifier);

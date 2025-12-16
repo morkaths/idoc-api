@@ -5,10 +5,10 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.idoc.auth.constant.query.UserQuery;
 import com.idoc.auth.entity.UserEntity;
 
 public interface UserRepository extends JpaRepository<UserEntity, Long>, JpaSpecificationExecutor<UserEntity> {
+	
 	boolean existsByUsername(String username);
 
 	boolean existsByEmail(String email);
@@ -19,9 +19,19 @@ public interface UserRepository extends JpaRepository<UserEntity, Long>, JpaSpec
 
 	UserEntity findOneByUsernameAndStatus(String username, int status);
 
-	@Query(UserQuery.FIND_BY_USERNAME_OR_EMAIL)
+	@Query("""
+			SELECT u FROM UserEntity u
+			LEFT JOIN FETCH u.roles r
+			LEFT JOIN FETCH r.permissions
+			WHERE u.username = :identifier OR u.email = :identifier
+			""")
 	UserEntity findByUsernameOrEmail(@Param("identifier") String identifier);
 
-	@Query(UserQuery.FIND_BY_USERNAME_WITH_ROLES_AND_PERMISSIONS)
+	@Query("""
+			SELECT u FROM UserEntity u
+			LEFT JOIN FETCH u.roles r
+			LEFT JOIN FETCH r.permissions
+			WHERE u.username = :username
+			""")
 	UserEntity findByUsernameWithRolesAndPermissions(@Param("username") String username);
 }

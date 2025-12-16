@@ -2,8 +2,10 @@ package com.idoc.auth.util;
 
 import org.springframework.http.ResponseEntity;
 
+import com.idoc.auth.dto.Pagination;
 import com.idoc.auth.dto.UserDto;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
 import java.util.Map;
@@ -16,6 +18,19 @@ public class ResponseUtil {
     body.put("success", true);
     body.put("message", message);
     body.put("user", user);
+    return ResponseEntity.status(HttpStatus.OK).body(body);
+  }
+
+  public static <T> ResponseEntity<Map<String, Object>> paged(String message, Page<T> page) {
+    Map<String, Object> body = new LinkedHashMap<>();
+    body.put("success", true);
+    body.put("message", message);
+    body.put("data", page.getContent());
+    body.put("pagination", new Pagination(
+        page.getTotalElements(),
+        page.getSize(),
+        page.getNumber(),
+        page.getTotalPages()));
     return ResponseEntity.status(HttpStatus.OK).body(body);
   }
 

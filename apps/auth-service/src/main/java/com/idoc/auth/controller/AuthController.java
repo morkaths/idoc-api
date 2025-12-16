@@ -57,7 +57,7 @@ public class AuthController {
 	public ResponseEntity<Map<String, Object>> verify() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		JwtTokenRequest principal = (JwtTokenRequest) authentication.getPrincipal();
-		UserDto user = userService.findById(principal.getUserId());
+		UserDto user = userService.getById(principal.getUserId());
 		if (user == null) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
 		}
@@ -68,7 +68,7 @@ public class AuthController {
 	public ResponseEntity<Map<String, Object>> update(@RequestBody Map<String, Object> request) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		JwtTokenRequest principal = (JwtTokenRequest) authentication.getPrincipal();
-		UserDto data = userService.partialUpdate(principal.getUserId(), request);
+		UserDto data = userService.partial(principal.getUserId(), request);
 		if (data == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Update failed");
 		}

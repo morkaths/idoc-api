@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,8 +33,22 @@ public class PermissionController {
   private PermissionService permissionService;
 
   @GetMapping
+  public ResponseEntity<Map<String, Object>> getList(
+      @RequestParam(defaultValue = "1") int page,
+      @RequestParam(defaultValue = "10") int limit,
+      @RequestParam Map<String, Object> filter) {
+    filter.remove("page");
+    filter.remove("limit");
+    Page<PermissionDto> data = permissionService.getList(PageRequest.of(page > 0 ? page - 1 : 0, limit), filter);
+    if (data.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No permissions found");
+    }
+    return ResponseUtil.paged("Permissions retrieved successfully", data);
+  }
+
+  @GetMapping("/all")
   public ResponseEntity<Map<String, Object>> getAll() {
-    List<PermissionDto> data = permissionService.findAll();
+    List<PermissionDto> data = permissionService.getAll();
     if (data.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No permissions found");
     }
@@ -44,7 +60,7 @@ public class PermissionController {
     if (id == null || id <= 0) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid permission ID");
     }
-    PermissionDto data = permissionService.findById(id);
+    PermissionDto data = permissionService.getById(id);
     if (data == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Permission not found with id: " + id);
     }
@@ -56,7 +72,7 @@ public class PermissionController {
     if (roleId == null || roleId <= 0) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role ID");
     }
-    List<PermissionDto> data = permissionService.findByRoleId(roleId);
+    List<PermissionDto> data = permissionService.getByRoleId(roleId);
     if (data.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No permissions found for role ID: " + roleId);
     }
@@ -68,7 +84,7 @@ public class PermissionController {
     if (code == null || code.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Permission code cannot be null or empty");
     }
-    PermissionDto data = permissionService.findByCode(code);
+    PermissionDto data = permissionService.getByCode(code);
     if (data == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Permission not found with code: " + code);
     }
@@ -78,7 +94,7 @@ public class PermissionController {
   @PostMapping
   @PreAuthorize("hasAnyRole('admin', 'manager')")
   public ResponseEntity<Map<String, Object>> createPermission(@RequestBody PermissionDto permission) {
-    PermissionDto data = permissionService.create(permission);
+    PermissionDto data = permissionService.save(permission);
     if (data == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to create permission");
     }
@@ -93,7 +109,7 @@ public class PermissionController {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role ID");
     }
     permission.setId(id);
-    PermissionDto data = permissionService.update(permission);
+    PermissionDto data = permissionService.save(permission);
     if (data == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Permission not found with id: " + permission.getId());
     }
@@ -107,7 +123,7 @@ public class PermissionController {
     if (id == null || id <= 0) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid permission ID");
     }
-    PermissionDto data = permissionService.partialUpdate(id, updates);
+    PermissionDto data = permissionService.partial(id, updates);
     if (data == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Permission not found with id: " + id);
     }

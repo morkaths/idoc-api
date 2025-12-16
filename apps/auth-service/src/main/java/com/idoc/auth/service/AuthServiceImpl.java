@@ -8,7 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
-import com.idoc.auth.constant.RoleConstants;
+import com.idoc.auth.constant.Role;
 import com.idoc.auth.dto.external.ProfileDto;
 import com.idoc.auth.entity.RoleEntity;
 import com.idoc.auth.entity.UserEntity;
@@ -72,7 +72,7 @@ public class AuthServiceImpl implements AuthService {
 		}
 
 		String hashedPassword = PasswordUtil.hash(password);
-		RoleEntity userRole = roleRepository.findByName(RoleConstants.USER);
+		RoleEntity userRole = roleRepository.findByCode(Role.USER.getValue());
 		if (userRole == null) {
 			throw new IllegalArgumentException("Default user role not found");
 		}

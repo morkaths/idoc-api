@@ -14,8 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.idoc.auth.constant.RoleConstants;
-import com.idoc.auth.constant.SecurityConstants;
+import com.idoc.auth.constant.Role;
 import com.idoc.auth.security.handler.CustomAccessDeniedHandler;
 import com.idoc.auth.security.handler.CustomUnauthorizedHandler;
 import com.idoc.auth.security.jwt.JwtAuthenticationFilter;
@@ -61,9 +60,25 @@ public class WebSecurityConfig {
 
 		// Configure route authorization
 		http.authorizeHttpRequests(registry -> registry
-				.requestMatchers(SecurityConstants.PUBLIC_ROUTES).permitAll()
-				.requestMatchers("/api/roles/**").authenticated()
-				.requestMatchers("/api/permissions/**").hasRole(RoleConstants.ADMIN)
+				.requestMatchers(
+                    "/api/auth/**",
+                    "/v3/api-docs/**",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html"
+                ).permitAll()
+				.requestMatchers("/api/roles/**").hasAnyRole(
+                    Role.MANAGER.getValue(),
+                    Role.ADMIN.getValue()
+                )
+                .requestMatchers("/api/permissions/**").hasAnyRole(
+                    Role.MANAGER.getValue(),
+                    Role.ADMIN.getValue()
+                )
+				.requestMatchers("/api/users/**").hasAnyRole(
+                    Role.STAFF.getValue(),
+                    Role.MANAGER.getValue(),
+                    Role.ADMIN.getValue()
+                )
 				.anyRequest().denyAll());
 
 		return http.build();

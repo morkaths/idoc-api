@@ -14,7 +14,7 @@ public interface BaseMapper<E, D> {
 
   E toEntity(D dto);
 
-  default void partialUpdateEntity(ObjectMapper objectMapper, Map<String, Object> fields, E entity) {
+  default void partial(ObjectMapper objectMapper, Map<String, Object> fields, E entity) {
     Set<String> validFields = Arrays.stream(entity.getClass().getDeclaredFields())
         .map(Field::getName)
         .collect(Collectors.toSet());
