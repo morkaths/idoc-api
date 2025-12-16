@@ -85,7 +85,7 @@ router.get('/user', authenticate, FileController.getByUser);
  *         schema:
  *           type: string
  *         required: true
- *         description: Khóa định danh file lưu trên storage (ví dụ: folder/uuid.ext)
+ *         description: Khóa định danh file lưu trên storage
  *     responses:
  *       200:
  *         description: Metadata file
@@ -102,7 +102,7 @@ router.get('/user', authenticate, FileController.getByUser);
  *                   description: Tên file gốc do user đặt
  *                 contentType:
  *                   type: string
- *                   description: MIME type của file (ví dụ: application/pdf, image/png)
+ *                   description: MIME type của file
  *                 size:
  *                   type: integer
  *                   description: Kích thước file tính bằng bytes

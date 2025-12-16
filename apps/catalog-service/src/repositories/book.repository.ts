@@ -31,8 +31,9 @@ class BookRepository extends BaseRepository<IBook> {
       conditions.push({
         $or: [
           { title: regex },
+          { slug: regex },
           { description: regex },
-          { isbn: regex },
+          { isbn: regex }
         ],
       });
     }
