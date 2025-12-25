@@ -1,18 +1,18 @@
-package com.idoc.auth.dto;
+package com.idoc.auth.dto.response;
 
 import java.util.Set;
 
-public class RoleDto {
+public class RoleResponse {
 	private Long id;
 	private String code;
 	private String name;
-	private Set<PermissionDto> permissions;
+	private Set<PermissionResponse> permissions;
 
-	public RoleDto() {
+	public RoleResponse() {
 		super();
 	}
 
-	public RoleDto(Long id, String code, String name) {
+	public RoleResponse(Long id, String code, String name) {
 		super();
 		this.id = id;
 		this.code = code;
@@ -43,11 +43,11 @@ public class RoleDto {
 		this.name = name;
 	}
 
-	public Set<PermissionDto> getPermissions() {
+	public Set<PermissionResponse> getPermissions() {
 		return permissions;
 	}
 
-	public void setPermissions(Set<PermissionDto> permissions) {
+	public void setPermissions(Set<PermissionResponse> permissions) {
 		this.permissions = permissions;
 	}
 

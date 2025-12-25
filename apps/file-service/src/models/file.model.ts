@@ -24,7 +24,7 @@ export interface IFile extends Document {
   filename: string;                   // tên file gốc
   objectName: string;                 // tên đối tượng/file trong hệ thống lưu trữ
   mimeType: string;                   // loại MIME của file
-  type: FileType;
+  type: string;
   size: number;                       // kích thước file tính bằng byte
   bucket?: string;                    // tên bucket trong MinIO/S3
   provider: StorageProvider;          // nhà cung cấp dịch vụ lưu trữ 
@@ -42,8 +42,7 @@ const FileSchema = new Schema<IFile>(
     objectName: { type: String, required: true, unique: true, trim: true },
     mimeType: { type: String, required: true, trim: true },
     type: { 
-      type: String, 
-      enum: Object.values(FileType), 
+      type: String,
       default: FileType.OTHER,
     },
     size: { type: Number, required: true },

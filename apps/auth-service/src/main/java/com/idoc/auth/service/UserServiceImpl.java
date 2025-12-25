@@ -1,49 +1,75 @@
 package com.idoc.auth.service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.idoc.auth.core.BaseServiceImpl;
-import com.idoc.auth.dto.UserDto;
+import com.idoc.auth.dto.external.ProfileRequest;
+import com.idoc.auth.dto.request.UserRequest;
+import com.idoc.auth.dto.response.UserResponse;
 import com.idoc.auth.entity.RoleEntity;
 import com.idoc.auth.entity.UserEntity;
+import com.idoc.auth.integration.ProfileClient;
 import com.idoc.auth.mapper.UserMapper;
 import com.idoc.auth.repository.RoleRepository;
+import com.idoc.auth.repository.TokenRepository;
 import com.idoc.auth.repository.UserRepository;
 import com.idoc.auth.spec.UserSpecification;
 import com.idoc.auth.util.SpecificationBuilder;
 
 @Service
-public class UserServiceImpl extends BaseServiceImpl<UserDto, UserEntity, Long> implements UserService {
+public class UserServiceImpl
+		extends BaseServiceImpl<UserRequest, UserResponse, UserEntity, Long>
+		implements UserService {
 
 	private final UserRepository userRepository;
+	private final RoleRepository roleRepository;
 	private final UserMapper userMapper;
+	private final ProfileClient profileClient;
+	private final TokenRepository tokenRepository;
 
-	@Autowired
-	private RoleRepository roleRepository;
-
-	public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
+	public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, RoleRepository roleRepository,
+			ProfileClient profileClient, TokenRepository tokenRepository) {
 		super(userRepository, userRepository, userMapper);
 		this.userRepository = userRepository;
 		this.userMapper = userMapper;
+		this.roleRepository = roleRepository;
+		this.profileClient = profileClient;
+		this.tokenRepository = tokenRepository;
 	}
 
 	@Override
-    public Page<UserDto> getList(Pageable pageable, Map<String, Object> filter) {
-        Specification<UserEntity> spec = UserSpecification.filter(filter);
-        return this.search(pageable, spec);
-    }
+	public Page<UserResponse> getList(Pageable pageable, Map<String, Object> filter) {
+		String sortBy = (String) filter.getOrDefault("sortBy", "id");
+		String sortOrder = (String) filter.getOrDefault("sortOrder", "asc");
+		Sort sort = sortOrder.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+		Pageable pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+		Specification<UserEntity> spec = UserSpecification.filter(filter);
+		return this.search(pageRequest, spec);
+	}
 
 	@Override
-	public List<UserDto> search(Map<String, Object> filter) {
+	public UserResponse getByUsernameOrEmail(String identifier) {
+		UserEntity user = userRepository.findByUsernameOrEmail(identifier);
+		if (user == null) {
+			throw new IllegalArgumentException("User not found with identifier: " + identifier);
+		}
+		return userMapper.toDto(user);
+	}
+
+	@Override
+	public List<UserResponse> search(Map<String, Object> filter) {
 		SpecificationBuilder<UserEntity> builder = SpecificationBuilder.<UserEntity>builder()
 				.queryFields("username", "email")
 				.likeFields("username", "email", "status")
@@ -57,7 +83,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserDto, UserEntity, Long> 
 	}
 
 	@Override
-	public UserDto assignRolesToUser(Long userId, List<Long> roleIds) {
+	@Transactional
+	public UserResponse assign(Long userId, Set<Long> roleIds) {
 		UserEntity user = userRepository.findById(userId)
 				.orElseThrow(() -> new IllegalArgumentException("User not found"));
 		Set<RoleEntity> roles = roleRepository.findAllById(roleIds)
@@ -68,12 +95,57 @@ public class UserServiceImpl extends BaseServiceImpl<UserDto, UserEntity, Long> 
 	}
 
 	@Override
-	public UserDto getByUsernameOrEmail(String identifier) {
-		UserEntity user = userRepository.findByUsernameOrEmail(identifier);
-		if (user == null) {
-			throw new IllegalArgumentException("User not found with identifier: " + identifier);
+	@Transactional
+	public UserResponse save(UserRequest dto) {
+		UserEntity entity = userMapper.toEntity(dto);
+		if (dto.getRoleIds() != null && !dto.getRoleIds().isEmpty()) {
+			Set<RoleEntity> roles = new HashSet<>(roleRepository.findAllById(dto.getRoleIds()));
+			entity.setRoles(roles);
 		}
-		return userMapper.toDto(user);
+		UserEntity saved = userRepository.save(entity);
+		return userMapper.toDto(saved);
+	}
+
+	@Override
+	@Transactional
+	public UserResponse create(UserRequest dto, Long createdBy) {
+		UserEntity entity = userMapper.toEntity(dto);
+		if (dto.getRoleIds() != null && !dto.getRoleIds().isEmpty()) {
+			Set<RoleEntity> roles = new HashSet<>(roleRepository.findAllById(dto.getRoleIds()));
+			entity.setRoles(roles);
+		}
+		UserEntity saved = userRepository.save(entity);
+		ProfileRequest profile = new ProfileRequest(
+				saved.getId(),
+				"User " + saved.getUsername(),
+				null,
+				null,
+				null,
+				null);
+		String accessToken = tokenRepository.getAccessToken(String.valueOf(createdBy));
+		try {
+			profileClient.create(profile, accessToken);
+		} catch (Exception ex) {
+			System.err.println("Error when creating profile: " + ex.getMessage());
+		}
+		return userMapper.toDto(saved);
+	}
+
+	@Override
+	@Transactional
+	public UserResponse partial(Long id, Map<String, Object> fields) {
+		UserEntity user = userRepository.findById(id)
+				.orElseThrow(() -> new IllegalArgumentException("User not found"));
+		if (fields.containsKey("roleIds")) {
+			List<?> rawRoleIds = (List<?>) fields.get("roleIds");
+			List<Long> roleIds = rawRoleIds.stream()
+					.map(val -> Long.valueOf(val.toString()))
+					.collect(Collectors.toList());
+			Set<RoleEntity> roles = new HashSet<>(roleRepository.findAllById(roleIds));
+			user.setRoles(roles);
+			fields.remove("roleIds");
+		}
+		return super.partial(id, fields);
 	}
 
 }

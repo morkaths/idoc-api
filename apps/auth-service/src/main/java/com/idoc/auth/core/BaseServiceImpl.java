@@ -15,39 +15,39 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
 
-public abstract class BaseServiceImpl<T, E, ID> implements BaseService<T, E, ID> {
+public abstract class BaseServiceImpl<Request, Response, Entity, ID> implements BaseService<Request, Response, Entity, ID> {
 
-  protected final JpaRepository<E, ID> repository;
-  protected final JpaSpecificationExecutor<E> specificationExecutor;
-  protected final BaseMapper<E, T> mapper;
-
+  protected final JpaRepository<Entity, ID> repository;
+  protected final JpaSpecificationExecutor<Entity> specificationExecutor;
+  protected final BaseMapper<Request, Response, Entity> mapper;
+  
   @Autowired
   protected ObjectMapper objectMapper;
 
-  public BaseServiceImpl(JpaRepository<E, ID> repository,
-      JpaSpecificationExecutor<E> specificationExecutor,
-      BaseMapper<E, T> mapper) {
+  public BaseServiceImpl(JpaRepository<Entity, ID> repository,
+      JpaSpecificationExecutor<Entity> specificationExecutor,
+      BaseMapper<Request, Response, Entity> mapper) {
     this.repository = repository;
     this.specificationExecutor = specificationExecutor;
     this.mapper = mapper;
   }
 
   @Override
-  public List<T> getAll() {
-    List<E> entities = repository.findAll();
+  public List<Response> getAll() {
+    List<Entity> entities = repository.findAll();
     return entities.stream()
         .map(mapper::toDto)
         .toList();
   }
 
   @Override
-  public Page<T> search(Pageable pageable, Specification<E> spec) {
-    Page<E> entities = specificationExecutor.findAll(spec, pageable);
+  public Page<Response> search(Pageable pageable, Specification<Entity> spec) {
+    Page<Entity> entities = specificationExecutor.findAll(spec, pageable);
     return entities.map(mapper::toDto);
   }
 
   @Override
-  public T getById(ID id) {
+  public Response getById(ID id) {
     return repository.findById(id)
         .map(mapper::toDto)
         .orElseThrow(() -> new IllegalArgumentException("Entity not found with id: " + id));
@@ -55,9 +55,9 @@ public abstract class BaseServiceImpl<T, E, ID> implements BaseService<T, E, ID>
 
   @Override
   @Transactional
-  public T save(T dto) {
+  public Response save(Request dto) {
     try {
-      E entity = repository.save(mapper.toEntity(dto));
+      Entity entity = repository.save(mapper.toEntity(dto));
       return mapper.toDto(entity);
     } catch (DataIntegrityViolationException ex) {
       throw ex;
@@ -67,15 +67,17 @@ public abstract class BaseServiceImpl<T, E, ID> implements BaseService<T, E, ID>
   }
 
   @Override
-  public T partial(ID id, Map<String, Object> fields) {
-    E entity = repository.findById(id)
+  @Transactional
+  public Response partial(ID id, Map<String, Object> fields) {
+    Entity entity = repository.findById(id)
         .orElseThrow(() -> new IllegalArgumentException("Entity with id " + id + " does not exist"));
     mapper.partial(objectMapper, fields, entity);
-    E saved = repository.save(entity);
+    Entity saved = repository.save(entity);
     return mapper.toDto(saved);
   }
 
   @Override
+  @Transactional
   public boolean delete(ID id) {
     if (repository.existsById(id)) {
       repository.deleteById(id);

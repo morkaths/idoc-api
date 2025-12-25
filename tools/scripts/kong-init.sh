@@ -65,3 +65,8 @@ curl -i -X POST http://localhost:8001/services/file-service/routes \
   --data "name=files-route" \
   --data "paths[]=/api/files" \
   --data "strip_path=false"
+
+curl -i -X POST http://localhost:8001/services/file-service/routes \
+  --data "name=images-route" \
+  --data "paths[]=/api/images" \
+  --data "strip_path=false"

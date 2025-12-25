@@ -30,6 +30,10 @@ class MinioClient {
     }
     return MinioClient.instance;
   }
+
+  static async reset(): Promise<void> {
+    MinioClient.instance = null;
+  }
 }
 
 export default MinioClient;

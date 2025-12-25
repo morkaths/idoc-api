@@ -1,16 +1,15 @@
-package com.idoc.auth.dto;
+package com.idoc.auth.dto.response;
 
-public class Pagination {
+public class PageResponse {
     private Long total;
     private int limit;
     private int page;
     private int pages;
 
-    public Pagination() {
-        super();
+    public PageResponse() {
     }
-    
-    public Pagination(Long total, int limit, int page, int pages) {
+
+    public PageResponse(Long total, int limit, int page, int pages) {
         this.total = total;
         this.limit = limit;
         this.page = page;
@@ -48,5 +47,4 @@ public class Pagination {
     public void setPages(int pages) {
         this.pages = pages;
     }
-    
 }

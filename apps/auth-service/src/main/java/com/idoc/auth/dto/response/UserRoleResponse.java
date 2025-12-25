@@ -1,14 +1,14 @@
-package com.idoc.auth.dto;
+package com.idoc.auth.dto.response;
 
-public class UserRoleDto {
+public class UserRoleResponse {
   private Long id;
   private String code;
   private String name;
 
-  public UserRoleDto() {
+  public UserRoleResponse() {
   }
 
-  public UserRoleDto(Long id, String code, String name) {
+  public UserRoleResponse(Long id, String code, String name) {
     this.id = id;
     this.code = code;
     this.name = name;

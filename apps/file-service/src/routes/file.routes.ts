@@ -125,6 +125,9 @@ router.get('/:key', FileController.getByKey);
  *     summary: Download file theo key
  *     tags:
  *       - File
+ *     security:
+ *       - bearerAuth: []
+ *       - apiKeyAuth: []
  *     parameters:
  *       - in: path
  *         name: key
@@ -143,7 +146,7 @@ router.get('/:key', FileController.getByKey);
  *       404:
  *         description: Không tìm thấy file
  */
-router.get('/:key/download', FileController.download);
+router.get('/:key/download', authenticate, FileController.download);
 
 /**
  * @openapi

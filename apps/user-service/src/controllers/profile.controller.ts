@@ -35,9 +35,6 @@ const ProfileController = {
 
   create: asyncHandler(async (req: AuthRequest, res: Response) => {
     const data = req.body;
-    const userId = req.user?.id;
-    if (!userId) return response.unauthorized(res, "Unauthorized");
-    data.userId = userId;
     const profile = await ProfileService.create(data);
     if (!profile) return response.badRequest(res, "Failed to create profile");
     response.created(res, "Profile created successfully", profile);

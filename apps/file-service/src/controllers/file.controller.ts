@@ -37,8 +37,8 @@ const FileController = {
 
   getUploadUrl: asyncHandler<AuthRequest>(async (req, res) => {
     const userId = req.user.id;
-    const { filename, type } = req.body;
-    const result = await MinioService.getPresignedUploadUrl(userId, filename, type);
+    const { filename, type, folder } = req.body;
+    const result = await MinioService.getPresignedUploadUrl(userId, filename, type, folder);
     response.success(res, 'Upload URL generated', result);
   }),
 

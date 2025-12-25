@@ -2,7 +2,7 @@ package com.idoc.auth.dto.external;
 
 import java.util.Date;
 
-public class ProfileDto {
+public class ProfileRequest {
   private Long userId;
   private String fullName;
   private Date birthday;
@@ -10,11 +10,11 @@ public class ProfileDto {
   private String bio;
   private String location;
 
-  public ProfileDto() {
+  public ProfileRequest() {
     super();
   }
 
-  public ProfileDto(Long userId, String fullName, Date birthday, String avatar, String bio, String location) {
+  public ProfileRequest(Long userId, String fullName, Date birthday, String avatar, String bio, String location) {
     this.userId = userId;
     this.fullName = fullName;
     this.birthday = birthday;

@@ -1,33 +1,20 @@
-package com.idoc.auth.dto;
+package com.idoc.auth.dto.response;
 
 import java.util.Set;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-
-public class UserDto {
+public class UserResponse {
 	private Long id;
-	
-	@NotBlank(message = "Username is required")
 	private String username;
-
-	@NotBlank(message = "Password is required")
 	private String password;
-
-	@NotBlank(message = "Email is required")
-	@Email(message = "Email should be valid")
 	private String email;
-
-	@NotBlank(message = "Status is required")
 	private int status;
-
-	private Set<UserRoleDto> roles;
-
-	public UserDto() {
+	private Set<UserRoleResponse> roles;
+	
+	public UserResponse() {
 		super();
 	}
 
-	public UserDto(Long id, String username, String password, String email, int status) {
+	public UserResponse(Long id, String username, String password, String email, int status) {
 		super();
 		this.id = id;
 		this.username = username;
@@ -36,7 +23,7 @@ public class UserDto {
 		this.status = status;
 	}
 
-	public UserDto(Long id, String username, String password, String email, int status, Set<UserRoleDto> roles) {
+	public UserResponse(Long id, String username, String password, String email, int status, Set<UserRoleResponse> roles) {
 		super();
 		this.id = id;
 		this.username = username;
@@ -86,11 +73,11 @@ public class UserDto {
 		this.status = status;
 	}
 
-	public Set<UserRoleDto> getRoles() {
+	public Set<UserRoleResponse> getRoles() {
 		return roles;
 	}
 
-	public void setRoles(Set<UserRoleDto> roles) {
+	public void setRoles(Set<UserRoleResponse> roles) {
 		this.roles = roles;
 	}
 

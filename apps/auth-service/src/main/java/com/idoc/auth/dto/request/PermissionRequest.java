@@ -1,18 +1,18 @@
-package com.idoc.auth.dto;
+package com.idoc.auth.dto.request;
 
-public class PermissionDto {
-	private Long id;
+public class PermissionRequest {
+    private Long id;
 	private String code;
 	private String name;
 
-	public PermissionDto() {
-	}
+	public PermissionRequest() {
+    }
 
-	public PermissionDto(Long id, String code, String name) {
-		this.id = id;
-		this.code = code;
-		this.name = name;
-	}
+    public PermissionRequest(Long id, String code, String name) {
+        this.id = id;
+        this.code = code;
+        this.name = name;
+    }
 
 	public Long getId() {
 		return id;

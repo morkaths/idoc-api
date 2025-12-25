@@ -15,9 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.idoc.auth.dto.LoginRequest;
-import com.idoc.auth.dto.RegisterRequest;
-import com.idoc.auth.dto.UserDto;
+import com.idoc.auth.dto.request.LoginRequest;
+import com.idoc.auth.dto.request.RegisterRequest;
+import com.idoc.auth.dto.response.AuthenticationResponse;
+import com.idoc.auth.dto.response.UserResponse;
 import com.idoc.auth.security.jwt.JwtTokenRequest;
 import com.idoc.auth.service.AuthService;
 import com.idoc.auth.service.UserService;
@@ -37,38 +38,65 @@ public class AuthController {
 
 	@PostMapping("/login")
 	public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody LoginRequest request) {
-		String token = authService.login(request.getIdentifier(), request.getPassword());
-		if (token == null) {
+		AuthenticationResponse response = authService.login(request.getIdentifier(), request.getPassword());
+		if (response == null) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
 		}
-		return ResponseUtil.success("Login successful", token);
+		return ResponseUtil.authentication("Login successful", response, null);
 	}
 
 	@PostMapping("/register")
 	public ResponseEntity<Map<String, Object>> register(@Valid @RequestBody RegisterRequest request) {
-		String token = authService.register(request.getEmail(), request.getUsername(), request.getPassword());
-		if (token == null) {
+		AuthenticationResponse response = authService.register(request.getEmail(), request.getUsername(),
+				request.getPassword());
+		if (response == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Registration failed");
 		}
-		return ResponseUtil.created("Registration successful", token);
+		return ResponseUtil.authentication("Registration successful", response, null);
 	}
 
 	@GetMapping("/verify")
 	public ResponseEntity<Map<String, Object>> verify() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		JwtTokenRequest principal = (JwtTokenRequest) authentication.getPrincipal();
-		UserDto user = userService.getById(principal.getUserId());
-		if (user == null) {
+		if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal() == null
+				|| authentication.getPrincipal().equals("anonymousUser")) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
 		}
+		JwtTokenRequest principal;
+		try {
+			principal = (JwtTokenRequest) authentication.getPrincipal();
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Principal is not a valid JwtTokenRequest: " + e.getMessage());
+		}
+		UserResponse user = userService.getById(principal.getUserId());
+		if (user == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No user found with userId: " + principal.getUserId());
+		}
 		return ResponseUtil.user("Token is valid", user);
+	}
+
+	@PostMapping("/refresh")
+	public ResponseEntity<Map<String, Object>> refresh(@RequestBody Map<String, String> body) {
+		AuthenticationResponse response = authService.refresh(body.get("refreshToken"));
+		if (response == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid refresh token");
+		}
+		return ResponseUtil.success("Token refreshed", response);
+	}
+
+	@PostMapping("/logout")
+	public ResponseEntity<Map<String, Object>> logout() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		JwtTokenRequest principal = (JwtTokenRequest) authentication.getPrincipal();
+		authService.logout(String.valueOf(principal.getUserId()));
+		return ResponseUtil.success("Logout successful", null);
 	}
 
 	@PatchMapping("/update")
 	public ResponseEntity<Map<String, Object>> update(@RequestBody Map<String, Object> request) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		JwtTokenRequest principal = (JwtTokenRequest) authentication.getPrincipal();
-		UserDto data = userService.partial(principal.getUserId(), request);
+		UserResponse data = userService.partial(principal.getUserId(), request);
 		if (data == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Update failed");
 		}

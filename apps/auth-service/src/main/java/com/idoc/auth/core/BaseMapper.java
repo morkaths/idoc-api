@@ -9,12 +9,11 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public interface BaseMapper<E, D> {
-  D toDto(E entity);
+public interface BaseMapper<Request, Response, Entity> {
+  Entity toEntity(Request dto);
+  Response toDto(Entity entity);
 
-  E toEntity(D dto);
-
-  default void partial(ObjectMapper objectMapper, Map<String, Object> fields, E entity) {
+  default void partial(ObjectMapper objectMapper, Map<String, Object> fields, Entity entity) {
     Set<String> validFields = Arrays.stream(entity.getClass().getDeclaredFields())
         .map(Field::getName)
         .collect(Collectors.toSet());

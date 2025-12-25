@@ -49,6 +49,18 @@ export const MINIO_SECRET_KEY = process.env.MINIO_SECRET_KEY
 export const MINIO_BUCKET = process.env.MINIO_BUCKET || '';
 
 // ────────────────────────────────────────────────────────────────────────────────
+// Cloudinary Config
+// ────────────────────────────────────────────────────────────────────────────────
+export const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME || '';
+export const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY
+  ? process.env.CLOUDINARY_API_KEY
+  : (() => { throw new Error('CLOUDINARY_API_KEY is not defined in environment variables'); })();
+
+export const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET
+  ? process.env.CLOUDINARY_API_SECRET
+  : (() => { throw new Error('CLOUDINARY_API_SECRET is not defined in environment variables'); })();
+
+// ────────────────────────────────────────────────────────────────────────────────
 // Redis Config
 // ────────────────────────────────────────────────────────────────────────────────
 export const REDIS_HOST = process.env.REDIS_HOST || 'localhost';

@@ -7,11 +7,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
-public interface BaseService<T, E, ID> {
-  List<T> getAll();
-  Page<T> search(Pageable pageable, Specification<E> spec);
-  T getById(ID id);
-  T save(T dto);
-  T partial(ID id, Map<String, Object> fields);
-  boolean delete(ID id);
+public interface BaseService<Request, Response, Entity, ID> {
+    List<Response> getAll();
+    Page<Response> search(Pageable pageable, Specification<Entity> spec);
+    Response getById(ID id);
+    Response save(Request request);
+    Response partial(ID id, Map<String, Object> fields);
+    boolean delete(ID id);
 }

@@ -1,7 +1,7 @@
 import MinioClient from '../config/minio.config';
 import { MINIO_BUCKET } from '../config/env.config';
 import { RedisService } from './redis.service';
-import { FileType, IFile, StorageProvider } from 'src/models/file.model';
+import { IFile, StorageProvider } from 'src/models/file.model';
 import { KeyGenerator } from '../utils/key.util';
 
 MinioClient.connect();
@@ -93,9 +93,10 @@ export const MinioService = {
   async getPresignedUploadUrl(
     userId: string,
     filename: string,
-    type: FileType
+    type: string,
+    folder = 'uploads'
   ): Promise<{ url: string; key: string }> {
-    const { path: objectName, key } = KeyGenerator.createStoragePath(userId, filename);
+    const { path: objectName, key } = KeyGenerator.createStoragePath(folder, filename);
     const client = MinioClient.get();
     const url = await client.presignedPutObject(MINIO_BUCKET, objectName, 600);
     const pendingMetadata: Partial<IFile> = {

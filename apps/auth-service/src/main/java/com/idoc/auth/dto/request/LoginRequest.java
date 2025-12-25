@@ -1,4 +1,4 @@
-package com.idoc.auth.dto;
+package com.idoc.auth.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 
