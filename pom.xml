@@ -101,6 +101,7 @@
 
     <modules>
         <module>apps/auth-service</module>
+        <module>apps/payment-service</module>
     </modules>
 
 </project>
