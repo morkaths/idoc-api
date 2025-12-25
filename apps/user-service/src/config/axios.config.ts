@@ -7,6 +7,11 @@ type ApiOptions = Omit<AxiosRequestConfig, 'method' | 'url' | 'baseURL'> & { mod
 
 class ApiClient {
   private static instances: { public: AxiosInstance; private: AxiosInstance };
+  private static token: string | null = null;
+
+  static setToken(token: string | null) {
+    ApiClient.token = token;
+  }
 
   static init() {
     if (!ApiClient.instances) {
@@ -27,6 +32,9 @@ class ApiClient {
     instance.interceptors.request.use((config) => {
       config.headers = config.headers || {};
       config.headers['x-api-key'] = API_CONFIG.key;
+      if (withCredentials && ApiClient.token) {
+        config.headers['Authorization'] = `Bearer ${ApiClient.token}`;
+      }
       return config;
     });
 
