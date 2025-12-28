@@ -59,7 +59,7 @@ export const FileService = {
       objectName: result.objectName,
       mimeType: file.mimetype,
       size: file.size,
-      bucket : result.bucket,
+      bucket: result.bucket,
       provider: StorageProvider.MINIO,
       uploadedBy: userId
     };
@@ -73,6 +73,12 @@ export const FileService = {
     if (!metadata || !metadata.objectName) throw new Error('File not found');
     const buffer = await MinioService.download(metadata.objectName);
     return { buffer, metadata };
+  },
+
+  async getDownloadUrl(key: string, expirySeconds = 21600): Promise<string> {
+    const metadata = await fileRepository.findByKey(key);
+    if (!metadata || !metadata.objectName) throw new Error('File not found');
+    return MinioService.getPresignedDownloadUrl(metadata.objectName, expirySeconds);
   },
 
 };

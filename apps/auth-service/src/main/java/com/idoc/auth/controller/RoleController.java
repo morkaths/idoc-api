@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -31,6 +32,7 @@ public class RoleController {
   private RoleService roleService;
 
   @GetMapping
+  @PreAuthorize("hasAuthority('role.view')")
   public ResponseEntity<Map<String, Object>> getList(
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "10") int limit,
@@ -38,7 +40,7 @@ public class RoleController {
   ) {
     filter.remove("page");
     filter.remove("limit");
-    var data = roleService.getList(PageRequest.of(page > 0 ? page - 1 : 0, limit), filter);
+    var data = roleService.find(PageRequest.of(page > 0 ? page - 1 : 0, limit), filter);
     if (data.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No roles found");
     }
@@ -46,8 +48,9 @@ public class RoleController {
   }
 
   @GetMapping("/all")
+  @PreAuthorize("hasAuthority('role.view')")
   public ResponseEntity<Map<String, Object>> getAll() {
-    List<RoleResponse> data = roleService.getAll();
+    List<RoleResponse> data = roleService.findAll();
     if (data.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No roles found");
     }
@@ -55,11 +58,12 @@ public class RoleController {
   }
 
   @GetMapping("/{id}")
+  @PreAuthorize("hasAuthority('role.view')")
   public ResponseEntity<Map<String, Object>> getById(@PathVariable Long id) {
     if (id == null || id <= 0) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role ID");
     }
-    RoleResponse data = roleService.getById(id);
+    RoleResponse data = roleService.findById(id);
     if (data == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found with id: " + id);
     }
@@ -67,6 +71,7 @@ public class RoleController {
   }
 
   @PostMapping
+  @PreAuthorize("hasAuthority('role.edit')")
   public ResponseEntity<Map<String, Object>> create(@RequestBody RoleRequest request) {
     RoleResponse data = roleService.save(request);
     if (data == null) {
@@ -76,6 +81,7 @@ public class RoleController {
   }
 
   @PatchMapping("/{id}")
+  @PreAuthorize("hasAuthority('role.edit')")
   public ResponseEntity<Map<String, Object>> update(@PathVariable Long id,
       @RequestBody Map<String, Object> updates) {
     if (id == null || id <= 0) {
@@ -89,6 +95,7 @@ public class RoleController {
   }
 
   @DeleteMapping("/{id}")
+  @PreAuthorize("hasAuthority('role.delete')")
   public ResponseEntity<Map<String, Object>> delete(@PathVariable Long id) {
     if (id == null || id <= 0) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role ID");

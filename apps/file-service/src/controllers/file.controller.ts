@@ -35,6 +35,12 @@ const FileController = {
     response.success(res, 'Files by user', files);
   }),
 
+  getDownloadUrl: asyncHandler(async (req, res) => {
+    const { key, expiry } = req.body;
+    const url = await FileService.getDownloadUrl(key, Number(expiry));
+    response.success(res, 'Presigned URL generated', { url });
+  }),
+
   getUploadUrl: asyncHandler<AuthRequest>(async (req, res) => {
     const userId = req.user.id;
     const { filename, type, folder } = req.body;

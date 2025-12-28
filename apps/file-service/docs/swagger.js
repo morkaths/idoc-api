@@ -56,6 +56,14 @@ const options = {
             key: { type: 'string' }
           }
         },
+        FileDownloadUrl: {
+          type: 'object',
+          required: ['key'],
+          properties: {
+            key: { type: 'string' },
+            expiry: { type: 'number', description: 'Expiry time in seconds' }
+          }
+        },
         File: {
           type: 'object',
           properties: {

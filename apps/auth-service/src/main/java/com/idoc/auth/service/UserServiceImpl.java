@@ -50,17 +50,17 @@ public class UserServiceImpl
 	}
 
 	@Override
-	public Page<UserResponse> getList(Pageable pageable, Map<String, Object> filter) {
+	public Page<UserResponse> find(Pageable pageable, Map<String, Object> filter) {
 		String sortBy = (String) filter.getOrDefault("sortBy", "id");
 		String sortOrder = (String) filter.getOrDefault("sortOrder", "asc");
 		Sort sort = sortOrder.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
 		Pageable pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 		Specification<UserEntity> spec = UserSpecification.filter(filter);
-		return this.search(pageRequest, spec);
+		return this.paginate(pageRequest, spec);
 	}
 
 	@Override
-	public UserResponse getByUsernameOrEmail(String identifier) {
+	public UserResponse findByUsernameOrEmail(String identifier) {
 		UserEntity user = userRepository.findByUsernameOrEmail(identifier);
 		if (user == null) {
 			throw new IllegalArgumentException("User not found with identifier: " + identifier);

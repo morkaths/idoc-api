@@ -42,17 +42,17 @@ public class RoleServiceImpl
   }
 
   @Override
-  public Page<RoleResponse> getList(Pageable pageable, Map<String, Object> filter) {
+  public Page<RoleResponse> find(Pageable pageable, Map<String, Object> filter) {
     String sortBy = (String) filter.getOrDefault("sortBy", "id");
 		String sortOrder = (String) filter.getOrDefault("sortOrder", "asc");
 		Sort sort = sortOrder.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
     Pageable pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 		Specification<RoleEntity> spec = RoleSpecification.filter(filter);
-    return this.search(pageRequest, spec);
+    return this.paginate(pageRequest, spec);
   }
 
   @Override
-  public RoleResponse getByCode(String code) {
+  public RoleResponse findByCode(String code) {
     RoleEntity entity = roleRepository.findByCode(code);
     if (entity == null) {
       throw new IllegalArgumentException("Role not found with code: " + code);

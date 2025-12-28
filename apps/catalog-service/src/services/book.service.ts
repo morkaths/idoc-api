@@ -27,7 +27,7 @@ class BookService extends BaseService<IBook, BookDto> {
     );
   }
 
-  async getList(
+  async findList(
     page: number,
     limit: number,
     filter: { [key: string]: any }
@@ -38,7 +38,7 @@ class BookService extends BaseService<IBook, BookDto> {
     return { data, pagination: result.pagination };
   }
 
-  async getById(id: string, lang?: string): Promise<BookDto | null> {
+  async findById(id: string, lang?: string): Promise<BookDto | null> {
     const book = await bookRepository.findById(id, lang);
     if (!book) return null;
     return this.mapBookToDto(book);

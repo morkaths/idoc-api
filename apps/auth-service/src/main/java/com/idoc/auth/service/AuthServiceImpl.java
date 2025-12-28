@@ -68,7 +68,12 @@ public class AuthServiceImpl implements AuthService {
 					user.getId(),
 					user.getUsername(),
 					user.getEmail(),
-					user.getRoles().stream().map(RoleEntity::getCode).toList());
+					user.getRoles().stream().map(RoleEntity::getCode).toList(),
+					user.getRoles().stream()
+							.flatMap(role -> role.getPermissions().stream())
+							.map(permission -> permission.getCode())
+							.distinct()
+							.toList());
 			String accessToken = jwtTokenProvider.createToken(request, accessTokenExpiration * 1000);
 			String refreshToken = jwtTokenProvider.createToken(request, refreshTokenExpiration * 1000);
 			if (accessToken == null) {
@@ -110,7 +115,12 @@ public class AuthServiceImpl implements AuthService {
 				user.getId(),
 				user.getUsername(),
 				user.getEmail(),
-				user.getRoles().stream().map(RoleEntity::getCode).toList());
+				user.getRoles().stream().map(RoleEntity::getCode).toList(),
+				user.getRoles().stream()
+						.flatMap(role -> role.getPermissions().stream())
+						.map(permission -> permission.getCode())
+						.distinct()
+						.toList());
 		String accessToken = jwtTokenProvider.createToken(request, accessTokenExpiration * 1000);
 		String refreshToken = jwtTokenProvider.createToken(request, refreshTokenExpiration * 1000);
 		if (accessToken == null) {
@@ -153,7 +163,12 @@ public class AuthServiceImpl implements AuthService {
 				user.getId(),
 				user.getUsername(),
 				user.getEmail(),
-				user.getRoles().stream().map(RoleEntity::getCode).toList());
+				user.getRoles().stream().map(RoleEntity::getCode).toList(),
+				user.getRoles().stream()
+						.flatMap(role -> role.getPermissions().stream())
+						.map(permission -> permission.getCode())
+						.distinct()
+						.toList());
 		String accessToken = jwtTokenProvider.createToken(request, Common.EXPIRATION_TIME);
 		if (accessToken == null) {
 			throw new IllegalStateException("Failed to generate access token");

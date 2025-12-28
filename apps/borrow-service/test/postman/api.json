@@ -1,0 +1,114 @@
+{
+  "info": {
+    "name": "User Service #microservice",
+    "description": "API collection for User service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "getAll",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
+            "url": "{{api_url}}/profiles"
+          }
+        },
+        {
+          "name": "getMe",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
+            "url": "{{api_url}}/profiles/me"
+          }
+        },
+        {
+          "name": "search",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
+            "url": "{{api_url}}/profiles/search?query=test"
+          }
+        },
+        {
+          "name": "getById",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
+            "url": "{{api_url}}/profiles/{{profileId}}"
+          }
+        },
+        {
+          "name": "create",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Test User\",\n  \"bio\": \"Hello!\",\n  \"location\": \"Vietnam\"\n}"
+            },
+            "url": "{{api_url}}/profiles"
+          }
+        },
+        {
+          "name": "updateMe",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bio\": \"Updated bio\"\n}"
+            },
+            "url": "{{api_url}}/profiles/me"
+          }
+        },
+        {
+          "name": "update",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bio\": \"Admin updated bio\"\n}"
+            },
+            "url": "{{api_url}}/profiles/{{profileId}}"
+          }
+        },
+        {
+          "name": "delete",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "x-api-key", "value": "{{api_key}}" }
+            ],
+            "url": "{{api_url}}/profiles/{{profileId}}"
+          }
+        }
+      ]
+    }
+  ]
+}

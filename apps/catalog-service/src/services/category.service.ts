@@ -37,7 +37,7 @@ class CategoryService extends BaseService<ICategory, CategoryDto> {
 		await categoryTransRepository.upsertTranslations(transEntities);
 	}
 
-	async getList(
+	async findList(
 		page: number,
 		limit: number,
 		filter: { [key: string]: any }
@@ -49,7 +49,7 @@ class CategoryService extends BaseService<ICategory, CategoryDto> {
 		return { data, pagination: result.pagination };
 	}
 
-	async getById(id: string, lang?: string): Promise<CategoryDto | null> {
+	async findById(id: string, lang?: string): Promise<CategoryDto | null> {
 		const category = await categoryRepository.findById(id, lang);
 		if (!category) return null;
 		return CategoryMapper.toDto(category, category.translation);

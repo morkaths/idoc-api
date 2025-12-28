@@ -8,9 +8,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 public interface BaseService<Request, Response, Entity, ID> {
-    List<Response> getAll();
-    Page<Response> search(Pageable pageable, Specification<Entity> spec);
-    Response getById(ID id);
+    Page<Response> paginate(Pageable pageable, Specification<Entity> spec);
+    List<Response> findAll();
+    Response findById(ID id);
+    List<Response> findAllByIds(List<ID> ids);
     Response save(Request request);
     Response partial(ID id, Map<String, Object> fields);
     boolean delete(ID id);

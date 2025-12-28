@@ -6,7 +6,7 @@ import * as response from '../utils/response.util';
 const CategoryController = {
   getList: asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, ...filters } = req.query;
-    const { data, pagination } = await CategoryService.getList(
+    const { data, pagination } = await CategoryService.findList(
       Number(page),
       Number(limit),
       filters
@@ -20,11 +20,23 @@ const CategoryController = {
   getById: asyncHandler(async (req, res) => {
     const { id } = req.params;
     const lang = typeof req.query.lang === 'string' ? req.query.lang : undefined;
-    const category = await CategoryService.getById(id, lang);
+    const category = await CategoryService.findById(id, lang);
     if (!category) {
       return response.notFound(res, 'Category not found');
     }
     response.success(res, 'Get category successfully', category);
+  }),
+
+  getByIds: asyncHandler(async (req, res) => {
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return response.badRequest(res, 'List of IDs must not be empty');
+    }
+    const categories = await CategoryService.findByIds(ids);
+    if (!categories || categories.length === 0) {
+      return response.notFound(res, 'No categories found for the provided IDs');
+    }
+    response.success(res, 'Get categories successfully', categories);
   }),
 
   create: asyncHandler<AuthRequest>(async (req, res) => {

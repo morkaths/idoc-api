@@ -68,6 +68,33 @@ router.get('/:id', CategoryController.getById);
 
 /**
  * @openapi
+ * /categories/batch:
+ *   post:
+ *     summary: Lấy nhiều category theo danh sách ID
+ *     tags:
+ *       - Category
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ids:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: Danh sách Category ID
+ *     responses:
+ *       200:
+ *         description: Danh sách category
+ *       400:
+ *         description: Danh sách ID không hợp lệ
+ */
+router.post('/batch', CategoryController.getByIds);
+
+/**
+ * @openapi
  * /categories:
  *   post:
  *     summary: Tạo mới category

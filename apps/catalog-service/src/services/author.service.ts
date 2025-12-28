@@ -11,7 +11,7 @@ class AuthorService extends BaseService<IAuthor, AuthorDto> {
     super(authorRepository, AuthorMapper);
   }
 
-  async getList(page: number, limit: number, filter: { [key: string]: any }): Promise<{ data: AuthorDto[]; pagination: Pagination }> {
+  async findList(page: number, limit: number, filter: { [key: string]: any }): Promise<{ data: AuthorDto[]; pagination: Pagination }> {
     const result = await authorRepository.findList(page, limit, filter);
     const data = (result.items || []).map((d: any) => this.mapper.toDto(d as IAuthor));
     return { data, pagination: result.pagination };

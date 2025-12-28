@@ -18,7 +18,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.idoc.auth.constant.Common;
 import com.idoc.auth.repository.TokenRepository;
-import com.idoc.auth.security.service.CustomUserDetailService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -95,21 +94,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		String username = jwt.getClaim("username").asString();
 		String email = jwt.getClaim("email").asString();
 		List<String> roles = jwt.getClaim("roles").asList(String.class);
+		List<String> permissions = jwt.getClaim("permissions").asList(String.class);
 		List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 		if (roles != null) {
 			authorities.addAll(roles.stream()
 					.map(role -> new SimpleGrantedAuthority("ROLE_" + role))
 					.collect(Collectors.toList()));
 		}
-		JwtTokenRequest principal = new JwtTokenRequest(userId, username, email, roles);
+		if (permissions != null) {
+			authorities.addAll(permissions.stream()
+					.map(permission -> new SimpleGrantedAuthority(permission))
+					.collect(Collectors.toList()));
+		}
+		JwtTokenRequest principal = new JwtTokenRequest(userId, username, email, roles, permissions);
 		return new UsernamePasswordAuthenticationToken(principal, null, authorities);
 	}
-
-	// private UsernamePasswordAuthenticationToken buildAuthentication(DecodedJWT jwt) {
-	// 	String username = jwt.getClaim("username").asString();
-	// 	UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-	// 	return new UsernamePasswordAuthenticationToken(
-	// 			userDetails, null, userDetails.getAuthorities());
-	// }
 
 }

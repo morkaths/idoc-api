@@ -25,8 +25,8 @@ const ProfileController = {
     response.success(res, "Profile retrieved successfully", profile);
   }),
 
-  getMe: asyncHandler(async (req: AuthRequest, res: Response) => {
-    const userId = req.user?.id;
+  getMe: asyncHandler<AuthRequest>(async (req: AuthRequest, res: Response) => {
+    const userId = req.user.id;
     if (!userId) return response.unauthorized(res, "Unauthorized");
     const profile = await ProfileService.findOne({ userId });
     if (!profile) return response.notFound(res, "Profile not found");
@@ -48,9 +48,9 @@ const ProfileController = {
     response.updated(res, "Profile updated successfully", updated);
   }),
 
-  updateMe: asyncHandler(async (req: AuthRequest, res: Response) => {
+  updateMe: asyncHandler<AuthRequest>(async (req: AuthRequest, res: Response) => {
     const data = req.body;
-    const userId = req.user?.id;
+    const userId = req.user.id;
     if (!userId) return response.unauthorized(res, "Unauthorized");
     const updated = await ProfileService.findOneAndUpdate({ userId }, data);
     if (!updated) return response.notFound(res, "Profile not found");

@@ -2,6 +2,7 @@ package com.idoc.auth.core;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -15,12 +16,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
 
-public abstract class BaseServiceImpl<Request, Response, Entity, ID> implements BaseService<Request, Response, Entity, ID> {
+public abstract class BaseServiceImpl<Request, Response, Entity, ID>
+    implements BaseService<Request, Response, Entity, ID> {
 
   protected final JpaRepository<Entity, ID> repository;
   protected final JpaSpecificationExecutor<Entity> specificationExecutor;
   protected final BaseMapper<Request, Response, Entity> mapper;
-  
+
   @Autowired
   protected ObjectMapper objectMapper;
 
@@ -33,7 +35,13 @@ public abstract class BaseServiceImpl<Request, Response, Entity, ID> implements 
   }
 
   @Override
-  public List<Response> getAll() {
+  public Page<Response> paginate(Pageable pageable, Specification<Entity> spec) {
+    Page<Entity> entities = specificationExecutor.findAll(spec, pageable);
+    return entities.map(mapper::toDto);
+  }
+  
+  @Override
+  public List<Response> findAll() {
     List<Entity> entities = repository.findAll();
     return entities.stream()
         .map(mapper::toDto)
@@ -41,16 +49,16 @@ public abstract class BaseServiceImpl<Request, Response, Entity, ID> implements 
   }
 
   @Override
-  public Page<Response> search(Pageable pageable, Specification<Entity> spec) {
-    Page<Entity> entities = specificationExecutor.findAll(spec, pageable);
-    return entities.map(mapper::toDto);
-  }
-
-  @Override
-  public Response getById(ID id) {
+  public Response findById(ID id) {
     return repository.findById(id)
         .map(mapper::toDto)
         .orElseThrow(() -> new IllegalArgumentException("Entity not found with id: " + id));
+  }
+
+  @Override
+  public List<Response> findAllByIds(List<ID> ids) {
+    List<Entity> entities = repository.findAllById(ids);
+    return entities.stream().map(mapper::toDto).collect(Collectors.toList());
   }
 
   @Override

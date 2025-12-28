@@ -62,6 +62,7 @@ public class WebSecurityConfig {
 		http.authorizeHttpRequests(registry -> registry
 				.requestMatchers(
                     "/api/auth/**",
+					"/api/users/**",
                     "/v3/api-docs/**",
                     "/swagger-ui/**",
                     "/swagger-ui.html"
@@ -71,11 +72,6 @@ public class WebSecurityConfig {
                     Role.ADMIN.getValue()
                 )
                 .requestMatchers("/api/permissions/**").hasAnyRole(
-                    Role.MANAGER.getValue(),
-                    Role.ADMIN.getValue()
-                )
-				.requestMatchers("/api/users/**").hasAnyRole(
-                    Role.STAFF.getValue(),
                     Role.MANAGER.getValue(),
                     Role.ADMIN.getValue()
                 )
@@ -93,40 +89,6 @@ public class WebSecurityConfig {
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-
-	// @Bean
-	// public CorsConfigurationSource
-	// corsConfigurationSource(@Value("${cors.allowed-origins}") String
-	// allowedOrigins) {
-	// CorsConfiguration configuration = new CorsConfiguration();
-	// for (String origin : allowedOrigins.split(",")) {
-	// configuration.addAllowedOrigin(origin.trim());
-	// }
-	// configuration.addAllowedMethod("*");
-	// configuration.addAllowedHeader("*");
-	// configuration.setAllowCredentials(true);
-	// UrlBasedCorsConfigurationSource source = new
-	// UrlBasedCorsConfigurationSource();
-	// source.registerCorsConfiguration("/**", configuration);
-	// return source;
-	// }
-
-	/**
-	 * Configure AuthenticationManager with custom UserDetailsService and
-	 * PasswordEncoder.
-	 * 
-	 * @param http - HttpSecurity
-	 * @return AuthenticationManager
-	 * @throws Exception - if an error occurs
-	 */
-	// @Bean
-	// public AuthenticationManager authenticationManager(HttpSecurity http) throws
-	// Exception {
-	// AuthenticationManagerBuilder builder =
-	// http.getSharedObject(AuthenticationManagerBuilder.class);
-	// builder.userDetailsService(customUserDetailService).passwordEncoder(passwordEncoder());
-	// return builder.build();
-	// }
 
 	/**
 	 * Alternative method to get AuthenticationManager from

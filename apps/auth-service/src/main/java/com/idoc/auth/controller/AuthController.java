@@ -68,7 +68,7 @@ public class AuthController {
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Principal is not a valid JwtTokenRequest: " + e.getMessage());
 		}
-		UserResponse user = userService.getById(principal.getUserId());
+		UserResponse user = userService.findById(principal.getUserId());
 		if (user == null) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No user found with userId: " + principal.getUserId());
 		}

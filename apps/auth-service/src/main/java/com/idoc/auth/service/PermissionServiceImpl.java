@@ -32,13 +32,13 @@ public class PermissionServiceImpl
   }
 
   @Override
-  public Page<PermissionResponse> getList(Pageable pageable, Map<String, Object> filter) {
+  public Page<PermissionResponse> find(Pageable pageable, Map<String, Object> filter) {
     Specification<PermissionEntity> spec = PermissionSpecification.filter(filter);
-    return this.search(pageable, spec);
+    return this.paginate(pageable, spec);
   }
 
   @Override
-  public PermissionResponse getByCode(String code) {
+  public PermissionResponse findByCode(String code) {
     PermissionEntity entity = permissionRepository.findByCode(code);
     if (entity == null) {
       throw new IllegalArgumentException("Permission not found with code: " + code);
@@ -47,7 +47,7 @@ public class PermissionServiceImpl
   }
 
   @Override
-  public List<PermissionResponse> getByRoleId(Long roleId) {
+  public List<PermissionResponse> findByRoleId(Long roleId) {
     List<PermissionEntity> entities = permissionRepository.findByRoleId(roleId);
     return entities.stream()
         .map(permissionMapper::toDto)

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,7 +43,7 @@ public class UserController {
 			@RequestParam Map<String, Object> filter) {
 		filter.remove("page");
 		filter.remove("limit");
-		var data = userService.getList(PageRequest.of(page > 0 ? page - 1 : 0, limit), filter);
+		var data = userService.find(PageRequest.of(page > 0 ? page - 1 : 0, limit), filter);
 		if (data.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No users found");
 		}
@@ -51,7 +52,7 @@ public class UserController {
 
 	@GetMapping("/all")
 	public ResponseEntity<Map<String, Object>> getAll() {
-		List<UserResponse> data = userService.getAll();
+		List<UserResponse> data = userService.findAll();
 		if (data.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No users found");
 		}
@@ -63,12 +64,25 @@ public class UserController {
 		if (id == null || id <= 0) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid user ID");
 		}
-		UserResponse data = userService.getById(id);
+		UserResponse data = userService.findById(id);
 		if (data == null) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + id);
 		}
 		return ResponseUtil.success("User retrieved successfully", data);
 	}
+
+	@PostMapping("/batch")
+	public ResponseEntity<Map<String, Object>> getUsersByIds(@RequestBody Map<String, List<Long>> body) {
+        List<Long> ids = body.get("ids");
+        if (ids == null || ids.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "List of IDs must not be empty");
+        }
+        List<UserResponse> data = userService.findAllByIds(ids);
+        if (data.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No users found for provided IDs");
+        }
+        return ResponseUtil.success("Users retrieved successfully", data);
+    }
 
 	@GetMapping("/search")
 	public ResponseEntity<Map<String, Object>> search(@RequestParam Map<String, String> params) {
@@ -86,6 +100,7 @@ public class UserController {
 	}
 
 	@PostMapping
+	@PreAuthorize("hasAuthority('user.edit')")
 	public ResponseEntity<Map<String, Object>> create(@Valid @RequestBody UserRequest request) {
 		JwtTokenRequest principal;
 		try {
@@ -102,6 +117,7 @@ public class UserController {
 	}
 
 	@PatchMapping("/{id}")
+	@PreAuthorize("hasAuthority('user.edit')")
 	public ResponseEntity<Map<String, Object>> update(@PathVariable Long id,
 			@RequestBody Map<String, Object> request) {
 		if (id == null || id <= 0) {
@@ -115,6 +131,7 @@ public class UserController {
 	}
 
 	@DeleteMapping("/{id}")
+	@PreAuthorize("hasAuthority('user.delete')")
 	public ResponseEntity<Map<String, Object>> delete(@PathVariable Long id) {
 		if (id == null || id <= 0) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid user ID");

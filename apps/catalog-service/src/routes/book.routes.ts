@@ -88,6 +88,33 @@ router.get('/:id', BookController.getById);
 
 /**
  * @openapi
+ * /books/batch:
+ *   post:
+ *     summary: Lấy nhiều sách theo danh sách ID
+ *     tags:
+ *       - Book
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ids:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: Danh sách Book ID
+ *     responses:
+ *       200:
+ *         description: Danh sách sách
+ *       400:
+ *         description: Danh sách ID không hợp lệ
+ */
+router.post('/batch', BookController.getByIds);
+
+/**
+ * @openapi
  * /books:
  *   post:
  *     summary: Tạo mới sách

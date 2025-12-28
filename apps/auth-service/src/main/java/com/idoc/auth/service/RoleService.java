@@ -11,6 +11,6 @@ import com.idoc.auth.dto.response.RoleResponse;
 import com.idoc.auth.entity.RoleEntity;
 
 public interface RoleService extends BaseService<RoleRequest, RoleResponse, RoleEntity, Long> {
-  Page<RoleResponse> getList(Pageable pageable, Map<String, Object> filter);
-  RoleResponse getByCode(String code);
+  Page<RoleResponse> find(Pageable pageable, Map<String, Object> filter);
+  RoleResponse findByCode(String code);
 }

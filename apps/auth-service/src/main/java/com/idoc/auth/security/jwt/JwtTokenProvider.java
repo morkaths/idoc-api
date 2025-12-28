@@ -42,6 +42,7 @@ public class JwtTokenProvider {
         .withClaim("username", request.getUsername())
         .withClaim("email", request.getEmail())
         .withClaim("roles", request.getRoles())
+        .withClaim("permissions", request.getPermissions())
         .sign(algorithm);
   }
 
@@ -49,7 +50,6 @@ public class JwtTokenProvider {
     try {
       return verifier.verify(token);
     } catch (JWTVerificationException | NullPointerException e) {
-      e.printStackTrace();
       return null;
     }
   }

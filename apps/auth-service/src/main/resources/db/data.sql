@@ -5,11 +5,8 @@ INSERT INTO role (code, name) VALUES
 ('staff', 'Staff'), 
 ('manager', 'Manager');
 
--- <resource>.<action>[.<scope>]
+-- <resource>.<action>
 INSERT INTO permission (code, name) VALUES 
-('user.view.own', 'View Own User'),
-('user.edit.own', 'Edit Own User'),
-('user.delete.own', 'Delete Own User'),
 ('user.view', 'View User'),
 ('user.edit', 'Edit User'),
 ('user.delete', 'Delete User'),
@@ -28,7 +25,7 @@ SELECT r.id, p.id FROM role r, permission p WHERE r.code = 'admin';
 -- User chỉ có quyền xem user
 INSERT INTO role_permission (role_id, permission_id)
 SELECT r.id, p.id FROM role r, permission p WHERE r.code = 'user'
-  AND (p.code LIKE '%.own' OR p.code = 'user.view');
+  AND p.code = 'user.view';
 
 -- Staff có quyền xem và sửa staff, xem user
 INSERT INTO role_permission (role_id, permission_id)

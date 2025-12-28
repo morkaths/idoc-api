@@ -12,7 +12,7 @@ import com.idoc.auth.dto.response.PermissionResponse;
 import com.idoc.auth.entity.PermissionEntity;
 
 public interface PermissionService extends BaseService<PermissionRequest, PermissionResponse, PermissionEntity, Long> {
-  Page<PermissionResponse> getList(Pageable pageable, Map<String, Object> filter);
-  PermissionResponse getByCode(String code);
-  List<PermissionResponse> getByRoleId(Long roleId);
+  Page<PermissionResponse> find(Pageable pageable, Map<String, Object> filter);
+  PermissionResponse findByCode(String code);
+  List<PermissionResponse> findByRoleId(Long roleId);
 }

@@ -20,6 +20,10 @@ curl -i -X POST http://localhost:8001/services \
   --data "name=file-service" \
   --data "url=http://host.docker.internal:5003"
 
+curl -i -X POST http://localhost:8001/services \
+  --data "name=borrow-service" \
+  --data "url=http://host.docker.internal:5004"
+
 # Import route
 curl -i -X POST http://localhost:8001/services/auth-service/routes \
   --data "name=auth-route" \
@@ -69,4 +73,9 @@ curl -i -X POST http://localhost:8001/services/file-service/routes \
 curl -i -X POST http://localhost:8001/services/file-service/routes \
   --data "name=images-route" \
   --data "paths[]=/api/images" \
+  --data "strip_path=false"
+
+curl -i -X POST http://localhost:8001/services/borrow-service/routes \
+  --data "name=borrows-route" \
+  --data "paths[]=/api/borrows" \
   --data "strip_path=false"

@@ -6,7 +6,7 @@ import * as response from '../utils/response.util';
 const AuthorController = {
   getList: asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, ...filters } = req.query;
-    const { data, pagination } = await AuthorService.getList(
+    const { data, pagination } = await AuthorService.findList(
       Number(page),
       Number(limit),
       filters
@@ -19,11 +19,23 @@ const AuthorController = {
 
   getById: asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const author = await AuthorService.getById(id);
+    const author = await AuthorService.findById(id);
     if (!author) {
       return response.notFound(res, 'Author not found');
     }
     response.success(res, 'Get author successfully', author);
+  }),
+
+  getByIds: asyncHandler(async (req, res) => {
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return response.badRequest(res, 'List of IDs must not be empty');
+    }
+    const authors = await AuthorService.findByIds(ids);
+    if (!authors || authors.length === 0) {
+      return response.notFound(res, 'No authors found for the provided IDs');
+    }
+    response.success(res, 'Get authors successfully', authors);
   }),
 
   create: asyncHandler<AuthRequest>(async (req, res) => {

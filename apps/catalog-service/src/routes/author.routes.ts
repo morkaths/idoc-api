@@ -58,6 +58,33 @@ router.get('/:id', AuthorController.getById);
 
 /**
  * @openapi
+ * /authors/batch:
+ *   post:
+ *     summary: Lấy nhiều tác giả theo danh sách ID
+ *     tags:
+ *       - Author
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ids:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: Danh sách Author ID
+ *     responses:
+ *       200:
+ *         description: Danh sách tác giả
+ *       400:
+ *         description: Danh sách ID không hợp lệ
+ */
+router.post('/batch', AuthorController.getByIds);
+
+/**
+ * @openapi
  * /authors:
  *   post:
  *     summary: Tạo mới tác giả

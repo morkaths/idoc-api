@@ -27,7 +27,7 @@ class DocumentService extends BaseService<IDocument, FileDto> {
     return files.map((f: any) => this.mapFileToDto(f));
   }
 
-  async getById(id: string, lang?: string): Promise<FileDto | null> {
+  async findById(id: string, lang?: string): Promise<FileDto | null> {
     const file = await FileRepository.findById(id, lang);
     if (!file) return null;
     return this.mapFileToDto(file);

@@ -113,7 +113,7 @@ export const MinioService = {
   },
 
   // Presigned URL để client tải file về trực tiếp từ MinIO
-  async getPresignedDownloadUrl(objectName: string, expirySeconds = 3600): Promise<string> {
+  async getPresignedDownloadUrl(objectName: string, expirySeconds = 21600): Promise<string> {
     const client = MinioClient.get();
     return client.presignedGetObject(MINIO_BUCKET, objectName, expirySeconds);
   },

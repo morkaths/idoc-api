@@ -150,6 +150,32 @@ router.get('/:key/download', authenticate, FileController.download);
 
 /**
  * @openapi
+ * /files/download/url:
+ *   post:
+ *     summary: Lấy presigned download URL
+ *     tags:
+ *       - File
+ *     security:
+ *       - bearerAuth: []
+ *       - apiKeyAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/FileDownloadUrl'
+ *     responses:
+ *       200:
+ *         description: URL download
+ *       401:
+ *         description: Chưa đăng nhập hoặc không có API Key
+ *       403:
+ *         description: Không đủ quyền truy cập
+ */
+router.post('/download/url', authenticate, FileController.getDownloadUrl);
+
+/**
+ * @openapi
  * /files/upload/url:
  *   post:
  *     summary: Lấy presigned upload URL
