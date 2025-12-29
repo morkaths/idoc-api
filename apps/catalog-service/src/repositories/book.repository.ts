@@ -40,7 +40,20 @@ class BookRepository extends BaseRepository<IBook> {
 
     Object.entries(rest).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
-        conditions.push({ [key]: value });
+        if (key === 'categoryIds') {
+          const categoryIds = Array.isArray(value) ? value : [value];
+          conditions.push({
+            categoryIds: { $in: categoryIds.map((id: string) => new Types.ObjectId(id)) }
+          });
+        }
+        else if (key === 'authorIds') {
+          const authorIds = Array.isArray(value) ? value : [value];
+          conditions.push({
+            authorIds: { $in: authorIds.map((id: string) => new Types.ObjectId(id)) }
+          });
+        } else {
+          conditions.push({ [key]: value });
+        }
       }
     });
 

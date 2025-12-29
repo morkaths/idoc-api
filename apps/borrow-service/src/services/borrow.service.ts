@@ -28,12 +28,8 @@ class BorrowService extends BaseService<Borrow, BorrowDto> {
       const user = userMap.get(borrow.userId || '');
       const item = itemMap.get(borrow.itemId || '');
       const dto = this.mapper.toDto(borrow);
-      dto.borrower = user
-        ? { id: user.id, username: user.username, email: user.email }
-        : undefined;
-      dto.item = item
-        ? { _id: item._id, title: item.title }
-        : undefined;
+      dto.borrower = user;
+      dto.item = item;
       return dto;
     });
     return { data, pagination: result.pagination };

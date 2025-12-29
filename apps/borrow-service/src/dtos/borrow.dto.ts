@@ -1,15 +1,5 @@
-import { Expose } from "class-transformer";
-
-export class BorrowerDto {
-  @Expose() id!: string;
-  @Expose() username!: string;
-  @Expose() email!: string;
-}
-
-export class ItemDto {
-  @Expose() _id!: string;
-  @Expose() title!: string;
-}
+import { Expose, Type } from "class-transformer";
+import { Book, User } from "src/types/schema";
 
 export class BorrowDto {
   @Expose() _id!: string;
@@ -23,6 +13,12 @@ export class BorrowDto {
   @Expose() status!: string;
   @Expose() createdAt?: Date;
   @Expose() updatedAt?: Date;
-  @Expose() borrower?: BorrowerDto;
-  @Expose() item?: ItemDto;
+  
+  @Expose()
+  @Type(() => Object)
+  borrower?: User;
+
+  @Expose()
+  @Type(() => Object)
+  item?: Book;
 }
