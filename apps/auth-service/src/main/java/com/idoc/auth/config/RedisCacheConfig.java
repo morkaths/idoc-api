@@ -1,5 +1,7 @@
 package com.idoc.auth.config;
 
+import java.time.Duration;
+
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -10,21 +12,19 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
-import java.time.Duration;
-
 @Configuration
 public class RedisCacheConfig {
 
-    @Value("${spring.redis.host:localhost}")
+    @Value("${spring.data.redis.host:localhost}")
     private String redisHost;
 
-    @Value("${spring.redis.port:6379}")
+    @Value("${spring.data.redis.port:6379}")
     private int redisPort;
 
-    @Value("${spring.redis.password:}")
+    @Value("${spring.data.redis.password:}")
     private String redisPassword;
 
-    @Value("${spring.redis.database:0}")
+    @Value("${spring.data.redis.database:0}")
     private int redisDatabase;
 
     @Bean
