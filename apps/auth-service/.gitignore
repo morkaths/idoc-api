@@ -1,0 +1,32 @@
+# Maven/Gradle build
+/target/
+/build/
+
+# IDE files
+*.iml
+.idea/
+*.classpath
+*.project
+*.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment & config files
+*.env
+*.env.*
+application.properties
+application-*.properties
+jwt.properties
+service.properties
+
+# Do NOT ignore example files
+!*.example
+
+# Sensitive files
+*.key
+*.pem
