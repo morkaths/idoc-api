@@ -5,21 +5,22 @@ import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import com.idoc.auth.core.BaseMapper;
-import com.idoc.auth.dto.RoleDto;
+import com.idoc.auth.dto.request.RoleRequest;
+import com.idoc.auth.dto.response.RoleResponse;
 import com.idoc.auth.entity.RoleEntity;
 
 @Mapper(componentModel = "spring", uses = PermissionMapper.class)
-public interface RoleMapper extends BaseMapper<RoleEntity, RoleDto> {
+public interface RoleMapper extends BaseMapper<RoleRequest, RoleResponse, RoleEntity> {
 
   RoleMapper INSTANCE = Mappers.getMapper(RoleMapper.class);
 
   @Override
   @Mapping(target = "users", ignore = true)
-  @Mapping(target = "permissions", source = "permissions")
-  RoleEntity toEntity(RoleDto dto);
+  @Mapping(target = "permissions", ignore = true)
+  RoleEntity toEntity(RoleRequest request);
 
   @Override
   @Mapping(target = "permissions", source = "permissions")
-  RoleDto toDto(RoleEntity entity);
+  RoleResponse toDto(RoleEntity entity);
 
 }

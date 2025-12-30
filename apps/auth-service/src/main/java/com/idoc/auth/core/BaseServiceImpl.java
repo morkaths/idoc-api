@@ -2,53 +2,70 @@ package com.idoc.auth.core;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public abstract class BaseServiceImpl<T, E, ID> implements BaseService<T, ID> {
+import jakarta.transaction.Transactional;
 
-  protected final JpaRepository<E, ID> repository;
-  protected final BaseMapper<E, T> mapper;
+public abstract class BaseServiceImpl<Request, Response, Entity, ID>
+    implements BaseService<Request, Response, Entity, ID> {
+
+  protected final JpaRepository<Entity, ID> repository;
+  protected final JpaSpecificationExecutor<Entity> specificationExecutor;
+  protected final BaseMapper<Request, Response, Entity> mapper;
 
   @Autowired
   protected ObjectMapper objectMapper;
 
-  public BaseServiceImpl(JpaRepository<E, ID> repository, BaseMapper<E, T> mapper) {
+  public BaseServiceImpl(JpaRepository<Entity, ID> repository,
+      JpaSpecificationExecutor<Entity> specificationExecutor,
+      BaseMapper<Request, Response, Entity> mapper) {
     this.repository = repository;
+    this.specificationExecutor = specificationExecutor;
     this.mapper = mapper;
   }
 
   @Override
-  public List<T> findAll() {
-    List<E> entities = repository.findAll();
+  public Page<Response> paginate(Pageable pageable, Specification<Entity> spec) {
+    Page<Entity> entities = specificationExecutor.findAll(spec, pageable);
+    return entities.map(mapper::toDto);
+  }
+  
+  @Override
+  public List<Response> findAll() {
+    List<Entity> entities = repository.findAll();
     return entities.stream()
         .map(mapper::toDto)
         .toList();
   }
 
   @Override
-  public Page<T> findAll(Pageable pageable) {
-    Page<E> entities = repository.findAll(pageable);
-    return entities.map(mapper::toDto);
-  }
-
-  @Override
-  public T findById(ID id) {
+  public Response findById(ID id) {
     return repository.findById(id)
         .map(mapper::toDto)
         .orElseThrow(() -> new IllegalArgumentException("Entity not found with id: " + id));
   }
 
   @Override
-  public T create(T dto) {
+  public List<Response> findAllByIds(List<ID> ids) {
+    List<Entity> entities = repository.findAllById(ids);
+    return entities.stream().map(mapper::toDto).collect(Collectors.toList());
+  }
+
+  @Override
+  @Transactional
+  public Response save(Request dto) {
     try {
-      E entity = repository.save(mapper.toEntity(dto));
+      Entity entity = repository.save(mapper.toEntity(dto));
       return mapper.toDto(entity);
     } catch (DataIntegrityViolationException ex) {
       throw ex;
@@ -58,27 +75,17 @@ public abstract class BaseServiceImpl<T, E, ID> implements BaseService<T, ID> {
   }
 
   @Override
-  public T update(T dto) {
-    try {
-      E entity = repository.save(mapper.toEntity(dto));
-      return mapper.toDto(entity);
-    } catch (DataIntegrityViolationException ex) {
-      throw ex;
-    } catch (Exception ex) {
-      throw new RuntimeException("Unknown error when saving entity", ex);
-    }
-  }
-
-  @Override
-  public T partialUpdate(ID id, Map<String, Object> fields) {
-    E entity = repository.findById(id)
+  @Transactional
+  public Response partial(ID id, Map<String, Object> fields) {
+    Entity entity = repository.findById(id)
         .orElseThrow(() -> new IllegalArgumentException("Entity with id " + id + " does not exist"));
-    mapper.partialUpdateEntity(objectMapper, fields, entity);
-    E saved = repository.save(entity);
+    mapper.partial(objectMapper, fields, entity);
+    Entity saved = repository.save(entity);
     return mapper.toDto(saved);
   }
 
   @Override
+  @Transactional
   public boolean delete(ID id) {
     if (repository.existsById(id)) {
       repository.deleteById(id);

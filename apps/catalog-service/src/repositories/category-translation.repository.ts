@@ -1,7 +1,7 @@
 import { CategoryTranslation, ICategoryTranslation } from "src/models/category-translation.model";
 import { BaseRepository } from "../core/base.repository";
 
-class CategoryTransRepositoryClass extends BaseRepository<ICategoryTranslation> {
+class CategoryTransRepository extends BaseRepository<ICategoryTranslation> {
   constructor() {
     super(CategoryTranslation);
   }
@@ -19,5 +19,4 @@ class CategoryTransRepositoryClass extends BaseRepository<ICategoryTranslation> 
 
 }
 
-const CategoryTransRepository = new CategoryTransRepositoryClass();
-export default CategoryTransRepository;
+export const categoryTransRepository = new CategoryTransRepository();

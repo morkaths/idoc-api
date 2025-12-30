@@ -4,9 +4,12 @@
   "main": "dist/server.js",
   "scripts": {
     "start": "node dist/server.js",
-    "dev": "ts-node-dev --respawn --transpile-only --project tsconfig.json -r tsconfig-paths/register src/server.ts",
+    "dev": "ts-node-dev --respawn -r tsconfig-paths/register src/server.ts",
     "build": "tsc",
-    "seed": "ts-node -r tsconfig-paths/register src/seeds/index.ts"
+    "seed": "ts-node -r tsconfig-paths/register src/seeds/index.ts",
+    "lint": "eslint ./src --ext .ts",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "Morkath",

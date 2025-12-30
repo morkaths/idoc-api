@@ -1,165 +1,138 @@
 package com.idoc.auth.util;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Consumer;
+
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.idoc.auth.dto.UserDto;
-
-import org.springframework.http.HttpStatus;
-
-import java.util.Map;
-import java.util.LinkedHashMap;
+import com.idoc.auth.dto.response.PageResponse;
+import com.idoc.auth.dto.response.UserResponse;
+import com.idoc.auth.dto.response.AuthenticationResponse;
 
 public class ResponseUtil {
 
-  public static ResponseEntity<Map<String, Object>> user(String message, UserDto user) {
+  private static Map<String, Object> baseBody(boolean success, String message) {
     Map<String, Object> body = new LinkedHashMap<>();
-    body.put("success", true);
+    body.put("success", success);
     body.put("message", message);
-    body.put("user", user);
-    return ResponseEntity.status(HttpStatus.OK).body(body);
+    return body;
+  }
+
+  public static ResponseEntity<Map<String, Object>> custom(HttpStatus status, boolean success, String message, Consumer<Map<String, Object>> customizer) {
+    Map<String, Object> body = baseBody(success, message);
+    if (customizer != null) customizer.accept(body);
+    return ResponseEntity.status(status).body(body);
+  }
+
+  public static ResponseEntity<Map<String, Object>> authentication(String message, AuthenticationResponse auth, Object data) {
+    return custom(HttpStatus.OK, true, message, body -> {
+      body.put("token", auth.getToken());
+      body.put("user", auth.getUser());
+      if (data != null) body.put("data", data);
+    });
+  }
+
+  public static ResponseEntity<Map<String, Object>> user(String message, UserResponse user) {
+    return custom(HttpStatus.OK, true, message, body -> {
+      body.put("user", user);
+    });
+  }
+
+  public static <T> ResponseEntity<Map<String, Object>> paged(String message, Page<T> page) {
+    return custom(HttpStatus.OK, true, message, body -> {
+      body.put("data", page.getContent());
+      body.put("pagination", new PageResponse(
+        page.getTotalElements(),
+        page.getSize(),
+        page.getNumber(),
+        page.getTotalPages()
+      ));
+    });
   }
 
   public static ResponseEntity<Map<String, Object>> success(String message, Object data) {
-    Map<String, Object> body = new LinkedHashMap<>();
-    body.put("success", true);
-    body.put("message", message);
-    if (data != null)
-      body.put("data", data);
-    return ResponseEntity.status(HttpStatus.OK).body(body);
+    return custom(HttpStatus.OK, true, message, body -> {
+      if (data != null) body.put("data", data);
+    });
   }
 
   public static ResponseEntity<Map<String, Object>> created(String message, Object data) {
-    Map<String, Object> body = new LinkedHashMap<>();
-    body.put("success", true);
-    body.put("message", message);
-    if (data != null)
-      body.put("data", data);
-    return ResponseEntity.status(HttpStatus.CREATED).body(body);
+    return custom(HttpStatus.CREATED, true, message, body -> {
+      if (data != null) body.put("data", data);
+    });
   }
 
   public static ResponseEntity<Map<String, Object>> updated(String message, Object data) {
-    Map<String, Object> body = new LinkedHashMap<>();
-    body.put("success", true);
-    body.put("message", message);
-    if (data != null)
-      body.put("data", data);
-    return ResponseEntity.status(HttpStatus.OK).body(body);
+    return success(message, data);
   }
 
   public static ResponseEntity<Map<String, Object>> deleted(String message) {
-    Map<String, Object> body = new LinkedHashMap<>();
-    body.put("success", true);
-    body.put("message", message);
-    return ResponseEntity.status(HttpStatus.OK).body(body);
+    return success(message, null);
   }
 
   public static ResponseEntity<Void> noContent() {
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
-  public static ResponseEntity<Map<String, Object>> error(String message, int statusCode, Object err) {
-    Map<String, Object> body = new LinkedHashMap<>();
-    body.put("success", false);
-    body.put("message", message);
-    if (err != null)
-      body.put("error", err);
-    return ResponseEntity.status(statusCode).body(body);
+  public static ResponseEntity<Map<String, Object>> error(String message, HttpStatus status, Object err) {
+    return custom(status, false, message, body -> {
+      if (err != null) body.put("error", err);
+    });
   }
 
+  // Các hàm error khác có thể gọi lại error() ở trên
   public static ResponseEntity<Map<String, Object>> unauthorized(String message) {
-    Map<String, Object> body = new LinkedHashMap<>();
-    body.put("success", false);
-    body.put("message", message);
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
+    return error(message, HttpStatus.UNAUTHORIZED, null);
   }
 
   public static ResponseEntity<Map<String, Object>> forbidden(String message) {
-    Map<String, Object> body = new LinkedHashMap<>();
-    body.put("success", false);
-    body.put("message", message);
-    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
+    return error(message, HttpStatus.FORBIDDEN, null);
   }
 
   public static ResponseEntity<Map<String, Object>> notFound(String message) {
-    Map<String, Object> body = new LinkedHashMap<>();
-    body.put("success", false);
-    body.put("message", message);
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    return error(message, HttpStatus.NOT_FOUND, null);
   }
 
   public static ResponseEntity<Map<String, Object>> methodNotAllowed(String message) {
-    Map<String, Object> body = new LinkedHashMap<>();
-    body.put("success", false);
-    body.put("message", message);
-    return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(body);
+    return error(message, HttpStatus.METHOD_NOT_ALLOWED, null);
   }
 
   public static ResponseEntity<Map<String, Object>> requestTimeout(String message) {
-    Map<String, Object> body = new LinkedHashMap<>();
-    body.put("success", false);
-    body.put("message", message);
-    return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).body(body);
+    return error(message, HttpStatus.REQUEST_TIMEOUT, null);
   }
 
   public static ResponseEntity<Map<String, Object>> duplicate(String message, Object err) {
-    Map<String, Object> body = new LinkedHashMap<>();
-    body.put("success", false);
-    body.put("message", message);
-    if (err != null)
-      body.put("error", err);
-    return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    return error(message, HttpStatus.CONFLICT, err);
   }
 
   public static ResponseEntity<Map<String, Object>> gone(String message) {
-    Map<String, Object> body = new LinkedHashMap<>();
-    body.put("success", false);
-    body.put("message", message);
-    return ResponseEntity.status(HttpStatus.GONE).body(body);
+    return error(message, HttpStatus.GONE, null);
   }
 
   public static ResponseEntity<Map<String, Object>> unsupportedMediaType(String message) {
-    Map<String, Object> body = new LinkedHashMap<>();
-    body.put("success", false);
-    body.put("message", message);
-    return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(body);
+    return error(message, HttpStatus.UNSUPPORTED_MEDIA_TYPE, null);
   }
 
   public static ResponseEntity<Map<String, Object>> unprocessable(String message, Object err) {
-    Map<String, Object> body = new LinkedHashMap<>();
-    body.put("success", false);
-    body.put("message", message);
-    if (err != null)
-      body.put("error", err);
-    return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(body);
+    return error(message, HttpStatus.UNPROCESSABLE_ENTITY, err);
   }
 
   public static ResponseEntity<Map<String, Object>> tooManyRequests(String message) {
-    Map<String, Object> body = new LinkedHashMap<>();
-    body.put("success", false);
-    body.put("message", message);
-    return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(body);
+    return error(message, HttpStatus.TOO_MANY_REQUESTS, null);
   }
 
   public static ResponseEntity<Map<String, Object>> internalError(String message, Object err) {
-    Map<String, Object> body = new LinkedHashMap<>();
-    body.put("success", false);
-    body.put("message", message);
-    if (err != null)
-      body.put("error", err);
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+    return error(message, HttpStatus.INTERNAL_SERVER_ERROR, err);
   }
 
   public static ResponseEntity<Map<String, Object>> notImplemented(String message) {
-    Map<String, Object> body = new LinkedHashMap<>();
-    body.put("success", false);
-    body.put("message", message);
-    return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(body);
+    return error(message, HttpStatus.NOT_IMPLEMENTED, null);
   }
 
   public static ResponseEntity<Map<String, Object>> serviceUnavailable(String message) {
-    Map<String, Object> body = new LinkedHashMap<>();
-    body.put("success", false);
-    body.put("message", message);
-    return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(body);
+    return error(message, HttpStatus.SERVICE_UNAVAILABLE, null);
   }
 }

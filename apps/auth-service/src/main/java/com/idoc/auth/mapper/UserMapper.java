@@ -13,21 +13,22 @@ import org.mapstruct.factory.Mappers;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.idoc.auth.core.BaseMapper;
-import com.idoc.auth.dto.UserDto;
+import com.idoc.auth.dto.request.UserRequest;
+import com.idoc.auth.dto.response.UserResponse;
 import com.idoc.auth.entity.UserEntity;
 
 @Mapper(componentModel = "spring", uses = UserRoleMapper.class)
-public interface UserMapper extends BaseMapper<UserEntity, UserDto> {
+public interface UserMapper extends BaseMapper<UserRequest, UserResponse, UserEntity> {
   UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
   @Override
-  @Mapping(target = "roles", source = "roles")
-  UserEntity toEntity(UserDto dto);
+  @Mapping(target = "roles", ignore = true)
+  UserEntity toEntity(UserRequest dto);
 
   @Override
   @Mapping(target = "password", ignore = true)
   @Mapping(target = "roles", source = "roles")
-  UserDto toDto(UserEntity entity);
+  UserResponse toDto(UserEntity entity);
 
   /**
    * Cập nhật UserEntity từ Map các trường và giá trị.

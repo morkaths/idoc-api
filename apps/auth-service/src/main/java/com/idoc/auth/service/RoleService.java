@@ -1,8 +1,16 @@
 package com.idoc.auth.service;
 
-import com.idoc.auth.core.BaseService;
-import com.idoc.auth.dto.RoleDto;
+import java.util.Map;
 
-public interface RoleService extends BaseService<RoleDto, Long> {
-  RoleDto findByCode(String code);
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import com.idoc.auth.core.BaseService;
+import com.idoc.auth.dto.request.RoleRequest;
+import com.idoc.auth.dto.response.RoleResponse;
+import com.idoc.auth.entity.RoleEntity;
+
+public interface RoleService extends BaseService<RoleRequest, RoleResponse, RoleEntity, Long> {
+  Page<RoleResponse> find(Pageable pageable, Map<String, Object> filter);
+  RoleResponse findByCode(String code);
 }

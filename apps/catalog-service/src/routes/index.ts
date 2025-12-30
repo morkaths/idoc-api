@@ -3,7 +3,7 @@ import express from 'express';
 import categoryRoutes from './category.routes';
 import authorRoutes from './author.routes';
 import bookRoutes from './book.routes';
-import fileRoutes from './file.routes';
+import documentRoutes from './document.routes';
 
 const router = express.Router();
 
@@ -11,7 +11,7 @@ const router = express.Router();
 router.use('/categories', categoryRoutes);
 router.use('/authors', authorRoutes)
 router.use('/books', bookRoutes);
-router.use('/files', fileRoutes);
+router.use('/documents', documentRoutes);
 
 
 export default router;

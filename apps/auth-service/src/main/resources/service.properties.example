@@ -1,0 +1,9 @@
+# ===============================
+# PROFILE SERVICE URL
+# ===============================
+service.profile.url=http://localhost:8000/api/profiles
+
+# ===============================
+# SERVICE KEY
+# ===============================
+service.key=your_service_api_key_here

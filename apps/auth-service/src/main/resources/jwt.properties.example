@@ -1,0 +1,8 @@
+# ===============================
+# JWT CONFIGURATION
+# ===============================
+jwt.secret=your_jwt_secret_here
+spring.jwt.expired-duration=900
+spring.jwt.refreshable-duration=604800
+jwt.audience=your_jwt_audience
+jwt.issuer=your_jwt_issuer

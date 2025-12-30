@@ -15,7 +15,7 @@ export interface IBook extends Document {
   price?: number;
   stock?: number;
   coverUrl?: string;
-  fileId?: string;
+  fileKey?: string;
   tags?: string[];
   updatedBy?: string;
   createdAt?: Date;
@@ -38,7 +38,7 @@ const BookSchema = new Schema<IBook>(
     price: { type: Number, min: 0 },
     stock: { type: Number, min: 0 },
     coverUrl: { type: String, trim: true },
-    fileId: { type: String, trim: true },
+    fileKey: { type: String, trim: true },
     tags: [{ type: String, index: true, trim: true }],
     updatedBy: { type: String, trim: true },
   },

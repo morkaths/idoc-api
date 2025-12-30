@@ -12,3 +12,11 @@ export interface Pagination {
   pages: number;  // Tổng số trang (tính từ total/limit)
 }
 
+export interface FindParams {
+  page?: number;
+  limit?: number;
+  query?: string;
+  sorts?: Record<string, string>[];
+  filters?: Record<string, unknown>[];
+}
+

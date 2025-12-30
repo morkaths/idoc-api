@@ -1,4 +1,3 @@
-import { Types } from "mongoose";
 import { CategoryDto } from "../dtos/category.dto";
 import { ICategory } from "../models/category.model";
 import { ICategoryTranslation } from "../models/category-translation.model";
@@ -28,6 +27,7 @@ export const CategoryMapper: BaseMapper<ICategory, CategoryDto> & {
     };
   },
   toEntity(dto: Partial<CategoryDto>): Partial<ICategory> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { translations, ...cleanDto } = dto;
     const baseEntity = baseCategoryMapper.toEntity(cleanDto);
     const result: Partial<ICategory> = { ...baseEntity };

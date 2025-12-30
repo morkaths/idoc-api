@@ -1,20 +1,22 @@
 import { Author, IAuthor } from "src/models/author.model";
 import { BaseRepository } from "../core/base.repository";
 
-class AuthorRepositoryClass extends BaseRepository<IAuthor> {
+class AuthorRepository extends BaseRepository<IAuthor> {
     constructor() {
         super(Author);
     }
 
-    async search(params: { [key: string]: any }) {
+    async findList(
+        page: number,
+        limit: number,
+        filter: { [key: string]: any }
+    ) {
         const {
             query,
-            page = 1,
-            limit = 10,
             sortBy = 'createdAt',
             sortOrder = 'desc',
             ...rest
-        } = params;
+        } = filter;
         const conditions: any[] = [];
 
         if (query) {
@@ -44,6 +46,4 @@ class AuthorRepositoryClass extends BaseRepository<IAuthor> {
     }
 }
 
-const AuthorRepository = new AuthorRepositoryClass();
-
-export default AuthorRepository;
+export const authorRepository = new AuthorRepository();;

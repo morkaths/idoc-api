@@ -3,38 +3,23 @@ import { BaseRepository } from "../core/base.repository";
 import { aggregateCategory } from "src/constants/aggregations/category.aggregation";
 import { Types } from "mongoose";
 
-class CategoryRepositoryClass extends BaseRepository<ICategory> {
+class CategoryRepository extends BaseRepository<ICategory> {
   constructor() {
     super(Category);
   }
 
-  async findAll(lang?: string) {
-    return Category.aggregate(aggregateCategory(lang));
-  }
-  
-  async findAllPaginated(lang?: string, page: number = 1, limit: number = 10) {
-    const p = Math.max(1, Number(page));
-    const l = Math.max(1, Number(limit));
-    const pipeline = aggregateCategory(lang);
-    return this.paginateAggregate(pipeline, p, l);
-  }
-
-  async findById(id: string, lang?: string) {
-    const match = { _id: new Types.ObjectId(id) };
-    const result = await Category.aggregate(aggregateCategory(lang, match));
-    return result[0] ?? null;
-  }
-
-  async search(params: { [key: string]: any }) {
+  async findList(
+    page: number,
+    limit: number,
+    filter: { [key: string]: any }
+  ) {
     const {
       query,
       lang,
-      page = 1,
-      limit = 10,
       sortBy = 'slug',
       sortOrder = 'asc',
       ...rest
-    } = params;
+    } = filter;
 
     const p = Math.max(1, Number(page));
     const l = Math.max(1, Number(limit));
@@ -60,9 +45,13 @@ class CategoryRepositoryClass extends BaseRepository<ICategory> {
 
     return this.paginateAggregate(pipeline, p, l);
   }
-  
+
+  async findById(id: string, lang?: string) {
+    const match = { _id: new Types.ObjectId(id) };
+    const result = await Category.aggregate(aggregateCategory(lang, match));
+    return result[0] ?? null;
+  }
+
 }
 
-const CategoryRepository = new CategoryRepositoryClass();
-
-export default CategoryRepository;
+export const categoryRepository = new CategoryRepository();

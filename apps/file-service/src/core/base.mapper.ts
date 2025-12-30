@@ -1,7 +1,7 @@
 import { plainToInstance } from "class-transformer";
 
 export interface BaseMapper<Entity, Dto> {
-  toDto(entity: Entity): Dto;
+  toDto(entity: Partial<Entity>): Dto;
   toEntity(dto: Partial<Dto>): Partial<Entity>;
 }
 

@@ -7,29 +7,17 @@ import type { Pagination } from './index';
 
 export interface ApiResponse<T> {
   success: boolean;
+  status: number;
   message?: string;
   token?: string;
   user?: User;
   data?: T;
   pagination?: Pagination;
-  statusCode?: number;
-}
-
-export interface ApiError {
-  message: string;
-  errors?: string[];
-}
-
-export interface LoginResponse {
-  success: true;
-  user: User;
-  token: string;
-  message: string;
 }
 
 export interface ErrorResponse {
   success: false;
+  status: number;
   message: string;
   errors?: string[];
-  statusCode: number;
 }

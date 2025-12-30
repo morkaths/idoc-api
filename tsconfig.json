@@ -4,13 +4,16 @@
   "files": [],
   "references": [
     {
-      "path": "./apps/auth-service"
-    },
-    {
       "path": "./apps/catalog-service"
     },
     {
       "path": "./apps/user-service"
+    },
+    {
+      "path": "./apps/file-service"
+    },
+    {
+      "path": "./apps/borrow-service"
     }
   ]
 }

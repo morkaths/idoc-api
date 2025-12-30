@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,14 +14,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.idoc.auth.dto.PermissionDto;
+import com.idoc.auth.dto.request.PermissionRequest;
+import com.idoc.auth.dto.response.PermissionResponse;
 import com.idoc.auth.service.PermissionService;
 import com.idoc.auth.util.ResponseUtil;
 
@@ -31,8 +33,24 @@ public class PermissionController {
   private PermissionService permissionService;
 
   @GetMapping
+  @PreAuthorize("hasAuthority('permission.view')")
+  public ResponseEntity<Map<String, Object>> getList(
+      @RequestParam(defaultValue = "1") int page,
+      @RequestParam(defaultValue = "10") int limit,
+      @RequestParam Map<String, Object> filter) {
+    filter.remove("page");
+    filter.remove("limit");
+    Page<PermissionResponse> data = permissionService.find(PageRequest.of(page > 0 ? page - 1 : 0, limit), filter);
+    if (data.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No permissions found");
+    }
+    return ResponseUtil.paged("Permissions retrieved successfully", data);
+  }
+
+  @GetMapping("/all")
+  @PreAuthorize("hasAuthority('permission.view')")
   public ResponseEntity<Map<String, Object>> getAll() {
-    List<PermissionDto> data = permissionService.findAll();
+    List<PermissionResponse> data = permissionService.findAll();
     if (data.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No permissions found");
     }
@@ -40,11 +58,12 @@ public class PermissionController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<Map<String, Object>> getPermissionById(@PathVariable Long id) {
+  @PreAuthorize("hasAuthority('permission.view')")
+  public ResponseEntity<Map<String, Object>> getById(@PathVariable Long id) {
     if (id == null || id <= 0) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid permission ID");
     }
-    PermissionDto data = permissionService.findById(id);
+    PermissionResponse data = permissionService.findById(id);
     if (data == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Permission not found with id: " + id);
     }
@@ -52,11 +71,12 @@ public class PermissionController {
   }
 
   @GetMapping("/by-role")
+  @PreAuthorize("hasAuthority('permission.view')")
   public ResponseEntity<Map<String, Object>> getByRoleId(@RequestParam Long roleId) {
     if (roleId == null || roleId <= 0) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role ID");
     }
-    List<PermissionDto> data = permissionService.findByRoleId(roleId);
+    List<PermissionResponse> data = permissionService.findByRoleId(roleId);
     if (data.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No permissions found for role ID: " + roleId);
     }
@@ -64,11 +84,12 @@ public class PermissionController {
   }
 
   @GetMapping("/by-code")
-  public ResponseEntity<Map<String, Object>> getPermissionByCode(@RequestParam String code) {
+  @PreAuthorize("hasAuthority('permission.view')")
+  public ResponseEntity<Map<String, Object>> getByCode(@RequestParam String code) {
     if (code == null || code.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Permission code cannot be null or empty");
     }
-    PermissionDto data = permissionService.findByCode(code);
+    PermissionResponse data = permissionService.findByCode(code);
     if (data == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Permission not found with code: " + code);
     }
@@ -76,38 +97,23 @@ public class PermissionController {
   }
 
   @PostMapping
-  @PreAuthorize("hasAnyRole('admin', 'manager')")
-  public ResponseEntity<Map<String, Object>> createPermission(@RequestBody PermissionDto permission) {
-    PermissionDto data = permissionService.create(permission);
+  @PreAuthorize("hasAuthority('permission.edit')")
+  public ResponseEntity<Map<String, Object>> create(@RequestBody PermissionRequest request) {
+    PermissionResponse data = permissionService.save(request);
     if (data == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to create permission");
     }
     return ResponseUtil.created("Permission created successfully", data);
   }
 
-  @PutMapping("/{id}")
-  @PreAuthorize("hasAnyRole('admin', 'manager')")
-  public ResponseEntity<Map<String, Object>> updatePermission(@PathVariable Long id,
-      @RequestBody PermissionDto permission) {
-    if (id == null || id <= 0) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role ID");
-    }
-    permission.setId(id);
-    PermissionDto data = permissionService.update(permission);
-    if (data == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Permission not found with id: " + permission.getId());
-    }
-    return ResponseUtil.updated("Permission updated successfully", data);
-  }
-
   @PatchMapping("/{id}")
-  @PreAuthorize("hasAnyRole('admin', 'manager')")
-  public ResponseEntity<Map<String, Object>> partialUpdatePermission(@PathVariable Long id,
-      @RequestBody Map<String, Object> updates) {
+  @PreAuthorize("hasAuthority('permission.edit')")
+  public ResponseEntity<Map<String, Object>> update(@PathVariable Long id,
+      @RequestBody Map<String, Object> request) {
     if (id == null || id <= 0) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid permission ID");
     }
-    PermissionDto data = permissionService.partialUpdate(id, updates);
+    PermissionResponse data = permissionService.partial(id, request);
     if (data == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Permission not found with id: " + id);
     }
@@ -115,7 +121,8 @@ public class PermissionController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Map<String, Object>> deletePermission(@PathVariable Long id) {
+  @PreAuthorize("hasAuthority('permission.delete')")
+  public ResponseEntity<Map<String, Object>> delete(@PathVariable Long id) {
     if (id == null || id <= 0) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid permission ID");
     }

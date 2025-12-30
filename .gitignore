@@ -47,6 +47,14 @@ test-output
 
 # Maven
 target/
+.mvn/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+
+# === Environment files ===
+.env
+.env.*
+*.env
+*.env.*
+**/**/env.list

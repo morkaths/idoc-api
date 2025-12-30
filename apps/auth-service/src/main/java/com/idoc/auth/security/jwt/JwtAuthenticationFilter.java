@@ -16,7 +16,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.idoc.auth.constant.SecurityConstants;
+import com.idoc.auth.constant.Common;
+import com.idoc.auth.repository.TokenRepository;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -28,6 +29,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	@Autowired
 	private JwtTokenProvider jwtTokenProvider;
+
+	@Autowired
+	private TokenRepository tokenRepository;
 
 	/**
 	 * Filter method to authenticate requests based on JWT tokens.
@@ -47,7 +51,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 		Optional<String> tokenOpt = extractToken(request);
 		if (tokenOpt.isPresent()) {
-			DecodedJWT jwt = jwtTokenProvider.decodeToken(tokenOpt.get());
+			String token = tokenOpt.get();
+			if (tokenRepository.isAccessTokenBlacklisted(token)) {
+				SecurityContextHolder.clearContext();
+				filterChain.doFilter(request, response);
+				return;
+			}
+			DecodedJWT jwt = jwtTokenProvider.decodeToken(token);
 			if (jwt != null) {
 				UsernamePasswordAuthenticationToken authentication = buildAuthentication(jwt);
 				SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -55,11 +65,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				SecurityContextHolder.clearContext(); // Token không hợp lệ, clear context
 			}
 		}
-		extractToken(request)
-				.map(jwtTokenProvider::decodeToken)
-				.filter(jwt -> jwt != null)
-				.map(this::buildAuthentication)
-				.ifPresent(authentication -> SecurityContextHolder.getContext().setAuthentication(authentication));
 		filterChain.doFilter(request, response);
 	}
 
@@ -70,8 +75,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	 * @return Optional containing the token if present, otherwise empty
 	 */
 	private Optional<String> extractToken(HttpServletRequest request) {
-		String token = request.getHeader(SecurityConstants.HEADER_STRING);
-		if (StringUtils.hasText(token) && token.startsWith(SecurityConstants.TOKEN_PREFIX)) {
+		String token = request.getHeader(Common.HEADER_STRING);
+		if (StringUtils.hasText(token) && token.startsWith(Common.TOKEN_PREFIX)) {
 			return Optional.of(token.substring(7));
 		}
 		return Optional.empty();
@@ -89,13 +94,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		String username = jwt.getClaim("username").asString();
 		String email = jwt.getClaim("email").asString();
 		List<String> roles = jwt.getClaim("roles").asList(String.class);
+		List<String> permissions = jwt.getClaim("permissions").asList(String.class);
 		List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 		if (roles != null) {
 			authorities.addAll(roles.stream()
 					.map(role -> new SimpleGrantedAuthority("ROLE_" + role))
 					.collect(Collectors.toList()));
 		}
-		JwtTokenRequest principal = new JwtTokenRequest(userId, username, email, roles);
+		if (permissions != null) {
+			authorities.addAll(permissions.stream()
+					.map(permission -> new SimpleGrantedAuthority(permission))
+					.collect(Collectors.toList()));
+		}
+		JwtTokenRequest principal = new JwtTokenRequest(userId, username, email, roles, permissions);
 		return new UsernamePasswordAuthenticationToken(principal, null, authorities);
 	}
 

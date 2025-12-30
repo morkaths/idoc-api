@@ -14,8 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.idoc.auth.constant.RoleConstants;
-import com.idoc.auth.constant.SecurityConstants;
+import com.idoc.auth.constant.Role;
 import com.idoc.auth.security.handler.CustomAccessDeniedHandler;
 import com.idoc.auth.security.handler.CustomUnauthorizedHandler;
 import com.idoc.auth.security.jwt.JwtAuthenticationFilter;
@@ -61,9 +60,21 @@ public class WebSecurityConfig {
 
 		// Configure route authorization
 		http.authorizeHttpRequests(registry -> registry
-				.requestMatchers(SecurityConstants.PUBLIC_ROUTES).permitAll()
-				.requestMatchers("/api/roles/**").authenticated()
-				.requestMatchers("/api/permissions/**").hasRole(RoleConstants.ADMIN)
+				.requestMatchers(
+                    "/api/auth/**",
+					"/api/users/**",
+                    "/v3/api-docs/**",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html"
+                ).permitAll()
+				.requestMatchers("/api/roles/**").hasAnyRole(
+                    Role.MANAGER.getValue(),
+                    Role.ADMIN.getValue()
+                )
+                .requestMatchers("/api/permissions/**").hasAnyRole(
+                    Role.MANAGER.getValue(),
+                    Role.ADMIN.getValue()
+                )
 				.anyRequest().denyAll());
 
 		return http.build();
@@ -78,40 +89,6 @@ public class WebSecurityConfig {
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-
-	// @Bean
-	// public CorsConfigurationSource
-	// corsConfigurationSource(@Value("${cors.allowed-origins}") String
-	// allowedOrigins) {
-	// CorsConfiguration configuration = new CorsConfiguration();
-	// for (String origin : allowedOrigins.split(",")) {
-	// configuration.addAllowedOrigin(origin.trim());
-	// }
-	// configuration.addAllowedMethod("*");
-	// configuration.addAllowedHeader("*");
-	// configuration.setAllowCredentials(true);
-	// UrlBasedCorsConfigurationSource source = new
-	// UrlBasedCorsConfigurationSource();
-	// source.registerCorsConfiguration("/**", configuration);
-	// return source;
-	// }
-
-	/**
-	 * Configure AuthenticationManager with custom UserDetailsService and
-	 * PasswordEncoder.
-	 * 
-	 * @param http - HttpSecurity
-	 * @return AuthenticationManager
-	 * @throws Exception - if an error occurs
-	 */
-	// @Bean
-	// public AuthenticationManager authenticationManager(HttpSecurity http) throws
-	// Exception {
-	// AuthenticationManagerBuilder builder =
-	// http.getSharedObject(AuthenticationManagerBuilder.class);
-	// builder.userDetailsService(customUserDetailService).passwordEncoder(passwordEncoder());
-	// return builder.build();
-	// }
 
 	/**
 	 * Alternative method to get AuthenticationManager from

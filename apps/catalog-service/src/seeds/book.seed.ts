@@ -1,9 +1,7 @@
-// ...existing code...
 import { faker } from '@faker-js/faker';
 import { Author } from 'src/models/author.model';
 import { Book } from '../models/book.model';
 import { Category } from 'src/models/category.model';
-import { BookFormat, FileType } from 'src/types';
 
 /**
  * Seed books using faker

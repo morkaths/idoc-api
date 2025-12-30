@@ -1,14 +1,21 @@
 import { Request, Response } from 'express';
 import ProfileService from '../services/profile.service';
-import { asyncHandler } from '../middleware/error-handler';
+import { asyncHandler } from '../middleware/error-handler.middleware';
 import { AuthRequest } from '../types/request';
 import * as response from '../utils/response.util';
 
 const ProfileController = {
-  getAll: asyncHandler(async (req: Request, res: Response) => {
-    const profiles = await ProfileService.findAll();
-    if (!profiles || profiles.length === 0) return response.notFound(res, "No profiles found");
-    response.success(res, "Profiles retrieved successfully", profiles);
+  getList: asyncHandler(async (req: Request, res: Response) => {
+    const { page = 1, limit = 10, ...filters } = req.query;
+    const { data, pagination } = await ProfileService.getList(
+      Number(page),
+      Number(limit),
+      filters
+    );
+    if (!data || data.length === 0) {
+      return response.notFound(res, 'No profiles found');
+    }
+    response.paginated(res, 'Profiles retrieved successfully', data, pagination);
   }),
 
   getById: asyncHandler(async (req: Request, res: Response) => {
@@ -18,25 +25,16 @@ const ProfileController = {
     response.success(res, "Profile retrieved successfully", profile);
   }),
 
-  getMe: asyncHandler(async (req: AuthRequest, res: Response) => {
-    const userId = req.user?.id;
+  getMe: asyncHandler<AuthRequest>(async (req: AuthRequest, res: Response) => {
+    const userId = req.user.id;
     if (!userId) return response.unauthorized(res, "Unauthorized");
     const profile = await ProfileService.findOne({ userId });
     if (!profile) return response.notFound(res, "Profile not found");
     response.success(res, "Profile retrieved successfully", profile);
   }),
 
-  search: asyncHandler(async (req: Request, res: Response) => {
-    const profiles = await ProfileService.search(req.query);
-    if (!profiles || profiles.length === 0) return response.notFound(res, "No profiles found");
-    response.success(res, "Profiles retrieved successfully", profiles);
-  }),
-
   create: asyncHandler(async (req: AuthRequest, res: Response) => {
     const data = req.body;
-    const userId = req.user?.id;
-    if (!userId) return response.unauthorized(res, "Unauthorized");
-    data.userId = userId;
     const profile = await ProfileService.create(data);
     if (!profile) return response.badRequest(res, "Failed to create profile");
     response.created(res, "Profile created successfully", profile);
@@ -50,9 +48,9 @@ const ProfileController = {
     response.updated(res, "Profile updated successfully", updated);
   }),
 
-  updateMe: asyncHandler(async (req: AuthRequest, res: Response) => {
+  updateMe: asyncHandler<AuthRequest>(async (req: AuthRequest, res: Response) => {
     const data = req.body;
-    const userId = req.user?.id;
+    const userId = req.user.id;
     if (!userId) return response.unauthorized(res, "Unauthorized");
     const updated = await ProfileService.findOneAndUpdate({ userId }, data);
     if (!updated) return response.notFound(res, "Profile not found");
@@ -65,7 +63,6 @@ const ProfileController = {
     if (!deleted) return response.notFound(res, "Profile not found");
     response.deleted(res, "Profile deleted successfully");
   }),
-
-}
+};
 
 export default ProfileController;

@@ -1,6 +1,7 @@
 import { Document, FilterQuery } from "mongoose";
 import { BaseRepository } from "./base.repository";
 import { BaseMapper } from "./base.mapper";
+import { Pagination } from "src/types";
 
 export class BaseService<E extends Document, D> {
   protected repository: BaseRepository<E>;
@@ -11,19 +12,17 @@ export class BaseService<E extends Document, D> {
     this.mapper = mapper;
   }
 
-  async findAll(): Promise<D[]> {
-    const entities = await this.repository.findAll();
-    return entities.map(entity => this.mapper.toDto(entity));
+  async find(
+    query: FilterQuery<E> = {}, 
+    options?: { limit?: number; skip?: number; sort?: any; lean?: boolean; select?: any }
+  ): Promise<D[]> {
+    const entities = await this.repository.find(query, options);
+    return (entities as E[]).map(e => this.mapper.toDto(e));
   }
 
   async findById(id: string): Promise<D | null> {
     const entity = await this.repository.findById(id);
     return entity ? this.mapper.toDto(entity) : null;
-  }
-
-  async find(query: FilterQuery<E>): Promise<D[]> {
-    const entities = await this.repository.find(query);
-    return entities.map(entity => this.mapper.toDto(entity));
   }
 
   async findOne(query: FilterQuery<E>): Promise<D | null> {
@@ -70,6 +69,27 @@ export class BaseService<E extends Document, D> {
 
   async deleteMany(query: FilterQuery<E>): Promise<number> {
     return await this.repository.deleteMany(query);
+  }
+
+  async paginate(
+    query: FilterQuery<E> = {},
+    options?: { page?: number; limit?: number; sort?: any; lean?: boolean; select?: any; }
+  ): Promise<{ data: D[]; pagination: Pagination }> {
+    const result = await this.repository.paginate(query, options);
+    const data = (result.items || []).map(entity => this.mapper.toDto(entity as E));
+    return {
+      data,
+      pagination: result.pagination
+    };
+  }
+
+  async paginateAggregate(pipeline: any[], page = 1, limit = 10): Promise<{ data: D[]; pagination: Pagination }> {
+    const result = await this.repository.paginateAggregate(pipeline, page, limit);
+    const data = (result.items || []).map(i => this.mapper.toDto(i as E));
+    return {
+      data,
+      pagination: result.pagination
+    };
   }
 
 }
