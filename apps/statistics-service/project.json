@@ -1,0 +1,6 @@
+{
+  "name": "@idoc-api/statistics-service",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/statistics-service/src",
+  "tags": []
+}

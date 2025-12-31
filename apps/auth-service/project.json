@@ -1,5 +1,5 @@
 {
-  "name": "auth-service",
+  "name": "@idoc-api/auth-service",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "sourceRoot": "apps/auth-service/src",
