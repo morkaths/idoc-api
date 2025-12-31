@@ -2,10 +2,7 @@
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "defaultBase": "master",
   "namedInputs": {
-    "default": [
-      "{projectRoot}/**/*",
-      "sharedGlobals"
-    ],
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
     "production": [
       "default",
       "!{projectRoot}/.eslintrc.json",
@@ -16,18 +13,14 @@
       "!{projectRoot}/src/test-setup.[jt]s",
       "!{projectRoot}/test-setup.[jt]s"
     ],
-    "sharedGlobals": [
-      "{workspaceRoot}/.github/workflows/ci.yml"
-    ]
+    "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"]
   },
-  "nxCloudId": "69300e8696a0f141735b663f",
+  "nxCloudId": "6955571db22d04e5ce988aa0",
   "plugins": [
     {
       "plugin": "@nx/js/typescript",
       "options": {
-        "typecheck": {
-          "targetName": "typecheck"
-        },
+        "typecheck": { "targetName": "typecheck" },
         "build": {
           "targetName": "build",
           "configName": "tsconfig.lib.json",
@@ -36,17 +29,10 @@
         }
       }
     },
-    {
-      "plugin": "@nx/eslint/plugin",
-      "options": {
-        "targetName": "lint"
-      }
-    },
+    { "plugin": "@nx/eslint/plugin", "options": { "targetName": "lint" } },
     {
       "plugin": "@nx/jest/plugin",
-      "options": {
-        "targetName": "test"
-      },
+      "options": { "targetName": "test" },
       "exclude": [
         "apps/file-service-e2e/**/*",
         "apps/catalog-service-e2e/**/*",
@@ -56,12 +42,8 @@
     {
       "plugin": "@nx/docker",
       "options": {
-        "buildTarget": {
-          "name": "docker:build"
-        },
-        "runTarget": {
-          "name": "docker:run"
-        }
+        "buildTarget": { "name": "docker:build" },
+        "runTarget": { "name": "docker:run" }
       }
     },
     "@jnxplus/nx-boot-maven",
@@ -85,18 +67,9 @@
   "targetDefaults": {
     "@nx/esbuild:esbuild": {
       "cache": true,
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "production",
-        "^production"
-      ]
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
     },
-    "test": {
-      "dependsOn": [
-        "^build"
-      ]
-    }
+    "test": { "dependsOn": ["^build"] }
   }
 }
