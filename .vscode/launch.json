@@ -82,6 +82,16 @@
         "${workspaceFolder}/apps/user-service/dist/**/*.(m|c|)js",
         "!**/node_modules/**"
       ]
+    },
+    {
+      "type": "java",
+      "name": "Spring Boot-StatisticsServiceApplication<statistics-service>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.idoc.statistics.StatisticsServiceApplication",
+      "projectName": "statistics-service",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
     }
   ]
 }

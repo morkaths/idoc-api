@@ -1,0 +1,33 @@
+# ===============================
+# APP INFO
+# ===============================
+spring.application.name=statistics-service
+server.port=8085
+
+# ===============================
+# DATABASE CONFIGURATION
+# ===============================
+spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/idoc_statistics_service?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+spring.datasource.username=${SPRING_DATASOURCE_USERNAME:root}
+spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:123456}
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# ===============================
+# JPA / HIBERNATE
+# ===============================
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+spring.jpa.hibernate.ddl-auto=${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+spring.jpa.show-sql=true
+
+# ===============================
+# REDIS CONFIGURATION
+# ===============================
+spring.data.redis.host=${SPRING_DATA_REDIS_HOST:localhost}
+spring.data.redis.port=${SPRING_DATA_REDIS_PORT:6379}
+spring.data.redis.password=${SPRING_DATA_REDIS_PASSWORD:}
+spring.data.redis.database=${SPRING_DATA_REDIS_DATABASE:0}
+
+# ===============================
+# APP SECURITY
+# ===============================
+app.api-key=${APP_API_KEY:secret-api-key}

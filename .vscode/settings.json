@@ -2,5 +2,8 @@
   "java.jdt.ls.lombokSupport.enabled": false,
   "java.compile.nullAnalysis.mode": "disabled",
   "java.configuration.updateBuildConfiguration": "automatic",
-  "typescript.updateImportsOnFileMove.enabled": "always"
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "java.debug.settings.onBuildFailureProceed": true,
+  "java.dependency.packagePresentation": "hierarchical",
+  "window.zoomLevel": -1
 }

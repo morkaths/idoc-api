@@ -14,5 +14,11 @@
   "keywords": [],
   "author": "Morkath",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "ioredis": "^5.8.2"
+  },
+  "devDependencies": {
+    "@types/ioredis": "^4.28.10"
+  }
 }

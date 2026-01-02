@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public interface BaseMapper<Request, Response, Entity> {
   Entity toEntity(Request dto);
-  Response toDto(Entity entity);
+  Response toResponse(Entity entity);
 
   default void partial(ObjectMapper objectMapper, Map<String, Object> fields, Entity entity) {
     Set<String> validFields = Arrays.stream(entity.getClass().getDeclaredFields())

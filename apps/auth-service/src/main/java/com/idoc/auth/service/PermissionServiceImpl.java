@@ -43,14 +43,14 @@ public class PermissionServiceImpl
     if (entity == null) {
       throw new IllegalArgumentException("Permission not found with code: " + code);
     }
-    return permissionMapper.toDto(entity);
+    return permissionMapper.toResponse(entity);
   }
 
   @Override
   public List<PermissionResponse> findByRoleId(Long roleId) {
     List<PermissionEntity> entities = permissionRepository.findByRoleId(roleId);
     return entities.stream()
-        .map(permissionMapper::toDto)
+        .map(permissionMapper::toResponse)
         .toList();
   }
 

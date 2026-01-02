@@ -85,7 +85,7 @@ public class AuthServiceImpl implements AuthService {
 					refreshToken,
 					true,
 					accessTokenExpiration);
-			return new AuthenticationResponse(token, userMapper.toDto(user));
+			return new AuthenticationResponse(token, userMapper.toResponse(user));
 		} catch (AuthenticationException ex) {
 			throw new IllegalArgumentException("Invalid username/email or password");
 		}
@@ -140,7 +140,7 @@ public class AuthServiceImpl implements AuthService {
 				refreshToken,
 				true,
 				accessTokenExpiration);
-		return new AuthenticationResponse(token, userMapper.toDto(user));
+		return new AuthenticationResponse(token, userMapper.toResponse(user));
 	}
 
 	@Override
@@ -179,7 +179,7 @@ public class AuthServiceImpl implements AuthService {
 				refreshToken,
 				true,
 				accessTokenExpiration);
-		return new AuthenticationResponse(token, userMapper.toDto(user));
+		return new AuthenticationResponse(token, userMapper.toResponse(user));
 	}
 
 	@Override

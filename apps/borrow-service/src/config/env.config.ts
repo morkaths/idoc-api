@@ -41,3 +41,11 @@ export const SMTP_PORT = parseNumber(process.env.SMTP_PORT, 587);
 export const SMTP_USER = process.env.SMTP_USER || '';
 export const SMTP_PASS = process.env.SMTP_PASS || '';
 export const SMTP_FROM = process.env.SMTP_FROM || '"Thư viện số" <no-reply@example.com>';
+
+// ────────────────────────────────────────────────────────────────────────────────
+// Redis Configuration
+// ────────────────────────────────────────────────────────────────────────────────
+export const REDIS_HOST = process.env.REDIS_HOST || 'localhost';
+export const REDIS_PORT = parseNumber(process.env.REDIS_PORT, 6379);
+export const REDIS_PASSWORD = process.env.REDIS_PASSWORD;
+export const REDIS_DB = parseNumber(process.env.REDIS_DB, 0);

@@ -30,11 +30,12 @@ public class RoleServiceImpl
     extends BaseServiceImpl<RoleRequest, RoleResponse, RoleEntity, Long>
     implements RoleService {
 
-  private final  PermissionRepository permissionRepository;
+  private final PermissionRepository permissionRepository;
   private final RoleRepository roleRepository;
   private final RoleMapper roleMapper;
 
-  public RoleServiceImpl(PermissionRepository permissionRepository, RoleRepository roleRepository, RoleMapper roleMapper) {
+  public RoleServiceImpl(PermissionRepository permissionRepository, RoleRepository roleRepository,
+      RoleMapper roleMapper) {
     super(roleRepository, roleRepository, roleMapper);
     this.permissionRepository = permissionRepository;
     this.roleRepository = roleRepository;
@@ -44,10 +45,10 @@ public class RoleServiceImpl
   @Override
   public Page<RoleResponse> find(Pageable pageable, Map<String, Object> filter) {
     String sortBy = (String) filter.getOrDefault("sortBy", "id");
-		String sortOrder = (String) filter.getOrDefault("sortOrder", "asc");
-		Sort sort = sortOrder.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+    String sortOrder = (String) filter.getOrDefault("sortOrder", "asc");
+    Sort sort = sortOrder.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
     Pageable pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-		Specification<RoleEntity> spec = RoleSpecification.filter(filter);
+    Specification<RoleEntity> spec = RoleSpecification.filter(filter);
     return this.paginate(pageRequest, spec);
   }
 
@@ -57,7 +58,7 @@ public class RoleServiceImpl
     if (entity == null) {
       throw new IllegalArgumentException("Role not found with code: " + code);
     }
-    return roleMapper.toDto(entity);
+    return roleMapper.toResponse(entity);
   }
 
   @Override
@@ -69,7 +70,7 @@ public class RoleServiceImpl
       entity.setPermissions(permissions);
     }
     RoleEntity saved = roleRepository.save(entity);
-    return roleMapper.toDto(saved);
+    return roleMapper.toResponse(saved);
   }
 
   @Override

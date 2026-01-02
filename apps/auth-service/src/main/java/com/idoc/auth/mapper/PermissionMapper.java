@@ -15,5 +15,5 @@ public interface PermissionMapper extends BaseMapper<PermissionRequest, Permissi
   PermissionEntity toEntity(PermissionRequest request);
 
   @Override
-  PermissionResponse toDto(PermissionEntity entity);
+  PermissionResponse toResponse(PermissionEntity entity);
 }

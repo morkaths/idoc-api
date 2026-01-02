@@ -4,13 +4,34 @@ import { Borrow } from "../models/borrow.model";
 import { BorrowDto } from "../dtos/borrow.dto";
 import { BorrowMapper } from "../mappers/borrow.mapper";
 import { borrowRepository } from "../repositories/borrow.repository";
-import { Pagination } from "../types";
+import { Category, Pagination } from "../types";
 import { UserClient } from "src/integrations/user.client";
 import { BookClient } from "src/integrations/book.client";
+import { publishBorrowEvent, publishReturnEvent } from "../utils/event-publisher.util";
 
 class BorrowService extends BaseService<Borrow, BorrowDto> {
   constructor() {
     super(borrowRepository, BorrowMapper);
+  }
+
+  async create(dto: BorrowDto): Promise<BorrowDto> {
+    const created = await super.create(dto);
+    
+    // Fetch book details to get category IDs
+    let categoryIds: string[] = [];
+    if (created.itemId) {
+      try {
+        const book = await BookClient.findById(created.itemId);
+        if (book && book.categories) {
+          categoryIds = book.categories.map((category: Category) => category._id);
+        }
+      } catch (error) {
+        console.error('Failed to fetch book details for category statistics:', error);
+      }
+    }
+
+    await publishBorrowEvent(created, categoryIds);
+    return created;
   }
 
   async findList(page: number, limit: number, filter: { [key: string]: any }): Promise<{ data: BorrowDto[]; pagination: Pagination }> {
@@ -22,8 +43,6 @@ class BorrowService extends BaseService<Borrow, BorrowDto> {
     const items = await BookClient.findByIds(itemIds);
     const userMap = new Map(users.map(u => [String(u.id), u]));
     const itemMap = new Map(items.map(b => [String(b._id), b]));
-    console.log('userMap:', userMap, 'itemMap:', itemMap);
-
     const data = borrows.map((borrow: Partial<Borrow>) => {
       const user = userMap.get(borrow.userId || '');
       const item = itemMap.get(borrow.itemId || '');
@@ -63,7 +82,12 @@ class BorrowService extends BaseService<Borrow, BorrowDto> {
     };
     const updated = await borrowRepository.update(borrowId, updateData);
     if (!updated) throw new createHttpError.BadRequest('Failed to return borrow record');
-    return this.mapper.toDto(updated);
+    
+    // Publish to Redis
+    const dto = this.mapper.toDto(updated);
+    await publishReturnEvent(dto);
+
+    return dto;
   }
 
   async markOverdueBorrows(): Promise<number> {

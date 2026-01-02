@@ -21,6 +21,6 @@ public interface RoleMapper extends BaseMapper<RoleRequest, RoleResponse, RoleEn
 
   @Override
   @Mapping(target = "permissions", source = "permissions")
-  RoleResponse toDto(RoleEntity entity);
+  RoleResponse toResponse(RoleEntity entity);
 
 }

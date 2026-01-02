@@ -65,7 +65,7 @@ public class UserServiceImpl
 		if (user == null) {
 			throw new IllegalArgumentException("User not found with identifier: " + identifier);
 		}
-		return userMapper.toDto(user);
+		return userMapper.toResponse(user);
 	}
 
 	@Override
@@ -78,7 +78,7 @@ public class UserServiceImpl
 		Specification<UserEntity> specification = builder.build(filter);
 		return userRepository.findAll(specification)
 				.stream()
-				.map(userMapper::toDto)
+				.map(userMapper::toResponse)
 				.toList();
 	}
 
@@ -91,7 +91,7 @@ public class UserServiceImpl
 				.stream()
 				.collect(Collectors.toSet());
 		user.setRoles(roles);
-		return userMapper.toDto(userRepository.save(user));
+		return userMapper.toResponse(userRepository.save(user));
 	}
 
 	@Override
@@ -103,7 +103,7 @@ public class UserServiceImpl
 			entity.setRoles(roles);
 		}
 		UserEntity saved = userRepository.save(entity);
-		return userMapper.toDto(saved);
+		return userMapper.toResponse(saved);
 	}
 
 	@Override
@@ -128,7 +128,7 @@ public class UserServiceImpl
 		} catch (Exception ex) {
 			System.err.println("Error when creating profile: " + ex.getMessage());
 		}
-		return userMapper.toDto(saved);
+		return userMapper.toResponse(saved);
 	}
 
 	@Override

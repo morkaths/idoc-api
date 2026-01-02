@@ -28,7 +28,7 @@ public interface UserMapper extends BaseMapper<UserRequest, UserResponse, UserEn
   @Override
   @Mapping(target = "password", ignore = true)
   @Mapping(target = "roles", source = "roles")
-  UserResponse toDto(UserEntity entity);
+  UserResponse toResponse(UserEntity entity);
 
   /**
    * Cập nhật UserEntity từ Map các trường và giá trị.
