@@ -1,0 +1,59 @@
+server:
+  port: ${SERVER_PORT:8085}
+  error:
+    include-message: always
+
+spring:
+  application:
+    name: statistics-service
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/idoc_statistics_service?useSSL=false&serverTimezone=UTC}
+    username: ${SPRING_DATASOURCE_USERNAME:}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 30000
+      max-lifetime: 600000
+      connection-timeout: 20000
+      pool-name: StatisticsPool
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+        enable_lazy_load_no_trans: true
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: 0
+  
+jwt:
+  issuer: idoc-service
+  audience: idoc-client
+  public-key: |
+    -----BEGIN PUBLIC KEY-----
+    ${JWT_PUBLIC_KEY:}
+    -----END PUBLIC KEY-----
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:3001,http://localhost:8000,http://localhost:5000}
+
+service:
+  key: ${SERVICE_KEY:}
+  auth:
+    url: ${AUTH_SERVICE_URL:http://localhost:8000/api/auth}
+
+logging:
+  level:
+    root: INFO

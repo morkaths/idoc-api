@@ -1,9 +1,9 @@
 {
   "name": "@idoc-api/file-service",
   "version": "1.0.0",
-  "main": "dist/server.js",
+  "main": "dist/apps/file-service/src/server.js",
   "scripts": {
-    "start": "node dist/server.js",
+    "start": "node dist/apps/file-service/src/server.js",
     "dev": "ts-node-dev --respawn -r tsconfig-paths/register src/server.ts",
     "build": "tsc",
     "seed": "ts-node -r tsconfig-paths/register src/seeds/index.ts",

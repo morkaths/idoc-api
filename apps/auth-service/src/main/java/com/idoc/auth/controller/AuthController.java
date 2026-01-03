@@ -25,6 +25,7 @@ import com.idoc.auth.service.AuthService;
 import com.idoc.auth.service.UserService;
 
 import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -87,10 +88,12 @@ public class AuthController {
 	}
 
 	@PostMapping("/logout")
-	public ResponseEntity<ApiResponse<Void>> logout() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		JwtTokenRequest principal = (JwtTokenRequest) authentication.getPrincipal();
-		authService.logout(String.valueOf(principal.getUserId()));
+	public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request) {
+		String token = request.getHeader("Authorization");
+		if (token != null && token.startsWith("Bearer ")) {
+			token = token.substring(7);
+			authService.logout(token);
+		}
 		return ResponseEntity.ok(ApiResponse.success(null, "Logout successful"));
 	}
 

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import CategoryController from '../controllers/category.controller';
-import { authenticateToken, authorizeRole } from '../middleware/auth.middleware';
+import { authenticate, authorize } from '../middleware/auth.middleware';
 import { RoleEnum } from '../constants/security/role';
 
 const router = Router();
@@ -119,8 +119,8 @@ router.post('/batch', CategoryController.getByIds);
  */
 router.post(
   '/',
-  authenticateToken,
-  authorizeRole([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]),
+  authenticate,
+  authorize([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]),
   CategoryController.create
 );
 
@@ -159,8 +159,8 @@ router.post(
  */
 router.patch(
   '/:id',
-  authenticateToken,
-  authorizeRole([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]),
+  authenticate,
+  authorize([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]),
   CategoryController.update
 );
 
@@ -193,8 +193,8 @@ router.patch(
  */
 router.delete(
   '/:id',
-  authenticateToken,
-  authorizeRole([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]),
+  authenticate,
+  authorize([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]),
   CategoryController.delete
 );
 

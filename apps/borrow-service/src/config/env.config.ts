@@ -49,3 +49,19 @@ export const REDIS_HOST = process.env.REDIS_HOST || 'localhost';
 export const REDIS_PORT = parseNumber(process.env.REDIS_PORT, 6379);
 export const REDIS_PASSWORD = process.env.REDIS_PASSWORD;
 export const REDIS_DB = parseNumber(process.env.REDIS_DB, 0);
+
+// ────────────────────────────────────────────────────────────────────────────────
+// Auth / Keys
+// ────────────────────────────────────────────────────────────────────────────────
+const RAW_RSA_PUBLIC_KEY = process.env.RSA_PUBLIC_KEY || '';
+export const RSA_PUBLIC_KEY = (() => {
+  if (!RAW_RSA_PUBLIC_KEY) return '';
+  const cleanKey = RAW_RSA_PUBLIC_KEY
+    .replace(/\\n/g, '')
+    .replace(/\s/g, '')
+    .replace(/"/g, '');
+  const coreKey = cleanKey
+    .replace('-----BEGINPUBLICKEY-----', '')
+    .replace('-----ENDPUBLICKEY-----', '');
+  return `-----BEGIN PUBLIC KEY-----\n${coreKey}\n-----END PUBLIC KEY-----`;
+})();

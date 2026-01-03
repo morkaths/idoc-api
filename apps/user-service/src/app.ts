@@ -7,13 +7,12 @@ import passport from 'passport';
 import swaggerUi from 'swagger-ui-express';
 import { Request, Response, NextFunction } from 'express';
 
-import routes from './routes';
+import routes from './routes/index';
 import { ALLOWED_ORIGINS } from './config/env.config';
 import { errorHandler } from './middleware/error-handler.middleware';
-
+import swaggerSpec from '../docs/swagger';
 
 const app = express();
-const swaggerSpec = require('../docs/swagger.js');
 
 // 1. CORS
 app.use(
@@ -85,6 +84,12 @@ app.use('/api/docs', (req: Request, res: Response, next: NextFunction) => {
   res.setHeader('Content-Security-Policy', CSP);
   next();
 }, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// 7.2. Swagger JSON for Gateway
+app.get('/api/docs-json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
 
 // 8. Định nghĩa các route chính
 app.use('/api', routes);

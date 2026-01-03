@@ -1,43 +1,58 @@
-
-import { AuthClient } from '../integrations/auth.client';
 import { Request, Response, NextFunction } from 'express';
+import { Redis } from 'ioredis';
+import * as jwt from 'jsonwebtoken';
 import { AuthRequest } from '../types';
+import { RSA_PUBLIC_KEY } from '../config/env.config';
 
-/**
- * Middleware to authenticate JWT token from Authorization header
- */
-export const authenticateToken = async (req: Request, res: Response, next: NextFunction) => {
+const redis = new Redis();
+const ACCESS_BLACKLIST_PREFIX = 'blacklist:access:';
+
+export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
+  // Get token from Authorization header
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Missing or invalid Authorization header' });
+  }
+  const token = authHeader.split(' ')[1];
   try {
-    // Get token from Authorization header
-    const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(' ')[1]; // Format: "Bearer TOKEN"
-    if (!token) return res.status(401).json({ success: false, message: 'No authentication token provided' });
+    let decoded: any;
 
-    // Verify token using AuthClient
-    const user = await AuthClient.verify(token);
-    if (!user) return res.status(401).json({ success: false, message: 'Invalid token' });
-    
-    (req as AuthRequest).user = user;
+    if (RSA_PUBLIC_KEY) {
+      console.log('RSA_PUBLIC_KEY:', RSA_PUBLIC_KEY);
+      try {
+        decoded = jwt.verify(token, RSA_PUBLIC_KEY, { algorithms: ['RS256'] }) as any;
+      } catch (error) {
+        console.error('Token signature verification failed:', error);
+        return res.status(401).json({ success: false, message: 'Invalid token signature' });
+      }
+    } else {
+      console.warn('RSA_PUBLIC_KEY not provided, skipping signature verification');
+      decoded = jwt.decode(token) as any;
+    }
+    console.log("Decode:", decoded);
+
+    if (!decoded || !decoded.jti) {
+      return res.status(401).json({ success: false, message: 'Invalid token structure' });
+    }
+
+    // Check Blacklist
+    const isBlacklisted = await redis.get(`${ACCESS_BLACKLIST_PREFIX}${decoded.jti}`);
+    if (isBlacklisted) {
+      return res.status(401).json({ success: false, message: 'Token revoked' });
+    }
+
+    (req as AuthRequest).user = {
+      id: decoded.sub,
+      email: decoded.email,
+      username: decoded.username,
+      roles: decoded.roles,
+      permissions: decoded.permissions,
+      status: 1
+    };
     next();
+    return;
   } catch {
     return res.status(401).json({ success: false, message: 'Authentication failed' });
-  }
-};
-
-export const optionalAuth = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    // Get token from Authorization header
-    const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(' ')[1];
-    if (token) {
-      const user = await AuthClient.verify(token);
-      if (user) {
-        (req as AuthRequest).user = user;
-      }
-    }
-    next();
-  } catch {
-    next();
   }
 };
 
@@ -46,7 +61,7 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
  * @param allowedRoles Array of allowed role codes (e.g., ['admin', 'user'])
  * @returns Middleware function
  */
-export const authorizeRole = (allowedRoles: string[]) => {
+export const authorize = (allowedRoles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       // Ensure user is authenticated
@@ -55,7 +70,7 @@ export const authorizeRole = (allowedRoles: string[]) => {
         return res.status(401).json({ success: false, message: 'You need to log in first' });
       }
       // Check if user has the required role
-      const hasRole = user.roles?.some(role => allowedRoles.includes(role.code));
+      const hasRole = user.roles?.some(role => allowedRoles.includes(role));
       if (!hasRole) {
         return res.status(403).json({ success: false, message: 'Access denied: insufficient permissions' });
       }

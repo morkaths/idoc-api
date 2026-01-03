@@ -1,0 +1,18 @@
+{
+  "name": "@idoc-api/gateway",
+  "version": "1.0.0",
+  "main": "dist/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node dist/server.js",
+    "dev": "npx -y tsx watch src/server.ts",
+    "build": "tsc",
+    "lint": "eslint ./src --ext .ts",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "Morkath",
+  "license": "ISC",
+  "description": ""
+}

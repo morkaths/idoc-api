@@ -23,10 +23,10 @@ import com.idoc.auth.entity.UserEntity;
 import com.idoc.auth.integration.ProfileClient;
 import com.idoc.auth.mapper.UserMapper;
 import com.idoc.auth.repository.RoleRepository;
-import com.idoc.auth.repository.TokenRepository;
 import com.idoc.auth.repository.UserRepository;
 import com.idoc.auth.spec.UserSpecification;
 import com.idoc.auth.util.SpecificationBuilder;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Service
 @Transactional(readOnly = true)
@@ -38,16 +38,14 @@ public class UserServiceImpl
 	private final RoleRepository roleRepository;
 	private final UserMapper userMapper;
 	private final ProfileClient profileClient;
-	private final TokenRepository tokenRepository;
 
 	public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, RoleRepository roleRepository,
-			ProfileClient profileClient, TokenRepository tokenRepository) {
+			ProfileClient profileClient) {
 		super(userRepository, userRepository, userMapper);
 		this.userRepository = userRepository;
 		this.userMapper = userMapper;
 		this.roleRepository = roleRepository;
 		this.profileClient = profileClient;
-		this.tokenRepository = tokenRepository;
 	}
 
 	@Override
@@ -98,6 +96,14 @@ public class UserServiceImpl
 	@Override
 	@Transactional
 	public UserResponse save(UserRequest dto) {
+		if (dto.getId() == null) {
+			if (userRepository.existsByUsername(dto.getUsername())) {
+				throw new IllegalArgumentException("Username already exists: " + dto.getUsername());
+			}
+			if (userRepository.existsByEmail(dto.getEmail())) {
+				throw new IllegalArgumentException("Email already exists: " + dto.getEmail());
+			}
+		}
 		UserEntity entity = userMapper.toEntity(dto);
 		if (dto.getRoleIds() != null && !dto.getRoleIds().isEmpty()) {
 			Set<RoleEntity> roles = new HashSet<>(roleRepository.findAllById(dto.getRoleIds()));
@@ -110,6 +116,12 @@ public class UserServiceImpl
 	@Override
 	@Transactional
 	public UserResponse create(UserRequest dto, Long createdBy) {
+		if (userRepository.existsByUsername(dto.getUsername())) {
+			throw new IllegalArgumentException("Username already exists: " + dto.getUsername());
+		}
+		if (userRepository.existsByEmail(dto.getEmail())) {
+			throw new IllegalArgumentException("Email already exists: " + dto.getEmail());
+		}
 		UserEntity entity = userMapper.toEntity(dto);
 		if (dto.getRoleIds() != null && !dto.getRoleIds().isEmpty()) {
 			Set<RoleEntity> roles = new HashSet<>(roleRepository.findAllById(dto.getRoleIds()));
@@ -123,7 +135,7 @@ public class UserServiceImpl
 				null,
 				null,
 				null);
-		String accessToken = tokenRepository.getAccessToken(String.valueOf(createdBy));
+		String accessToken = (String) SecurityContextHolder.getContext().getAuthentication().getCredentials();
 		try {
 			profileClient.create(profile, accessToken);
 		} catch (Exception ex) {

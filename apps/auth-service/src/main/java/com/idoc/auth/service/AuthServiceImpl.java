@@ -82,7 +82,7 @@ public class AuthServiceImpl implements AuthService {
 			if (accessToken == null) {
 				throw new IllegalStateException("Failed to generate token");
 			}
-			tokenRepository.storeToken(String.valueOf(user.getId()), accessToken, refreshToken);
+			tokenRepository.saveSession(String.valueOf(user.getId()), refreshToken);
 			TokenResponse token = new TokenResponse(
 					accessToken,
 					refreshToken,
@@ -130,7 +130,7 @@ public class AuthServiceImpl implements AuthService {
 		if (accessToken == null) {
 			throw new IllegalStateException("Failed to generate token");
 		}
-		tokenRepository.storeToken(String.valueOf(user.getId()), accessToken, refreshToken);
+		tokenRepository.saveSession(String.valueOf(user.getId()), refreshToken);
 		ProfileRequest profile = new ProfileRequest(
 				user.getId(),
 				"User " + user.getUsername(),
@@ -178,7 +178,7 @@ public class AuthServiceImpl implements AuthService {
 		if (accessToken == null) {
 			throw new IllegalStateException("Failed to generate access token");
 		}
-		tokenRepository.storeToken(String.valueOf(user.getId()), accessToken, refreshToken);
+		tokenRepository.saveSession(String.valueOf(user.getId()), refreshToken);
 		TokenResponse token = new TokenResponse(
 				accessToken,
 				refreshToken,
@@ -188,7 +188,19 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public void logout(String userId) {
-		tokenRepository.removeAllToken(userId);
+	public void logout(String accessToken) {
+		DecodedJWT jwt = jwtTokenProvider.decodeToken(accessToken);
+		if (jwt != null) {
+			String jti = jwt.getId();
+			long expiration = jwt.getExpiresAt().getTime();
+			long now = System.currentTimeMillis();
+			long ttl = expiration - now;
+			if (ttl > 0) {
+				tokenRepository.revokeToken(jti, ttl);
+			}
+			// Remove refresh token by userId
+			String userId = jwt.getSubject();
+			tokenRepository.removeSession(userId);
+		}
 	}
 }

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import ProfileService from '../services/profile.service';
 import { asyncHandler } from '../middleware/error-handler.middleware';
-import { AuthRequest } from '../types/request';
+import { AuthRequest } from '../types';
 import * as response from '../utils/response.util';
 
 const ProfileController = {

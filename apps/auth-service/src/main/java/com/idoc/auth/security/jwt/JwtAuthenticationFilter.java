@@ -52,14 +52,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		Optional<String> tokenOpt = extractToken(request);
 		if (tokenOpt.isPresent()) {
 			String token = tokenOpt.get();
-			if (tokenRepository.isAccessTokenBlacklisted(token)) {
-				SecurityContextHolder.clearContext();
-				filterChain.doFilter(request, response);
-				return;
-			}
 			DecodedJWT jwt = jwtTokenProvider.decodeToken(token);
+
 			if (jwt != null) {
-				UsernamePasswordAuthenticationToken authentication = buildAuthentication(jwt);
+				if (tokenRepository.isAccessTokenBlacklisted(jwt.getId())) {
+					SecurityContextHolder.clearContext();
+					filterChain.doFilter(request, response);
+					return;
+				}
+				UsernamePasswordAuthenticationToken authentication = buildAuthentication(jwt, token);
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			} else {
 				SecurityContextHolder.clearContext(); // Token không hợp lệ, clear context
@@ -89,7 +90,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	 * @return UsernamePasswordAuthenticationToken representing the authenticated
 	 *         user
 	 */
-	private UsernamePasswordAuthenticationToken buildAuthentication(DecodedJWT jwt) {
+	private UsernamePasswordAuthenticationToken buildAuthentication(DecodedJWT jwt, String token) {
 		Long userId = Long.valueOf(jwt.getSubject());
 		String username = jwt.getClaim("username").asString();
 		String email = jwt.getClaim("email").asString();
@@ -107,7 +108,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 					.collect(Collectors.toList()));
 		}
 		JwtTokenRequest principal = new JwtTokenRequest(userId, username, email, roles, permissions);
-		return new UsernamePasswordAuthenticationToken(principal, null, authorities);
+		return new UsernamePasswordAuthenticationToken(principal, token, authorities);
 	}
 
 }

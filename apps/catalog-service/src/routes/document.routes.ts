@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import DocumentController from '../controllers/document.controller';
-import { authenticateToken, authorizeRole } from '../middleware/auth.middleware';
+import { authenticate, authorize } from '../middleware/auth.middleware';
 import { RoleEnum } from '../constants/security/role';
 
 const router = Router();
@@ -41,8 +41,8 @@ router.get('/:id', DocumentController.getById);
  */
 router.post(
   '/',
-  authenticateToken,
-  authorizeRole([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]),
+  authenticate,
+  authorize([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]),
   DocumentController.create
 );
 
@@ -53,8 +53,8 @@ router.post(
  */
 router.patch(
   '/:id',
-  authenticateToken,
-  authorizeRole([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]),
+  authenticate,
+  authorize([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]),
   DocumentController.update
 );
 
@@ -65,8 +65,8 @@ router.patch(
  */
 router.delete(
   '/:id',
-  authenticateToken,
-  authorizeRole([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]),
+  authenticate,
+  authorize([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]),
   DocumentController.delete
 );
 

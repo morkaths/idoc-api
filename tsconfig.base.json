@@ -16,6 +16,10 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
-    "customConditions": ["@idoc-api/source"]
+    "customConditions": ["@idoc-api/source"],
+    "baseUrl": ".",
+    "paths": {
+      "@repo/shared/auth": ["libs/shared/auth/src/index.ts"]
+    }
   }
 }

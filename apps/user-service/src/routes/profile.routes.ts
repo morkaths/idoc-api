@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import ProfileController from '../controllers/profile.controller';
-import { authenticateToken, authorizeRole } from '../middleware/auth.middleware';
+import { authenticate, authorize } from '../middleware/auth.middleware';
 import { RoleEnum } from 'src/constants/security/role';
 
 const router = Router();
@@ -53,7 +53,7 @@ router.get('/', ProfileController.getList);
  *       401:
  *         description: Chưa xác thực
  */
-router.get('/me', authenticateToken, ProfileController.getMe);
+router.get('/me', authenticate, ProfileController.getMe);
 
 /**
  * @openapi
@@ -102,7 +102,7 @@ router.get('/:id', ProfileController.getById);
  *       401:
  *         description: Chưa xác thực
  */
-router.post('/', authenticateToken, ProfileController.create);
+router.post('/', authenticate, ProfileController.create);
 
 /**
  * @openapi
@@ -126,7 +126,7 @@ router.post('/', authenticateToken, ProfileController.create);
  *       401:
  *         description: Chưa xác thực
  */
-router.patch('/me', authenticateToken, ProfileController.updateMe);
+router.patch('/me', authenticate, ProfileController.updateMe);
 
 /**
  * @openapi
@@ -161,7 +161,7 @@ router.patch('/me', authenticateToken, ProfileController.updateMe);
  *       404:
  *         description: Không tìm thấy hồ sơ
  */
-router.patch('/:id', authenticateToken, authorizeRole([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]), ProfileController.update);
+router.patch('/:id', authenticate, authorize([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]), ProfileController.update);
 
 /**
  * @openapi
@@ -190,6 +190,6 @@ router.patch('/:id', authenticateToken, authorizeRole([RoleEnum.ADMIN, RoleEnum.
  *       404:
  *         description: Không tìm thấy hồ sơ
  */
-router.delete('/:id', authenticateToken, authorizeRole([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]), ProfileController.delete);
+router.delete('/:id', authenticate, authorize([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]), ProfileController.delete);
 
 export default router;

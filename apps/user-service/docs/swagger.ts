@@ -1,7 +1,10 @@
-const swaggerJsdoc = require('swagger-jsdoc');
-require('dotenv').config({ path: '../.env' });
+import swaggerJsdoc, { Options } from 'swagger-jsdoc';
+import dotenv from 'dotenv';
+import path from 'path';
 
-const options = {
+dotenv.config({ path: path.join(process.cwd(), '.env') });
+
+const options: Options = {
   definition: {
     openapi: '3.0.0',
     info: {
@@ -10,7 +13,7 @@ const options = {
       description: 'API documentation for User Service',
     },
     servers: [
-      { url: process.env.API_URL },
+      { url: process.env.API_URL || 'http://localhost:5001/api' },
       { url: 'http://localhost:5001/api' }
     ],
     tags: [
@@ -55,4 +58,4 @@ const options = {
 };
 
 const swaggerSpec = swaggerJsdoc(options);
-module.exports = swaggerSpec;
+export default swaggerSpec;

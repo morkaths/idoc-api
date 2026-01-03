@@ -1,6 +1,9 @@
 package com.idoc.auth.security.jwt;
 
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -10,22 +13,39 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
+import com.idoc.auth.util.KeyUtils;
+
+import jakarta.annotation.PostConstruct;
 
 @Component
 public class JwtTokenProvider {
 
-  private final Algorithm algorithm;
-  private final JWTVerifier verifier;
-  private final String issuer;
-  private final String audience;
+  private Algorithm algorithm;
+  private JWTVerifier verifier;
 
-  public JwtTokenProvider(
-      @Value("${jwt.secret}") String jwtSecret,
-      @Value("${jwt.issuer}") String jwtIssuer,
-      @Value("${jwt.audience}") String jwtAudience) {
-    this.algorithm = Algorithm.HMAC256(jwtSecret);
-    this.issuer = jwtIssuer;
-    this.audience = jwtAudience;
+  @Value("${jwt.issuer}")
+  private String issuer;
+
+  @Value("${jwt.audience}")
+  private String audience;
+
+  @Value("${jwt.private-key}")
+  private String privateKeyStr;
+
+  @Value("${jwt.public-key}")
+  private String publicKeyStr;
+
+  private final KeyUtils keyUtils;
+
+  public JwtTokenProvider(KeyUtils keyUtils) {
+    this.keyUtils = keyUtils;
+  }
+
+  @PostConstruct
+  public void init() throws Exception {
+    RSAPrivateKey privateKey = keyUtils.getPrivateKey(privateKeyStr);
+    RSAPublicKey publicKey = keyUtils.getPublicKey(publicKeyStr);
+    this.algorithm = Algorithm.RSA256(publicKey, privateKey);
     this.verifier = JWT.require(algorithm)
         .withIssuer(issuer)
         .withAudience(audience)
@@ -35,6 +55,7 @@ public class JwtTokenProvider {
   public String createToken(JwtTokenRequest request, long expiration) {
     return JWT.create()
         .withSubject(String.valueOf(request.getUserId()))
+        .withJWTId(UUID.randomUUID().toString()) // Add JTI
         .withIssuer(issuer)
         .withAudience(audience)
         .withIssuedAt(new Date())

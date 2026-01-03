@@ -33,7 +33,7 @@ public class OpenApiConfig {
                                 .url("https://www.apache.org/licenses/LICENSE-2.0.html")))
                 .servers(List.of(
                         new Server().url("http://localhost:8080").description("Local server"),
-                        new Server().url("http://localhost:8000").description("Local server"),
+                        new Server().url("http://localhost:8000").description("Gateway server"),
                         new Server().url("https://api.idoc.com").description("Production server")))
                 .addSecurityItem(new SecurityRequirement()
                         .addList("bearerAuth")

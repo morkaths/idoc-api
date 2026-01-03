@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import BookController from '../controllers/book.controller';
-import { authenticateToken, authorizeRole } from '../middleware/auth.middleware';
+import { authenticate, authorize } from '../middleware/auth.middleware';
 import { RoleEnum } from '../constants/security/role';
 
 const router = Router();
@@ -32,7 +32,7 @@ const router = Router();
  *       200:
  *         description: Danh sách sách
  */
-router.get('/', BookController.getList);
+router.get('/', authenticate, BookController.getList);
 
 /**
  * @openapi
@@ -139,8 +139,8 @@ router.post('/batch', BookController.getByIds);
  */
 router.post(
   '/',
-  authenticateToken,
-  authorizeRole([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]),
+  authenticate,
+  authorize([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]),
   BookController.create
 );
 
@@ -184,8 +184,8 @@ router.post(
  */
 router.patch(
   '/:id',
-  authenticateToken,
-  authorizeRole([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]),
+  authenticate,
+  authorize([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]),
   BookController.update
 );
 
@@ -218,8 +218,8 @@ router.patch(
  */
 router.delete(
   '/:id',
-  authenticateToken,
-  authorizeRole([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]),
+  authenticate,
+  authorize([RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF]),
   BookController.delete
 );
 

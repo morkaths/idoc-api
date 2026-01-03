@@ -1,8 +1,6 @@
+export * from './api';
 export * from './request';
-export * from './api.types';
-export * from './auth.types';
-export * from './document.types';
-export * from './enum.types';
+export * from './schema';
 
 // Phân trang
 export interface Pagination {
@@ -12,3 +10,10 @@ export interface Pagination {
   pages: number;  // Tổng số trang (tính từ total/limit)
 }
 
+export interface FindParams {
+  page?: number;
+  limit?: number;
+  query?: string;
+  sorts?: Record<string, string>[];
+  filters?: Record<string, unknown>[];
+}

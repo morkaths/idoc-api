@@ -1,5 +1,4 @@
-import type { User } from './auth.types';
-import type { Pagination } from './index';
+import type { Pagination, AuthUser } from './index';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // API TYPES: Xử lý phản hồi API
@@ -7,17 +6,34 @@ import type { Pagination } from './index';
 
 export interface ApiResponse<T> {
   success: boolean;
-  status: number;
+  status?: number;
   message?: string;
-  token?: string;
-  user?: User;
+  token?: AuthToken;
+  user?: AuthUser;
   data?: T;
   pagination?: Pagination;
 }
 
-export interface ErrorResponse {
-  success: false;
-  status: number;
+export interface ApiError {
   message: string;
   errors?: string[];
+}
+
+export interface ErrorResponse {
+  success: false;
+  message: string;
+  errors?: string[];
+  statusCode: number;
+}
+
+export interface AuthenticationResponse {
+  user: AuthUser;
+  token: AuthToken;
+}
+
+export interface AuthToken {
+  accessToken: string;
+  refreshToken: string;
+  accessTokenExpiresIn: number;
+  authenticated: boolean;
 }

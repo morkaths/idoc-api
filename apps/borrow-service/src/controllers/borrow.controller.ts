@@ -85,9 +85,7 @@ const BorrowController = {
     const { id } = req.params;
     const { extraDays, note } = req.body;
     const privilegedRoles = [RoleEnum.ADMIN, RoleEnum.MANAGER, RoleEnum.STAFF];
-    const isPrivileged = req.user.roles?.some(
-      (role: { code: string }) => privilegedRoles.includes(role.code as RoleEnum)
-    ) ?? false;
+    const isPrivileged = req.user.roles?.some((role: string) => privilegedRoles.includes(role as RoleEnum)) ?? false;
     const borrow = await BorrowService.extendBorrow(id, String(req.user.id), isPrivileged, Number(extraDays), note);
     response.updated(res, 'Borrow record extended successfully', borrow);
   }),

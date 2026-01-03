@@ -1,4 +1,4 @@
-import type { Pagination, User } from './index';
+import type { Pagination, AuthUser } from './index';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // API TYPES: Xử lý phản hồi API
@@ -9,7 +9,7 @@ export interface ApiResponse<T> {
   status?: number;
   message?: string;
   token?: AuthToken;
-  user?: User;
+  user?: AuthUser;
   data?: T;
   pagination?: Pagination;
 }
@@ -27,7 +27,7 @@ export interface ErrorResponse {
 }
 
 export interface AuthenticationResponse {
-  user: User;
+  user: AuthUser;
   token: AuthToken;
 }
 
