@@ -8,17 +8,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.DayOfWeek;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "day_of_week_statistics")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class DayOfWeekStatisticEntity extends BaseEntity {
 
     @Id
@@ -28,4 +20,28 @@ public class DayOfWeekStatisticEntity extends BaseEntity {
 
     @Column(name = "total_borrows", nullable = false)
     private long totalBorrows = 0;
+
+    public DayOfWeekStatisticEntity() {
+    }
+
+    public DayOfWeekStatisticEntity(DayOfWeek dayOfWeek, long totalBorrows) {
+        this.dayOfWeek = dayOfWeek;
+        this.totalBorrows = totalBorrows;
+    }
+
+    public DayOfWeek getDayOfWeek() {
+        return dayOfWeek;
+    }
+
+    public void setDayOfWeek(DayOfWeek dayOfWeek) {
+        this.dayOfWeek = dayOfWeek;
+    }
+
+    public long getTotalBorrows() {
+        return totalBorrows;
+    }
+
+    public void setTotalBorrows(long totalBorrows) {
+        this.totalBorrows = totalBorrows;
+    }
 }

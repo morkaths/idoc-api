@@ -8,17 +8,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "daily_statistics")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class DailyStatisticEntity extends BaseEntity {
 
     @Id
@@ -36,4 +28,55 @@ public class DailyStatisticEntity extends BaseEntity {
 
     @Column(name = "total_overdue", nullable = false)
     private long totalOverdue = 0;
+
+    public DailyStatisticEntity() {
+    }
+
+    public DailyStatisticEntity(Long id, LocalDate date, long totalBorrows, long totalReturns, long totalOverdue) {
+        this.id = id;
+        this.date = date;
+        this.totalBorrows = totalBorrows;
+        this.totalReturns = totalReturns;
+        this.totalOverdue = totalOverdue;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public long getTotalBorrows() {
+        return totalBorrows;
+    }
+
+    public void setTotalBorrows(long totalBorrows) {
+        this.totalBorrows = totalBorrows;
+    }
+
+    public long getTotalReturns() {
+        return totalReturns;
+    }
+
+    public void setTotalReturns(long totalReturns) {
+        this.totalReturns = totalReturns;
+    }
+
+    public long getTotalOverdue() {
+        return totalOverdue;
+    }
+
+    public void setTotalOverdue(long totalOverdue) {
+        this.totalOverdue = totalOverdue;
+    }
 }

@@ -29,6 +29,7 @@ import com.idoc.auth.spec.UserSpecification;
 import com.idoc.auth.util.SpecificationBuilder;
 
 @Service
+@Transactional(readOnly = true)
 public class UserServiceImpl
 		extends BaseServiceImpl<UserRequest, UserResponse, UserEntity, Long>
 		implements UserService {

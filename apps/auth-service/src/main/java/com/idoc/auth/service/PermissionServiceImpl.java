@@ -16,7 +16,10 @@ import com.idoc.auth.mapper.PermissionMapper;
 import com.idoc.auth.repository.PermissionRepository;
 import com.idoc.auth.spec.PermissionSpecification;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
+@Transactional(readOnly = true)
 public class PermissionServiceImpl
     extends BaseServiceImpl<PermissionRequest, PermissionResponse, PermissionEntity, Long>
     implements PermissionService {

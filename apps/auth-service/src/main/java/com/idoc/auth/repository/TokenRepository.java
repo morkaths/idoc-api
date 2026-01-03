@@ -15,10 +15,10 @@ public class TokenRepository {
     static final String ACCESS_BLACKLIST_PREFIX = "blacklist:access:";
     static final String REFRESH_BLACKLIST_PREFIX = "blacklist:refresh:";
 
-    @Value("${spring.jwt.expired-duration}")
+    @Value("${jwt.expired-duration}")
     private long jwtExpiration;
 
-    @Value("${spring.jwt.refreshable-duration}")
+    @Value("${jwt.refreshable-duration}")
     private long jwtRefreshExpiration;
 
     public TokenRepository(StringRedisTemplate redisTemplate) {

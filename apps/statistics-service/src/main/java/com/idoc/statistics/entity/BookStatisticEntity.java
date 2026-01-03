@@ -5,17 +5,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "book_statistics")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class BookStatisticEntity extends BaseEntity {
 
     @Id
@@ -24,4 +16,28 @@ public class BookStatisticEntity extends BaseEntity {
 
     @Column(name = "total_borrows", nullable = false)
     private long totalBorrows = 0;
+
+    public BookStatisticEntity() {
+    }
+
+    public BookStatisticEntity(String bookId, long totalBorrows) {
+        this.bookId = bookId;
+        this.totalBorrows = totalBorrows;
+    }
+
+    public String getBookId() {
+        return bookId;
+    }
+
+    public void setBookId(String bookId) {
+        this.bookId = bookId;
+    }
+
+    public long getTotalBorrows() {
+        return totalBorrows;
+    }
+
+    public void setTotalBorrows(long totalBorrows) {
+        this.totalBorrows = totalBorrows;
+    }
 }

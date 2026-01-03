@@ -11,11 +11,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.transaction.Transactional;
-
+@Service
+@Transactional(readOnly = true)
 public abstract class BaseServiceImpl<Request, Response, Entity, ID>
     implements BaseService<Request, Response, Entity, ID> {
 

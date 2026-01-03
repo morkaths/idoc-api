@@ -27,13 +27,16 @@ import com.idoc.auth.security.jwt.JwtTokenRequest;
 import com.idoc.auth.security.model.AuthUser;
 import com.idoc.auth.util.PasswordUtil;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
+@Transactional(readOnly = true)
 public class AuthServiceImpl implements AuthService {
 
-	@Value("${spring.jwt.expired-duration}")
+	@Value("${jwt.expired-duration}")
 	private long accessTokenExpiration;
 
-	@Value("${spring.jwt.refreshable-duration}")
+	@Value("${jwt.refreshable-duration}")
 	private long refreshTokenExpiration;
 
 	private final AuthenticationManager authenticationManager;
@@ -92,6 +95,7 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
+	@Transactional
 	public AuthenticationResponse register(String email, String username, String password) {
 
 		if (userRepository.existsByEmail(email)) {
@@ -144,6 +148,7 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
+	@Transactional
 	public AuthenticationResponse refresh(String refreshToken) {
 		if (tokenRepository.isRefreshTokenBlacklisted(refreshToken)) {
 			throw new IllegalArgumentException("Invalid refresh token");

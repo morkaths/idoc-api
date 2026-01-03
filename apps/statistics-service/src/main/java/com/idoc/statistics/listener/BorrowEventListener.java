@@ -3,17 +3,21 @@ package com.idoc.statistics.listener;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.idoc.statistics.dto.event.BorrowEvent;
 import com.idoc.statistics.service.StatisticService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
-@Slf4j
 public class BorrowEventListener {
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(BorrowEventListener.class);
 
     private final ObjectMapper objectMapper;
     private final StatisticService statisticService;
+
+    public BorrowEventListener(ObjectMapper objectMapper, StatisticService statisticService) {
+        this.objectMapper = objectMapper;
+        this.statisticService = statisticService;
+    }
 
     public void handleMessage(String message) {
         try {

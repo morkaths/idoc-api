@@ -6,17 +6,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "user_statistics")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class UserStatisticEntity extends BaseEntity {
 
     @Id
@@ -28,4 +20,37 @@ public class UserStatisticEntity extends BaseEntity {
 
     @Column(name = "last_active_date")
     private LocalDate lastActiveDate;
+
+    public UserStatisticEntity() {
+    }
+
+    public UserStatisticEntity(String userId, long totalBorrows, LocalDate lastActiveDate) {
+        this.userId = userId;
+        this.totalBorrows = totalBorrows;
+        this.lastActiveDate = lastActiveDate;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public long getTotalBorrows() {
+        return totalBorrows;
+    }
+
+    public void setTotalBorrows(long totalBorrows) {
+        this.totalBorrows = totalBorrows;
+    }
+
+    public LocalDate getLastActiveDate() {
+        return lastActiveDate;
+    }
+
+    public void setLastActiveDate(LocalDate lastActiveDate) {
+        this.lastActiveDate = lastActiveDate;
+    }
 }

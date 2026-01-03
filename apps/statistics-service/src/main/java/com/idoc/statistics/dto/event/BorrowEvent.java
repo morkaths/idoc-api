@@ -2,8 +2,6 @@ package com.idoc.statistics.dto.event;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 public class BorrowEvent {
     private String userId;

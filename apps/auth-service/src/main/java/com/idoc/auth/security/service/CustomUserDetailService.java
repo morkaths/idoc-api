@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +18,7 @@ import com.idoc.auth.repository.UserRepository;
 import com.idoc.auth.security.model.AuthUser;
 
 @Service
+@Cacheable(value = "users", key = "#identifier")
 public class CustomUserDetailService implements UserDetailsService {
 
 	@Autowired

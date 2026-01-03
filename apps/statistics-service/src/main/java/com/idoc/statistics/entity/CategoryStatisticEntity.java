@@ -5,17 +5,10 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "category_statistics")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+
 public class CategoryStatisticEntity extends BaseEntity {
 
     @Id
@@ -24,4 +17,28 @@ public class CategoryStatisticEntity extends BaseEntity {
 
     @Column(name = "total_borrows", nullable = false)
     private long totalBorrows = 0;
+
+    public CategoryStatisticEntity() {
+    }
+
+    public CategoryStatisticEntity(String categoryId, long totalBorrows) {
+        this.categoryId = categoryId;
+        this.totalBorrows = totalBorrows;
+    }
+
+    public String getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public long getTotalBorrows() {
+        return totalBorrows;
+    }
+
+    public void setTotalBorrows(long totalBorrows) {
+        this.totalBorrows = totalBorrows;
+    }
 }

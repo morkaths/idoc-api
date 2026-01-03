@@ -14,8 +14,9 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional(readOnly = true)
 public abstract class BaseServiceImpl<Request, Response, Entity, ID>
     implements BaseService<Request, Response, Entity, ID> {
 
@@ -39,7 +40,7 @@ public abstract class BaseServiceImpl<Request, Response, Entity, ID>
     Page<Entity> entities = specificationExecutor.findAll(spec, pageable);
     return entities.map(mapper::toResponse);
   }
-  
+
   @Override
   public List<Response> findAll() {
     List<Entity> entities = repository.findAll();

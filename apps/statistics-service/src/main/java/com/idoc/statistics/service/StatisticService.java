@@ -12,15 +12,15 @@ import com.idoc.statistics.repository.UserStatisticRepository;
 
 import java.time.LocalDate;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
+@Transactional(readOnly = true)
 public class StatisticService {
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(StatisticService.class);
 
     private final DailyStatisticRepository dailyStatisticRepository;
     private final BookStatisticRepository bookStatisticRepository;
@@ -28,6 +28,20 @@ public class StatisticService {
     private final CategoryStatisticRepository categoryStatisticRepository;
     private final DayOfWeekStatisticRepository dayOfWeekStatisticRepository;
     private final StatisticMapper statisticMapper;
+
+    public StatisticService(DailyStatisticRepository dailyStatisticRepository,
+            BookStatisticRepository bookStatisticRepository,
+            UserStatisticRepository userStatisticRepository,
+            CategoryStatisticRepository categoryStatisticRepository,
+            DayOfWeekStatisticRepository dayOfWeekStatisticRepository,
+            StatisticMapper statisticMapper) {
+        this.dailyStatisticRepository = dailyStatisticRepository;
+        this.bookStatisticRepository = bookStatisticRepository;
+        this.userStatisticRepository = userStatisticRepository;
+        this.categoryStatisticRepository = categoryStatisticRepository;
+        this.dayOfWeekStatisticRepository = dayOfWeekStatisticRepository;
+        this.statisticMapper = statisticMapper;
+    }
 
     @Transactional
     public void incrementDailyBorrow(LocalDate date, String bookId, String userId, java.util.List<String> categoryIds) {

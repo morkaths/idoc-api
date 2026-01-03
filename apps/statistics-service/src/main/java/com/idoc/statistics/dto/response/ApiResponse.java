@@ -1,23 +1,116 @@
 package com.idoc.statistics.dto.response;
 
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class ApiResponse<T> {
     private boolean success;
     private int status;
     private String message;
     private T data;
     private PageResponse pagination;
+
+    public ApiResponse() {
+    }
+
+    public ApiResponse(boolean success, int status, String message, T data, PageResponse pagination) {
+        this.success = success;
+        this.status = status;
+        this.message = message;
+        this.data = data;
+        this.pagination = pagination;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
+    }
+
+    public PageResponse getPagination() {
+        return pagination;
+    }
+
+    public void setPagination(PageResponse pagination) {
+        this.pagination = pagination;
+    }
+
+    public static <T> ApiResponseBuilder<T> builder() {
+        return new ApiResponseBuilder<>();
+    }
+
+    public static class ApiResponseBuilder<T> {
+        private boolean success;
+        private int status;
+        private String message;
+        private T data;
+        private PageResponse pagination;
+
+        ApiResponseBuilder() {
+        }
+
+        public ApiResponseBuilder<T> success(boolean success) {
+            this.success = success;
+            return this;
+        }
+
+        public ApiResponseBuilder<T> status(int status) {
+            this.status = status;
+            return this;
+        }
+
+        public ApiResponseBuilder<T> message(String message) {
+            this.message = message;
+            return this;
+        }
+
+        public ApiResponseBuilder<T> data(T data) {
+            this.data = data;
+            return this;
+        }
+
+        public ApiResponseBuilder<T> pagination(PageResponse pagination) {
+            this.pagination = pagination;
+            return this;
+        }
+
+        public ApiResponse<T> build() {
+            return new ApiResponse<>(success, status, message, data, pagination);
+        }
+
+        public String toString() {
+            return "ApiResponse.ApiResponseBuilder(success=" + this.success + ", status=" + this.status + ", message="
+                    + this.message + ", data=" + this.data + ", pagination=" + this.pagination + ")";
+        }
+    }
 
     // ============================================
     // SUCCESS CASES

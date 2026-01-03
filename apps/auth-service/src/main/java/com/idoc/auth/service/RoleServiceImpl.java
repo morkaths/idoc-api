@@ -23,9 +23,10 @@ import com.idoc.auth.repository.PermissionRepository;
 import com.idoc.auth.repository.RoleRepository;
 import com.idoc.auth.spec.RoleSpecification;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 public class RoleServiceImpl
     extends BaseServiceImpl<RoleRequest, RoleResponse, RoleEntity, Long>
     implements RoleService {
