@@ -105,11 +105,6 @@ public class ApiResponse<T> {
         public ApiResponse<T> build() {
             return new ApiResponse<>(success, status, message, data, pagination);
         }
-
-        public String toString() {
-            return "ApiResponse.ApiResponseBuilder(success=" + this.success + ", status=" + this.status + ", message="
-                    + this.message + ", data=" + this.data + ", pagination=" + this.pagination + ")";
-        }
     }
 
     // ============================================

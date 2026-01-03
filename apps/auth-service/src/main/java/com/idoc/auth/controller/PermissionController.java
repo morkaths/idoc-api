@@ -21,9 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.idoc.auth.dto.request.PermissionRequest;
+import com.idoc.auth.dto.response.ApiResponse;
 import com.idoc.auth.dto.response.PermissionResponse;
 import com.idoc.auth.service.PermissionService;
-import com.idoc.auth.util.ResponseUtil;
 
 @RestController
 @RequestMapping("/api/permissions")
@@ -34,7 +34,7 @@ public class PermissionController {
 
   @GetMapping
   @PreAuthorize("hasAuthority('permission.view')")
-  public ResponseEntity<Map<String, Object>> getList(
+  public ResponseEntity<ApiResponse<List<PermissionResponse>>> getList(
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "10") int limit,
       @RequestParam Map<String, Object> filter) {
@@ -44,22 +44,22 @@ public class PermissionController {
     if (data.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No permissions found");
     }
-    return ResponseUtil.paged("Permissions retrieved successfully", data);
+    return ResponseEntity.ok(ApiResponse.paged(data, "Permissions retrieved successfully"));
   }
 
   @GetMapping("/all")
   @PreAuthorize("hasAuthority('permission.view')")
-  public ResponseEntity<Map<String, Object>> getAll() {
+  public ResponseEntity<ApiResponse<List<PermissionResponse>>> getAll() {
     List<PermissionResponse> data = permissionService.findAll();
     if (data.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No permissions found");
     }
-    return ResponseUtil.success("Permissions retrieved successfully", data);
+    return ResponseEntity.ok(ApiResponse.success(data, "Permissions retrieved successfully"));
   }
 
   @GetMapping("/{id}")
   @PreAuthorize("hasAuthority('permission.view')")
-  public ResponseEntity<Map<String, Object>> getById(@PathVariable Long id) {
+  public ResponseEntity<ApiResponse<PermissionResponse>> getById(@PathVariable Long id) {
     if (id == null || id <= 0) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid permission ID");
     }
@@ -67,12 +67,12 @@ public class PermissionController {
     if (data == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Permission not found with id: " + id);
     }
-    return ResponseUtil.success("Permission retrieved successfully", data);
+    return ResponseEntity.ok(ApiResponse.success(data, "Permission retrieved successfully"));
   }
 
   @GetMapping("/by-role")
   @PreAuthorize("hasAuthority('permission.view')")
-  public ResponseEntity<Map<String, Object>> getByRoleId(@RequestParam Long roleId) {
+  public ResponseEntity<ApiResponse<List<PermissionResponse>>> getByRoleId(@RequestParam Long roleId) {
     if (roleId == null || roleId <= 0) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role ID");
     }
@@ -80,12 +80,12 @@ public class PermissionController {
     if (data.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No permissions found for role ID: " + roleId);
     }
-    return ResponseUtil.success("Permissions retrieved successfully", data);
+    return ResponseEntity.ok(ApiResponse.success(data, "Permissions retrieved successfully"));
   }
 
   @GetMapping("/by-code")
   @PreAuthorize("hasAuthority('permission.view')")
-  public ResponseEntity<Map<String, Object>> getByCode(@RequestParam String code) {
+  public ResponseEntity<ApiResponse<PermissionResponse>> getByCode(@RequestParam String code) {
     if (code == null || code.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Permission code cannot be null or empty");
     }
@@ -93,22 +93,22 @@ public class PermissionController {
     if (data == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Permission not found with code: " + code);
     }
-    return ResponseUtil.success("Permission retrieved successfully", data);
+    return ResponseEntity.ok(ApiResponse.success(data, "Permission retrieved successfully"));
   }
 
   @PostMapping
   @PreAuthorize("hasAuthority('permission.edit')")
-  public ResponseEntity<Map<String, Object>> create(@RequestBody PermissionRequest request) {
+  public ResponseEntity<ApiResponse<PermissionResponse>> create(@RequestBody PermissionRequest request) {
     PermissionResponse data = permissionService.save(request);
     if (data == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to create permission");
     }
-    return ResponseUtil.created("Permission created successfully", data);
+    return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.created(data, "Permission created successfully"));
   }
 
   @PatchMapping("/{id}")
   @PreAuthorize("hasAuthority('permission.edit')")
-  public ResponseEntity<Map<String, Object>> update(@PathVariable Long id,
+  public ResponseEntity<ApiResponse<PermissionResponse>> update(@PathVariable Long id,
       @RequestBody Map<String, Object> request) {
     if (id == null || id <= 0) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid permission ID");
@@ -117,12 +117,12 @@ public class PermissionController {
     if (data == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Permission not found with id: " + id);
     }
-    return ResponseUtil.updated("Permission partially updated successfully", data);
+    return ResponseEntity.ok(ApiResponse.updated(data));
   }
 
   @DeleteMapping("/{id}")
   @PreAuthorize("hasAuthority('permission.delete')")
-  public ResponseEntity<Map<String, Object>> delete(@PathVariable Long id) {
+  public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
     if (id == null || id <= 0) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid permission ID");
     }
@@ -130,7 +130,7 @@ public class PermissionController {
     if (!deleted) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Permission not found with id: " + id);
     }
-    return ResponseUtil.deleted("Permission deleted successfully");
+    return ResponseEntity.ok(ApiResponse.deleted());
   }
 
 }

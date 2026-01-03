@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,9 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.idoc.auth.dto.request.RoleRequest;
+import com.idoc.auth.dto.response.ApiResponse;
 import com.idoc.auth.dto.response.RoleResponse;
 import com.idoc.auth.service.RoleService;
-import com.idoc.auth.util.ResponseUtil;
 
 @RestController
 @RequestMapping("/api/roles")
@@ -33,33 +34,32 @@ public class RoleController {
 
   @GetMapping
   @PreAuthorize("hasAuthority('role.view')")
-  public ResponseEntity<Map<String, Object>> getList(
+  public ResponseEntity<ApiResponse<List<RoleResponse>>> getList(
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "10") int limit,
-      @RequestParam Map<String, Object> filter
-  ) {
+      @RequestParam Map<String, Object> filter) {
     filter.remove("page");
     filter.remove("limit");
-    var data = roleService.find(PageRequest.of(page > 0 ? page - 1 : 0, limit), filter);
+    Page<RoleResponse> data = roleService.find(PageRequest.of(page > 0 ? page - 1 : 0, limit), filter);
     if (data.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No roles found");
     }
-    return com.idoc.auth.util.ResponseUtil.paged("Roles retrieved successfully", data);
+    return ResponseEntity.ok(ApiResponse.paged(data, "Roles retrieved successfully"));
   }
 
   @GetMapping("/all")
   @PreAuthorize("hasAuthority('role.view')")
-  public ResponseEntity<Map<String, Object>> getAll() {
+  public ResponseEntity<ApiResponse<List<RoleResponse>>> getAll() {
     List<RoleResponse> data = roleService.findAll();
     if (data.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No roles found");
     }
-    return ResponseUtil.success("Roles retrieved successfully", data);
+    return ResponseEntity.ok(ApiResponse.success(data, "Roles retrieved successfully"));
   }
 
   @GetMapping("/{id}")
   @PreAuthorize("hasAuthority('role.view')")
-  public ResponseEntity<Map<String, Object>> getById(@PathVariable Long id) {
+  public ResponseEntity<ApiResponse<RoleResponse>> getById(@PathVariable Long id) {
     if (id == null || id <= 0) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role ID");
     }
@@ -67,22 +67,22 @@ public class RoleController {
     if (data == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found with id: " + id);
     }
-    return ResponseUtil.success("Role retrieved successfully", data);
+    return ResponseEntity.ok(ApiResponse.success(data, "Role retrieved successfully"));
   }
 
   @PostMapping
   @PreAuthorize("hasAuthority('role.edit')")
-  public ResponseEntity<Map<String, Object>> create(@RequestBody RoleRequest request) {
+  public ResponseEntity<ApiResponse<RoleResponse>> create(@RequestBody RoleRequest request) {
     RoleResponse data = roleService.save(request);
     if (data == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to create role");
     }
-    return ResponseUtil.created("Role created successfully", data);
+    return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.created(data, "Role created successfully"));
   }
 
   @PatchMapping("/{id}")
   @PreAuthorize("hasAuthority('role.edit')")
-  public ResponseEntity<Map<String, Object>> update(@PathVariable Long id,
+  public ResponseEntity<ApiResponse<RoleResponse>> update(@PathVariable Long id,
       @RequestBody Map<String, Object> updates) {
     if (id == null || id <= 0) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role ID");
@@ -91,12 +91,12 @@ public class RoleController {
     if (data == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found with id: " + id);
     }
-    return ResponseUtil.success("Role partially updated successfully", data);
+    return ResponseEntity.ok(ApiResponse.updated(data));
   }
 
   @DeleteMapping("/{id}")
   @PreAuthorize("hasAuthority('role.delete')")
-  public ResponseEntity<Map<String, Object>> delete(@PathVariable Long id) {
+  public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
     if (id == null || id <= 0) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role ID");
     }
@@ -104,7 +104,7 @@ public class RoleController {
     if (!deleted) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found with id: " + id);
     }
-    return ResponseUtil.deleted("Role deleted successfully");
+    return ResponseEntity.ok(ApiResponse.deleted());
   }
 
 }

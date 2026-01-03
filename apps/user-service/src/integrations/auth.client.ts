@@ -6,8 +6,8 @@ export const AuthClient = {
   verify: async (token: string): Promise<User | null> => {
     ApiClient.setToken(token);
     const response = await ApiClient.get<User>(API_CONFIG.endpoints.auth.verify);
-    if (response.success && response.user) {
-      return response.user;
+    if (response.success && response.data) {
+      return response.data;
     }
     return null;
   }
