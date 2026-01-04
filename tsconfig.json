@@ -16,7 +16,25 @@
       "path": "./apps/borrow-service"
     },
     {
-      "path": "./libs/shared/auth"
+      "path": "./libs/node/auth"
+    },
+    {
+      "path": "./libs/node/mongodb"
+    },
+    {
+      "path": "./libs/node/redis"
+    },
+    {
+      "path": "./libs/shared/schema"
+    },
+    {
+      "path": "./libs/node/minio"
+    },
+    {
+      "path": "./libs/node/axios"
+    },
+    {
+      "path": "./libs/node/cloundinary"
     }
   ]
 }

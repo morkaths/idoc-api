@@ -1,5 +1,5 @@
 import { BorrowDto } from '../dtos/borrow.dto';
-import redisClient from '../config/redis.config';
+import { RedisClient } from '@libs/redis';
 
 /**
  * Generic function to publish messages to Redis topics.
@@ -8,7 +8,7 @@ import redisClient from '../config/redis.config';
  */
 export const publishEvent = async (topic: string, payload: any): Promise<void> => {
   try {
-    await redisClient.publish(topic, JSON.stringify(payload));
+    await RedisClient.instance.publish(topic, JSON.stringify(payload));
     console.log(`Published event to Redis [${topic}]:`, payload);
   } catch (error) {
     console.error(`Failed to publish event to Redis [${topic}]:`, error);

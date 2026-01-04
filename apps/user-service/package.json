@@ -2,7 +2,6 @@
   "name": "@idoc-api/user-service",
   "version": "1.0.0",
   "main": "dist/server.js",
-  "type": "module",
   "scripts": {
     "start": "node dist/server.js",
     "dev": "npx -y tsx watch src/server.ts",

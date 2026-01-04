@@ -1,5 +1,5 @@
 import ApiClient from 'src/config/axios.config';
-import type { User } from 'src/types/auth.types';
+import type { User } from 'src/types';
 import { API_CONFIG } from 'src/config/api.config';
 
 export const UserClient = {

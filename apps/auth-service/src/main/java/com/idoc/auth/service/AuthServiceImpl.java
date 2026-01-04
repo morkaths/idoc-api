@@ -10,7 +10,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.idoc.auth.constant.Common;
 import com.idoc.auth.constant.Role;
 import com.idoc.auth.dto.external.ProfileRequest;
 import com.idoc.auth.dto.response.AuthenticationResponse;
@@ -99,11 +98,11 @@ public class AuthServiceImpl implements AuthService {
 	public AuthenticationResponse register(String email, String username, String password) {
 
 		if (userRepository.existsByEmail(email)) {
-			throw new IllegalArgumentException("Email already registered");
+			throw new IllegalArgumentException("Email already exists: " + email);
 		}
 
 		if (userRepository.existsByUsername(username)) {
-			throw new IllegalArgumentException("Username already taken");
+			throw new IllegalArgumentException("Username already exists: " + username);
 		}
 
 		String hashedPassword = PasswordUtil.hash(password);
@@ -116,11 +115,11 @@ public class AuthServiceImpl implements AuthService {
 				username, hashedPassword, email, 1, Set.of(userRole)));
 
 		JwtTokenRequest request = new JwtTokenRequest(
-				user.getId(),
-				user.getUsername(),
-				user.getEmail(),
-				user.getRoles().stream().map(RoleEntity::getCode).toList(),
-				user.getRoles().stream()
+					user.getId(),
+					user.getUsername(),
+					user.getEmail(),
+					user.getRoles().stream().map(RoleEntity::getCode).toList(),
+					user.getRoles().stream()
 						.flatMap(role -> role.getPermissions().stream())
 						.map(permission -> permission.getCode())
 						.distinct()
@@ -131,13 +130,7 @@ public class AuthServiceImpl implements AuthService {
 			throw new IllegalStateException("Failed to generate token");
 		}
 		tokenRepository.saveSession(String.valueOf(user.getId()), refreshToken);
-		ProfileRequest profile = new ProfileRequest(
-				user.getId(),
-				"User " + user.getUsername(),
-				null,
-				null,
-				null,
-				null);
+		ProfileRequest profile = new ProfileRequest(user.getId(), "User " + user.getUsername());
 		profileClient.create(profile, accessToken);
 		TokenResponse token = new TokenResponse(
 				accessToken,
@@ -165,16 +158,16 @@ public class AuthServiceImpl implements AuthService {
 
 		// Sinh access token mới
 		JwtTokenRequest request = new JwtTokenRequest(
-				user.getId(),
-				user.getUsername(),
-				user.getEmail(),
-				user.getRoles().stream().map(RoleEntity::getCode).toList(),
-				user.getRoles().stream()
+					user.getId(),
+					user.getUsername(),
+					user.getEmail(),
+					user.getRoles().stream().map(RoleEntity::getCode).toList(),
+					user.getRoles().stream()
 						.flatMap(role -> role.getPermissions().stream())
 						.map(permission -> permission.getCode())
 						.distinct()
 						.toList());
-		String accessToken = jwtTokenProvider.createToken(request, Common.EXPIRATION_TIME);
+		String accessToken = jwtTokenProvider.createToken(request, accessTokenExpiration * 1000);
 		if (accessToken == null) {
 			throw new IllegalStateException("Failed to generate access token");
 		}

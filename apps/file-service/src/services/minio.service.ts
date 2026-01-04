@@ -1,10 +1,8 @@
-import MinioClient from '../config/minio.config';
+import { MinioClient } from '@libs/minio';
 import { MINIO_BUCKET } from '../config/env.config';
 import { RedisService } from './redis.service';
-import { IFile, StorageProvider } from 'src/models/file.model';
+import { IFile, StorageProvider } from '../models/file.model';
 import { KeyGenerator } from '../utils/key.util';
-
-MinioClient.connect();
 
 export const MinioService = {
   // Upload file trực tiếp lên MinIO
@@ -26,7 +24,7 @@ export const MinioService = {
 
   // Xác nhận upload và lấy metadata
   async confirmUpload(userId: string, key: string): Promise<Partial<IFile>> {
-    const pending = await RedisService.getCache<Partial<IFile>>(`upload:pending:${key}`);
+    const pending = await RedisService.get<Partial<IFile>>(`upload:pending:${key}`);
     if (!pending || !pending.objectName) throw new Error('Upload session expired or not found');
     const client = MinioClient.get();
     const stat = await client.statObject(MINIO_BUCKET, pending.objectName);
@@ -44,7 +42,7 @@ export const MinioService = {
       uploadedBy: userId
     };
 
-    await RedisService.deleteCache(`upload:pending:${key}`);
+    await RedisService.delete(`upload:pending:${key}`);
     return metadata;
   },
 
@@ -108,7 +106,7 @@ export const MinioService = {
       provider: StorageProvider.MINIO,
       uploadedBy: userId
     };
-    await RedisService.setCache(`upload:pending:${key}`, pendingMetadata, 600);
+    await RedisService.set(`upload:pending:${key}`, pendingMetadata, 600);
     return { url, key };
   },
 

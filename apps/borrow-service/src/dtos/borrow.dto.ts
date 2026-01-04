@@ -1,5 +1,5 @@
 import { Expose, Type } from "class-transformer";
-import { Book, User } from "src/types/schema";
+import { Book, User } from "src/types";
 
 export class BorrowDto {
   @Expose() _id!: string;

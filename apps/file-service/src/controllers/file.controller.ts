@@ -1,5 +1,5 @@
 import FileService from '../services/file.service';
-import { asyncHandler } from '../middleware/error-handler.middleware';
+import { asyncHandler } from '../middleware/error.middleware';
 import * as response from '../utils/response.util';
 import { AuthRequest, UploadRequest } from 'src/types';
 import { MinioService } from '../services/minio.service';

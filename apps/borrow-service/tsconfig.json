@@ -10,7 +10,11 @@
     "types": ["node"],
     "paths": {
       "src/*": ["src/*"],
-      "@repo/shared/auth": ["../../libs/shared/auth/src/index.ts"]
+      "@libs/schema": ["../../libs/shared/schema/src/index.ts"],
+      "@libs/axios": ["../../libs/node/axios/src/index.ts"],
+      "@libs/mongodb": ["../../libs/node/mongodb/src/index.ts"],
+      "@libs/redis": ["../../libs/node/redis/src/index.ts"],
+      "@libs/auth": ["../../libs/node/auth/src/index.ts"],
     },
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

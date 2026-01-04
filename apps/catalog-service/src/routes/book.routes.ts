@@ -32,7 +32,7 @@ const router = Router();
  *       200:
  *         description: Danh sách sách
  */
-router.get('/', authenticate, BookController.getList);
+router.get('/', BookController.getList);
 
 /**
  * @openapi

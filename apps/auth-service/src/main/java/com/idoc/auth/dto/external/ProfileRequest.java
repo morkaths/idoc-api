@@ -14,6 +14,11 @@ public class ProfileRequest {
     super();
   }
 
+  public ProfileRequest(Long userId, String fullName) {
+    this.userId = userId;
+    this.fullName = fullName;
+  }
+
   public ProfileRequest(Long userId, String fullName, Date birthday, String avatar, String bio, String location) {
     this.userId = userId;
     this.fullName = fullName;

@@ -3,13 +3,35 @@ import 'reflect-metadata';
 import 'multer';
 
 import app from './app';
-import MongoDBClient from './config/mongodb.config';
-import { PORT, BASE_URL } from './config/env.config';
+import { MongoDBClient } from '@libs/mongodb';
+import { RedisClient } from '@libs/redis';
+import { MinioClient } from '@libs/minio';
+import { 
+  PORT, 
+  BASE_URL, 
+  MINIO_ENDPOINT, 
+  MINIO_PORT, 
+  MINIO_USE_SSL, 
+  MINIO_ACCESS_KEY, 
+  MINIO_SECRET_KEY, 
+  MONGODB_URI, 
+  REDIS_URI 
+} from './config/env.config';
 
 const server = http.createServer(app);
 
-// Kết nối đến MongoDB
-MongoDBClient.connect().then(() => {
+// Kết nối đến MongoDB, Minio
+Promise.all([
+  MongoDBClient.connect(MONGODB_URI),
+  RedisClient.connect(REDIS_URI),
+  MinioClient.connect({
+    endPoint: MINIO_ENDPOINT,
+    port: MINIO_PORT,
+    useSSL: MINIO_USE_SSL,
+    accessKey: MINIO_ACCESS_KEY,
+    secretKey: MINIO_SECRET_KEY,
+  }),
+]).then(() => {
   server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`Server running on ${BASE_URL}`);
@@ -22,7 +44,6 @@ const gracefulShutdown = async () => {
   try {
     await MongoDBClient.close();
     console.log("MongoDB connection closed");
-
     server.close(() => {
       console.log("HTTP server closed");
       process.exit(0);

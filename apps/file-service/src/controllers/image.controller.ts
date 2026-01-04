@@ -1,6 +1,6 @@
 import { CloudinaryService } from '../services/cloundinary.service';
 import { extractPublicId } from '../utils/cloundinary.util';
-import { asyncHandler } from 'src/middleware/error-handler.middleware';
+import { asyncHandler } from 'src/middleware/error.middleware';
 import { UploadRequest } from 'src/types';
 import * as response from '../utils/response.util';
 

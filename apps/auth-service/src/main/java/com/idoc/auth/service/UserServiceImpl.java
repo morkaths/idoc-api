@@ -25,6 +25,7 @@ import com.idoc.auth.mapper.UserMapper;
 import com.idoc.auth.repository.RoleRepository;
 import com.idoc.auth.repository.UserRepository;
 import com.idoc.auth.spec.UserSpecification;
+import com.idoc.auth.util.PasswordUtil;
 import com.idoc.auth.util.SpecificationBuilder;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -122,6 +123,7 @@ public class UserServiceImpl
 		if (userRepository.existsByEmail(dto.getEmail())) {
 			throw new IllegalArgumentException("Email already exists: " + dto.getEmail());
 		}
+		dto.setPassword(PasswordUtil.hash(dto.getPassword()));
 		UserEntity entity = userMapper.toEntity(dto);
 		if (dto.getRoleIds() != null && !dto.getRoleIds().isEmpty()) {
 			Set<RoleEntity> roles = new HashSet<>(roleRepository.findAllById(dto.getRoleIds()));

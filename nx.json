@@ -34,7 +34,10 @@
           "buildDepsName": "build-deps",
           "watchDepsName": "watch-deps"
         }
-      }
+      },
+      "exclude": [
+        "libs/shared/schema/*"
+      ]
     },
     {
       "plugin": "@nx/eslint/plugin",
@@ -79,6 +82,17 @@
         "serveTargetName": "serve",
         "buildImageTargetName": "build-image",
         "buildInfoTargetName": "build-info"
+      }
+    },
+    {
+      "plugin": "@nx/js/typescript",
+      "include": [
+        "libs/shared/schema/*"
+      ],
+      "options": {
+        "typecheck": {
+          "targetName": "typecheck"
+        }
       }
     }
   ],

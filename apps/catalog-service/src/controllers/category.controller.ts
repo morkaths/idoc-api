@@ -1,5 +1,5 @@
 import CategoryService from '../services/category.service';
-import { asyncHandler } from '../middleware/error-handler.middleware';
+import { asyncHandler } from '../middleware/error.middleware';
 import { AuthRequest } from '../types/request';
 import * as response from '../utils/response.util';
 

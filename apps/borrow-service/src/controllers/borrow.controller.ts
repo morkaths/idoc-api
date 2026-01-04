@@ -1,6 +1,6 @@
 import BorrowService from '../services/borrow.service';
 import { asyncHandler } from '../middleware/error-handler.middleware';
-import { AuthRequest } from '../types/request';
+import { AuthRequest } from '../types';
 import * as response from '../utils/response.util';
 import { RoleEnum } from 'src/constants/security/role';
 import { BookClient } from 'src/integrations/book.client';

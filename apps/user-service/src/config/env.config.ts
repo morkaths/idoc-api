@@ -31,8 +31,10 @@ export const MONGODB_URI = process.env.MONGODB_URI
 // ────────────────────────────────────────────────────────────────────────────────
 export const REDIS_HOST = process.env.REDIS_HOST || 'localhost';
 export const REDIS_PORT = parseNumber(process.env.REDIS_PORT, 6379);
-export const REDIS_PASSWORD = process.env.REDIS_PASSWORD || undefined;
+export const REDIS_PASSWORD = process.env.REDIS_PASSWORD;
 export const REDIS_DB = parseNumber(process.env.REDIS_DB, 0);
+const REDIS_AUTH = REDIS_PASSWORD ? `:${REDIS_PASSWORD}@` : '';
+export const REDIS_URI = process.env.REDIS_URI || `redis://${REDIS_AUTH}${REDIS_HOST}:${REDIS_PORT}`;
 
 // ────────────────────────────────────────────────────────────────────────────────
 // API Keys

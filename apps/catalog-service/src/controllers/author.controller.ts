@@ -1,5 +1,5 @@
 import AuthorService from '../services/author.service';
-import { asyncHandler } from '../middleware/error-handler.middleware';
+import { asyncHandler } from '../middleware/error.middleware';
 import { AuthRequest } from '../types/request';
 import * as response from '../utils/response.util';
 

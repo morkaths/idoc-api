@@ -9,7 +9,7 @@ import { Request, Response, NextFunction } from 'express';
 
 import routes from './routes';
 import { ALLOWED_ORIGINS } from './config/env.config';
-import { errorHandler } from './middleware/error-handler.middleware';
+import { errorHandler } from './middleware/error.middleware';
 import swaggerSpec from '../docs/swagger';
 
 const app = express();
