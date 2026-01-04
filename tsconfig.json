@@ -16,25 +16,22 @@
       "path": "./apps/borrow-service"
     },
     {
-      "path": "./libs/node/auth"
+      "path": "./libs/shared/logger"
     },
     {
-      "path": "./libs/node/mongodb"
+      "path": "./libs/shared/auth"
     },
     {
-      "path": "./libs/node/redis"
+      "path": "./libs/shared/axios"
     },
     {
-      "path": "./libs/shared/schema"
+      "path": "./libs/shared/minio"
     },
     {
-      "path": "./libs/node/minio"
+      "path": "./libs/shared/mongodb"
     },
     {
-      "path": "./libs/node/axios"
-    },
-    {
-      "path": "./libs/node/cloundinary"
+      "path": "./libs/shared/redis"
     }
   ]
 }

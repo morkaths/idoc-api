@@ -1,5 +1,5 @@
 {
-  "name": "@idoc-api/node-auth",
+  "name": "@idoc-api/logger",
   "version": "0.0.1",
   "private": true,
   "main": "./dist/index.js",

@@ -23,20 +23,20 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@idoc/node/auth": [
-        "libs/node/auth/src/index.ts"
-      ],
-      "@idoc/node/mongodb": [
-        "libs/node/mongodb/src/index.ts"
-      ],
-      "@idoc/node/node-redis": [
-        "libs/node/redis/src/index.ts"
-      ],
-      "@idoc/schema": [
+      "@idoc-api/schema": [
         "libs/shared/schema/src/index.ts"
       ],
+      "@idoc-api/auth": [
+        "libs/shared/auth/src/index.ts"
+      ],
+      "@idoc-api/mongodb": [
+        "libs/shared/mongodb/src/index.ts"
+      ],
+      "@idoc-api/redis": [
+        "libs/shared/redis/src/index.ts"
+      ],
       "@idoc-api/minio": [
-        "libs/node/minio/src/index.ts"
+        "libs/shared/minio/src/index.ts"
       ]
     }
   }

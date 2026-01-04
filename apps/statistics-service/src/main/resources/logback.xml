@@ -13,7 +13,8 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_DIR}/archived/app.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
-            <totalSizeCap>1GB</totalSizeCap> </rollingPolicy>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
         <encoder><pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern></encoder>
     </appender>
 
@@ -22,7 +23,8 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_DIR}/archived/sql.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>7</maxHistory>
-            <totalSizeCap>500MB</totalSizeCap> </rollingPolicy>
+            <totalSizeCap>500MB</totalSizeCap>
+        </rollingPolicy>
         <encoder><pattern>%d{HH:mm:ss} - %msg%n</pattern></encoder>
     </appender>
 
@@ -41,18 +43,18 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_DIR}/archived/security.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>90</maxHistory>
-            <totalSizeCap>1GB</totalSizeCap>
         </rollingPolicy>
         <encoder><pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level - %msg%n</pattern></encoder>
     </appender>
 
     <appender name="FILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_DIR}/error.log</file>
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter"><level>ERROR</level></filter>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_DIR}/archived/error.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
-            <totalSizeCap>500MB</totalSizeCap>
         </rollingPolicy>
         <encoder><pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern></encoder>
     </appender>
@@ -62,39 +64,68 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_DIR}/archived/cache.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>7</maxHistory>
-            <totalSizeCap>500MB</totalSizeCap>
         </rollingPolicy>
         <encoder><pattern>%d{HH:mm:ss} %-5level - %msg%n</pattern></encoder>
     </appender>
 
-
     <springProfile name="default,dev,local">
-        <logger name="org.hibernate.SQL" level="DEBUG" additivity="false"><appender-ref ref="FILE_SQL" /></logger>
-        <logger name="org.hibernate.orm.jdbc.bind" level="TRACE" additivity="false"><appender-ref ref="FILE_SQL" /></logger>
-        
-        <logger name="org.springframework.web.client.RestTemplate" level="DEBUG" additivity="false"><appender-ref ref="FILE_API" /></logger>
-        <logger name="org.springframework.web.servlet.DispatcherServlet" level="DEBUG" additivity="false"><appender-ref ref="FILE_API" /></logger>
-        
-        <logger name="com.idoc.auth" level="DEBUG" additivity="false">
+        <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
+            <appender-ref ref="FILE_SQL" />
+        </logger>
+        <logger name="org.hibernate.orm.jdbc.bind" level="TRACE" additivity="false">
+            <appender-ref ref="FILE_SQL" />
+        </logger>
+
+        <logger name="org.springframework.web.client.RestTemplate" level="DEBUG" additivity="false">
+            <appender-ref ref="FILE_API" />
+        </logger>
+        <logger name="org.springframework.web.reactive.function.client.WebClient" level="DEBUG" additivity="false">
+             <appender-ref ref="FILE_API" />
+        </logger>
+        <logger name="org.springframework.web.servlet.DispatcherServlet" level="DEBUG" additivity="false">
+            <appender-ref ref="FILE_API" />
+        </logger>
+        <logger name="org.springframework.http.client.support.HttpRequestWrapper" level="DEBUG" additivity="false">
+            <appender-ref ref="FILE_API" />
+        </logger>
+
+        <logger name="com.idoc.statistics" level="DEBUG" additivity="false">
             <appender-ref ref="FILE_APP" />
             <appender-ref ref="CONSOLE" />
         </logger>
     </springProfile>
 
     <springProfile name="prod">
-        <logger name="org.hibernate.SQL" level="INFO" additivity="false"><appender-ref ref="FILE_SQL" /></logger>
-        <logger name="org.hibernate.orm.jdbc.bind" level="OFF" additivity="false"><appender-ref ref="FILE_SQL" /></logger>
-        
-        <logger name="org.springframework.web.client.RestTemplate" level="INFO" additivity="false"><appender-ref ref="FILE_API" /></logger>
-        <logger name="org.springframework.web.servlet.DispatcherServlet" level="INFO" additivity="false"><appender-ref ref="FILE_API" /></logger>
-        
-        <logger name="com.idoc.auth" level="INFO" additivity="false">
+        <logger name="org.hibernate.SQL" level="INFO" additivity="false">
+            <appender-ref ref="FILE_SQL" />
+        </logger>
+        <logger name="org.hibernate.orm.jdbc.bind" level="OFF" additivity="false">
+            <appender-ref ref="FILE_SQL" />
+        </logger>
+
+        <logger name="org.springframework.web.client.RestTemplate" level="INFO" additivity="false">
+            <appender-ref ref="FILE_API" />
+        </logger>
+        <logger name="org.springframework.web.servlet.DispatcherServlet" level="INFO" additivity="false">
+            <appender-ref ref="FILE_API" />
+        </logger>
+
+        <logger name="com.idoc.statistics" level="INFO" additivity="false">
             <appender-ref ref="FILE_APP" />
-            <appender-ref ref="FILE_ERROR" /> </logger>
+            <appender-ref ref="FILE_ERROR" />
+        </logger>
     </springProfile>
 
-    <logger name="org.springframework.security" level="INFO" additivity="false"><appender-ref ref="FILE_SECURITY" /></logger>
-    <logger name="org.springframework.data.redis" level="INFO" additivity="false"><appender-ref ref="FILE_CACHE" /></logger>
+    <logger name="org.springframework.security" level="INFO" additivity="false">
+        <appender-ref ref="FILE_SECURITY" />
+    </logger>
+
+    <logger name="org.springframework.data.redis" level="INFO" additivity="false">
+        <appender-ref ref="FILE_CACHE" />
+    </logger>
+    <logger name="io.lettuce.core" level="INFO" additivity="false">
+        <appender-ref ref="FILE_CACHE" />
+    </logger>
 
     <root level="INFO">
         <appender-ref ref="CONSOLE" />
