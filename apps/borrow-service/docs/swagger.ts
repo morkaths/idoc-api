@@ -1,8 +1,5 @@
 import swaggerJsdoc from 'swagger-jsdoc';
-import dotenv from 'dotenv';
-import path from 'path';
-
-dotenv.config({ path: path.join(process.cwd(), '.env') });
+import { config } from '@libs/config';
 
 const options = {
   definition: {
@@ -13,8 +10,8 @@ const options = {
       description: 'API documentation for Borrow Service',
     },
     servers: [
-      { url: process.env.API_URL },
-      { url: 'http://localhost:5004/api' }
+      { url: config.urls.api },
+      { url: `${config.services.borrow.url}/api` }
     ],
     tags: [
       { name: 'Borrow', description: 'Borrow management' }

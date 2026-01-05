@@ -1,17 +1,47 @@
-version: "3.8"
-
 services:
   redis:
-    image: redis/redis-stack:latest
-    container_name: redis
+    image: redis/redis-stack:7.2.0-v9
+    
+    container_name: ${APP_NAME:-idoc}_redis
+    hostname: redis
+    restart: unless-stopped
+
     ports:
-      - "6379:6379"
-      - "8003:8001"
+      - "${REDIS_BIND_IP:-127.0.0.1}:${REDIS_PORT:-6379}:6379"
+      - "127.0.0.1:${REDIS_MANAGEMENT_PORT:-8001}:8001"
+      
     volumes:
       - redis_data:/data
-    restart: unless-stopped
+      
+    env_file:
+      - .env
+      
     environment:
-      REDIS_ARGS: --requirepass ${REDIS_PASSWORD}
+      REDIS_ARGS: >-
+        --requirepass ${REDIS_PASSWORD}
+        --save ${REDIS_SAVE_POLICY:-60 1}
+        --loglevel ${REDIS_LOG_LEVEL:-notice}
+        --appendonly yes
+        --maxmemory 512mb
+        --maxmemory-policy volatile-lru
+        --protected-mode yes
+    
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a ${REDIS_PASSWORD} ping | grep PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.2'
+          memory: 256M
 
 volumes:
   redis_data:
+    name: ${APP_NAME:-idoc}_redis_data

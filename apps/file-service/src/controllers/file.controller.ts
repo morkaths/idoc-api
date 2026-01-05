@@ -44,7 +44,7 @@ const FileController = {
   getUploadUrl: asyncHandler<AuthRequest>(async (req, res) => {
     const userId = req.user.id;
     const { filename, type, folder } = req.body;
-    const result = await MinioService.getPresignedUploadUrl(userId, filename, type, folder);
+    const result = await FileService.getUploadUrl(userId, filename, type, folder);
     response.success(res, 'Upload URL generated', result);
   }),
 
@@ -64,8 +64,7 @@ const FileController = {
     if (!key) {
       return response.badRequest(res, 'Missing file key');
     }
-    const metadata = await MinioService.confirmUpload(userId, key);
-    const result = await FileService.create(metadata);
+    const result = await FileService.confirm(userId, key);
     response.created(res, 'Upload confirmed successfully', result);
   }),
 

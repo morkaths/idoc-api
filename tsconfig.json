@@ -35,6 +35,9 @@
     },
     {
       "path": "./libs/shared/cloundinary"
+    },
+    {
+      "path": "./libs/shared/config"
     }
   ]
 }

@@ -1,5 +1,5 @@
-@REM CMD: tools\scripts\seed-db.bat
-@REM PowerShell: .\tools\scripts\seed-db.bat
+@REM CMD: tools\scripts\seed.bat
+@REM PowerShell: .\tools\scripts\seed.bat
 
 @echo off
 

@@ -1,79 +1,62 @@
 
-import dotenv from 'dotenv';
-dotenv.config();
-
-const parseNumber = (v?: string, d = 0) => (v ? Number(v) : d);
-const parseList = (v?: string) => (v ? v.split(',').map(s => s.trim()).filter(Boolean) : []);
+import { config } from '@idoc-api/config';
 
 // ────────────────────────────────────────────────────────────────────────────────
 // App Config
 // ────────────────────────────────────────────────────────────────────────────────
-export const PORT = parseNumber(process.env.PORT, 5003);
-export const NODE_ENV = process.env.NODE_ENV || 'development';
+export const PORT = config.services.file.port; // Using file service port
+export const NODE_ENV = config.app.env;
 
 // ────────────────────────────────────────────────────────────────────────────────
 // URLs
 // ────────────────────────────────────────────────────────────────────────────────
-export const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
-export const BASE_URL = process.env.BASE_URL || 'http://localhost:5003';
-export const API_URL = process.env.API_URL || 'http://localhost:8080/api';
-export const ALLOWED_ORIGINS = parseList(process.env.ALLOWED_ORIGINS);
+export const FRONTEND_URL = config.urls.frontend;
+export const BASE_URL = config.urls.base;
+export const API_URL = config.urls.api;
+export const ALLOWED_ORIGINS = config.app.allowedOrigins;
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Database (Mongo DB)
 // ────────────────────────────────────────────────────────────────────────────────
-export const MONGODB_URI = process.env.MONGODB_URI
-  ? process.env.MONGODB_URI
-  : (() => { throw new Error('MONGODB_URI chưa được định nghĩa trong file .env'); })();
+// Use service specific DB if available, otherwise fallback (or fail if schema requires it)
+export const MONGODB_URI = config.services.file.dbUri || config.db.mongoUri;
 
 // ────────────────────────────────────────────────────────────────────────────────
 // API Keys
 // ────────────────────────────────────────────────────────────────────────────────
-export const API_KEY = process.env.API_KEY
-  ? process.env.API_KEY
-  : (() => { throw new Error('API_KEY is not defined in environment variables'); })();
-
+export const API_KEY = config.auth.apiKey;
 
 // ────────────────────────────────────────────────────────────────────────────────
 // MinIO Config
 // ────────────────────────────────────────────────────────────────────────────────
-export const MINIO_ENDPOINT = process.env.MINIO_ENDPOINT || 'localhost';
-export const MINIO_PORT = Number(process.env.MINIO_PORT) || 9000;
-export const MINIO_USE_SSL = process.env.MINIO_USE_SSL === 'true';
-export const MINIO_ACCESS_KEY = process.env.MINIO_ACCESS_KEY
-  ? process.env.MINIO_ACCESS_KEY
-  : (() => { throw new Error('MINIO_ACCESS_KEY is not defined in environment variables'); })();
-export const MINIO_SECRET_KEY = process.env.MINIO_SECRET_KEY
-  ? process.env.MINIO_SECRET_KEY
-  : (() => { throw new Error('MINIO_SECRET_KEY is not defined in environment variables'); })();
-export const MINIO_BUCKET = process.env.MINIO_BUCKET || '';
+export const MINIO_ENDPOINT = config.storage.minio.endPoint;
+export const MINIO_PORT = config.storage.minio.port;
+export const MINIO_USE_SSL = config.storage.minio.useSSL;
+export const MINIO_ACCESS_KEY = config.storage.minio.accessKey;
+export const MINIO_SECRET_KEY = config.storage.minio.secretKey;
+export const MINIO_BUCKET = config.storage.minio.bucket;
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Cloudinary Config
 // ────────────────────────────────────────────────────────────────────────────────
-export const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME || '';
-export const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY
-  ? process.env.CLOUDINARY_API_KEY
-  : (() => { throw new Error('CLOUDINARY_API_KEY is not defined in environment variables'); })();
-
-export const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET
-  ? process.env.CLOUDINARY_API_SECRET
-  : (() => { throw new Error('CLOUDINARY_API_SECRET is not defined in environment variables'); })();
+export const CLOUDINARY_CLOUD_NAME = config.storage.cloudinary.cloudName;
+export const CLOUDINARY_API_KEY = config.storage.cloudinary.apiKey;
+export const CLOUDINARY_API_SECRET = config.storage.cloudinary.apiSecret;
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Redis Config
 // ────────────────────────────────────────────────────────────────────────────────
-export const REDIS_HOST = process.env.REDIS_HOST || 'localhost';
-export const REDIS_PORT = parseNumber(process.env.REDIS_PORT, 6379);
-export const REDIS_PASSWORD = process.env.REDIS_PASSWORD;
-export const REDIS_DB = parseNumber(process.env.REDIS_DB, 0);
+export const REDIS_HOST = config.redis.host;
+export const REDIS_PORT = config.redis.port;
+export const REDIS_PASSWORD = config.redis.password;
+export const REDIS_DB = config.redis.db;
 const REDIS_AUTH = REDIS_PASSWORD ? `:${REDIS_PASSWORD}@` : '';
-export const REDIS_URI = process.env.REDIS_URI || `redis://${REDIS_AUTH}${REDIS_HOST}:${REDIS_PORT}`;
+export const REDIS_URI = `redis://${REDIS_AUTH}${REDIS_HOST}:${REDIS_PORT}`;
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Auth / Keys
 // ────────────────────────────────────────────────────────────────────────────────
-const RAW_RSA_PUBLIC_KEY = process.env.RSA_PUBLIC_KEY || '';
+const RAW_RSA_PUBLIC_KEY = config.auth.rsaPublicKey;
 export const RSA_PUBLIC_KEY = (() => {
   if (!RAW_RSA_PUBLIC_KEY) return '';
   const cleanKey = RAW_RSA_PUBLIC_KEY

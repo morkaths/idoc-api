@@ -1,12 +1,12 @@
-import { SMTP_FROM, SMTP_HOST, SMTP_PASS, SMTP_PORT, SMTP_USER } from './env.config';
+import { config } from '@libs/config';
 
 export const emailConfig = {
-    host: SMTP_HOST,
-    port: SMTP_PORT,
+    host: config.email.smtp.host,
+    port: config.email.smtp.port,
     secure: false,
     auth: {
-        user: SMTP_USER,
-        pass: SMTP_PASS,
+        user: config.email.smtp.user,
+        pass: config.email.smtp.pass,
     },
-    from: SMTP_FROM,
+    from: config.email.smtp.from,
 };

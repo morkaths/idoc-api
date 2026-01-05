@@ -1,73 +1,91 @@
-version: "3.8"
 
-volumes:
-  kong_db_data:
-
-networks:
-  kong-ee-net:
-    driver: bridge
-
-x-kong-config: &kong-env
+# Config (DRY)
+x-kong-env: &kong-env
   KONG_DATABASE: postgres
-  KONG_PG_HOST: kong-ee-database
-  KONG_PG_DATABASE: ${KONG_PG_DATABASE}
-  KONG_PG_USER: ${KONG_PG_USER}
+  KONG_PG_HOST: kong-database
+  KONG_PG_USER: ${KONG_PG_USER:-kong}
   KONG_PG_PASSWORD: ${KONG_PG_PASSWORD}
+  KONG_PG_DATABASE: ${KONG_PG_DATABASE:-kong}
+  # Log
+  KONG_PROXY_ACCESS_LOG: /dev/stdout
+  KONG_ADMIN_ACCESS_LOG: /dev/stdout
+  KONG_PROXY_ERROR_LOG: /dev/stderr
+  KONG_ADMIN_ERROR_LOG: /dev/stderr
 
 services:
-  kong-ee-database:
-    container_name: kong-ee-database
-    image: postgres:latest
-    restart: on-failure
+  # 1. DATABASE
+  kong-database:
+    image: postgres:15-alpine 
+    container_name: ${APP_NAME:-idoc}_kong_db
+    restart: unless-stopped
+    env_file: .env
     volumes:
-      - kong_db_data:/var/lib/postgresql
-    networks:
-      - kong-ee-net
+      - kong_db_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: ${KONG_PG_USER}
-      POSTGRES_DB: ${KONG_PG_DATABASE}
+      POSTGRES_USER: ${KONG_PG_USER:-kong}
+      POSTGRES_DB: ${KONG_PG_DATABASE:-kong}
       POSTGRES_PASSWORD: ${KONG_PG_PASSWORD}
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "kong"]
-      interval: 5s
-      timeout: 10s
-      retries: 10
+      test: ["CMD-SHELL", "pg_isready -U ${KONG_PG_USER:-kong}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
-      - '5432:5432'
+      - "127.0.0.1:5432:5432"
 
-  kong-bootstrap:
+  # 2. MIGRATIONS (Bootstrap)
+  kong-migrations:
     image: '${GW_IMAGE:-kong/kong-gateway:3.12.0.0}'
-    container_name: kong-bootstrap
-    networks:
-      - kong-ee-net
+    container_name: ${APP_NAME:-idoc}_kong_migrations
+    env_file: .env
     depends_on:
-      kong-ee-database:
+      kong-database:
         condition: service_healthy
-    restart: on-failure
+    command: kong migrations bootstrap
     environment:
       <<: *kong-env
       KONG_PASSWORD: ${KONG_PASSWORD}
-    command: kong migrations bootstrap
+    # profiles: ["tools"] 
 
-  kong-cp:
+  # 3. KONG GATEWAY
+  kong-gateway:
     image: '${GW_IMAGE:-kong/kong-gateway:3.12.0.0}'
-    container_name: kong-cp
-    restart: on-failure
-    networks:
-      - kong-ee-net
+    container_name: ${APP_NAME:-idoc}_kong_gateway
+    restart: unless-stopped
+    env_file: .env
+    
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    
+    stop_grace_period: 1m
+
+    depends_on:
+      kong-migrations:
+        condition: service_completed_successfully
+      kong-database:
+        condition: service_healthy
+
     environment:
       <<: *kong-env
       KONG_ADMIN_LISTEN: 0.0.0.0:8001, 0.0.0.0:8444 ssl
       KONG_ADMIN_GUI_LISTEN: 0.0.0.0:8002, 0.0.0.0:8445 ssl
-      KONG_ADMIN_GUI_URL: http://${GW_HOST:-localhost}:8002
+      KONG_ADMIN_GUI_URL: http://${KONG_ADMIN_GUI_HOST:-localhost}:${KONG_ADMIN_GUI_PORT:-8002}
       KONG_PASSWORD: ${KONG_PASSWORD}
-    depends_on:
-      kong-bootstrap:
-        condition: service_completed_successfully
+
     ports:
-      - "8000:8000"
-      - "8443:8443"
-      - "8001:8001"
-      - "8444:8444"
-      - "8002:8002"
-      - "8445:8445"
+      # Proxy Public
+      - "${KONG_PORT:-8000}:8000"
+      - "${KONG_SSL_PORT:-8443}:8443"
+
+      # Admin API
+      - "${KONG_ADMIN_IP:-127.0.0.1}:${KONG_ADMIN_PORT:-8001}:8001"
+      - "${KONG_ADMIN_IP:-127.0.0.1}:${KONG_ADMIN_SSL_PORT:-8444}:8444"
+      
+      # Admin GUI
+      - "${KONG_ADMIN_IP:-127.0.0.1}:${KONG_ADMIN_GUI_PORT:-8002}:8002"
+
+volumes:
+  kong_db_data:
+    name: ${APP_NAME:-idoc}_kong_db_data

@@ -37,18 +37,14 @@ export const FileService = {
     return Promise.all(items.map(toDtoWithUrl));
   },
 
-  async create(metadata: Partial<IFile>): Promise<FileDto> {
-    const saved = await fileRepository.create(metadata);
-    await RedisClient.set(`file:metadata:${saved.key}`, saved, 3600);
-    return toDtoWithUrl(saved);
+  async getUploadUrl(userId: string, filename: string, type: string, folder: string): Promise<{ url: string; key: string }> {
+    return MinioService.getPresignedUploadUrl(userId, filename, type, folder);
   },
 
-  async delete(key: string): Promise<void> {
+  async getDownloadUrl(key: string, expirySeconds = 21600): Promise<string> {
     const metadata = await fileRepository.findByKey(key);
     if (!metadata || !metadata.objectName) throw new Error('File not found');
-    await MinioService.delete(metadata.objectName);
-    await fileRepository.delete(key);
-    await RedisClient.delete(`file:metadata:${key}`);
+    return MinioService.getPresignedDownloadUrl(metadata.objectName, expirySeconds);
   },
 
   async upload(userId: string, file: Express.Multer.File): Promise<FileDto> {
@@ -64,8 +60,15 @@ export const FileService = {
       uploadedBy: userId
     };
     const savedMetadata = await fileRepository.create(metadata);
-    await RedisClient.set(`file:metadata:${savedMetadata._id}`, savedMetadata, 3600);
+    await RedisClient.set(`file:metadata:${savedMetadata.key}`, savedMetadata, 3600);
     return toDtoWithUrl(savedMetadata);
+  },
+
+  async confirm(userId: string, key: string): Promise<FileDto> {
+    const metadata = await MinioService.confirmUpload(userId, key);
+    const saved = await fileRepository.create(metadata);
+    await RedisClient.set(`file:metadata:${saved.key}`, saved, 3600);
+    return toDtoWithUrl(saved);
   },
 
   async download(key: string): Promise<{ buffer: Buffer, metadata: IFile }> {
@@ -75,10 +78,12 @@ export const FileService = {
     return { buffer, metadata };
   },
 
-  async getDownloadUrl(key: string, expirySeconds = 21600): Promise<string> {
+  async delete(key: string): Promise<void> {
     const metadata = await fileRepository.findByKey(key);
     if (!metadata || !metadata.objectName) throw new Error('File not found');
-    return MinioService.getPresignedDownloadUrl(metadata.objectName, expirySeconds);
+    await MinioService.delete(metadata.objectName);
+    await fileRepository.delete(key);
+    await RedisClient.delete(`file:metadata:${key}`);
   },
 
 };

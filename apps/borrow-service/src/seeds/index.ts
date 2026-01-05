@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
-import { MONGODB_URI } from '../config/env.config';
+import { config } from '@libs/config';
 import { seedBorrows } from './borrow.seed';
 
 async function seed() {
   try {
-    await mongoose.connect(MONGODB_URI);
+    await mongoose.connect(config.services.borrow.db);
 
     // Seed data
     await seedBorrows();

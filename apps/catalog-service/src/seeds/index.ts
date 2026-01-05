@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { MONGODB_URI } from '../config/env.config';
+import { config } from '@libs/config';
 import { seedAuthors } from './author.seed';
 import { seedCategories } from './category.seed';
 import { seedBooks } from './book.seed';
@@ -7,7 +7,7 @@ import { seedCategoryTranslations } from './categoryTrans.seed';
 
 async function seed() {
   try {
-    await mongoose.connect(MONGODB_URI);
+    await mongoose.connect(config.services.catalog.db);
 
     // Seed data
     await seedAuthors();

@@ -1,8 +1,5 @@
 import swaggerJsdoc, { Options } from 'swagger-jsdoc';
-import dotenv from 'dotenv';
-import path from 'path';
-
-dotenv.config({ path: path.join(process.cwd(), '.env') });
+import { config } from '@libs/config';
 
 const options: Options = {
   definition: {
@@ -13,8 +10,8 @@ const options: Options = {
       description: 'API documentation for User Service',
     },
     servers: [
-      { url: process.env.API_URL || 'http://localhost:5001/api' },
-      { url: 'http://localhost:5001/api' }
+      { url: config.urls.api },
+      { url: `${config.services.user.url}/api` }
     ],
     tags: [
       { name: 'Profile', description: 'Profile management' }

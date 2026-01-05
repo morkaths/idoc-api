@@ -10,6 +10,7 @@
     "types": ["node"],
     "paths": {
       "src/*": ["src/*"],
+      "@libs/config": ["../../libs/shared/config/src/index.ts"],
       "@libs/schema": ["../../libs/shared/schema/src/index.ts"],
       "@libs/axios": ["../../libs/shared/axios/src/index.ts"],
       "@libs/redis": ["../../libs/shared/redis/src/index.ts"],

@@ -1,9 +1,9 @@
-import { API_KEY, API_URL } from './env.config';
+import { config } from '@libs/config';
 
 export const API_CONFIG = {
-  timeout: 10000,
-  key: API_KEY,
-  baseURL: API_URL,
+  timeout: config.services.timeout,
+  key: config.auth.apiKey,
+  baseURL: config.services.catalog.url,
   endpoints: {
     auth: {
       verify: '/auth/verify',

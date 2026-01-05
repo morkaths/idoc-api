@@ -8,7 +8,7 @@ import swaggerUi from 'swagger-ui-express';
 import { Request, Response, NextFunction } from 'express';
 
 import routes from './routes/index';
-import { ALLOWED_ORIGINS } from './config/env.config';
+import { config } from '@libs/config';
 import { errorHandler } from './middleware/error.middleware';
 import swaggerSpec from '../docs/swagger';
 import { contextMiddleware, httpLogger } from '@libs/logger';
@@ -20,7 +20,7 @@ app.use(
   cors({
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
-      if (ALLOWED_ORIGINS.includes(origin)) {
+      if (config.app.allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
       return callback(new Error('Not allowed by CORS'));
@@ -80,7 +80,7 @@ app.get('/', (req, res) => {
 
 // 7.1. Swagger UI
 app.use('/api/docs', (req: Request, res: Response, next: NextFunction) => {
-  const connectHosts = ["'self'", ...ALLOWED_ORIGINS].join(' ');
+  const connectHosts = ["'self'", ...config.app.allowedOrigins].join(' ');
   const CSP = [
     "default-src 'self'",
     `connect-src ${connectHosts}`,

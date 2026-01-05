@@ -1,0 +1,9 @@
+name: idoc-stack
+include:
+  - docker-compose.kong.yml
+  - docker-compose.minio.yml
+  - docker-compose.redis.yml
+networks:
+  default:
+    name: ${APP_NAME:-idoc}_network
+    driver: bridge

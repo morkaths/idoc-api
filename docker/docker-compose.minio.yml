@@ -1,24 +1,58 @@
-version: "3.8"
-
 services:
   minio:
     image: minio/minio:RELEASE.2024-01-31T20-20-33Z
-    container_name: minio
+    container_name: ${APP_NAME:-idoc}_minio
+    hostname: minio
+    env_file: .env
+    restart: unless-stopped
+    
+    ports:
+      - "${MINIO_PORT:-9000}:9000"
+      - "127.0.0.1:${MINIO_CONSOLE_PORT:-9001}:9001"
+      
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    restart: unless-stopped
+      MINIO_REGION_NAME: ${MINIO_REGION_NAME:-us-east-1}
+
     volumes:
       - minio_data:/data
-    command: server /data --console-address ":9001"
+      
+    command: server /data --address ":9000" --console-address ":9001"
+    
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 10s
-      timeout: 5s
-      retries: 6
+      interval: 30s
+      timeout: 20s
+      retries: 5
+      start_period: 40s
+    
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.2'
+          memory: 512M
+
+  createbuckets:
+    image: minio/mc
+    container_name: ${APP_NAME:-idoc}_minio_setup
+    depends_on:
+      minio:
+        condition: service_healthy
+    env_file:
+      - .env
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host add myminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
+      /usr/bin/mc mb myminio/${MINIO_BUCKET_NAME:-idoc-public} --ignore-existing;
+      /usr/bin/mc anonymous set download myminio/${MINIO_BUCKET_NAME:-idoc-public};
+      echo 'Bucket setup completed!';
+      exit 0;
+      "
 
 volumes:
   minio_data:
+    name: ${APP_NAME:-idoc}_minio_data

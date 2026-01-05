@@ -5,10 +5,11 @@
 
 ```
 docker/
+├── .env
 ├── docker-compose.kong.yml
 ├── docker-compose.minio.yml
 ├── docker-compose.redis.yml
-├── .env
+├── docker-compose.yml
 ├── README.md
 ```
 
@@ -17,17 +18,34 @@ docker/
 - File `.env` dùng chung cho toàn bộ stack:
 
 ```env
+# =========================================
 # Kong
+# =========================================
 KONG_PG_DATABASE=kong
-KONG_PG_USER=kong
-KONG_PG_PASSWORD=kong
-KONG_PASSWORD=handyshake
+KONG_PG_USER=idocadmin
+KONG_PG_PASSWORD=idocadmin123
+KONG_PASSWORD=idocadmin123
 GW_IMAGE=kong/kong-gateway:3.12.0.0
 GW_HOST=localhost
 
+# =========================================
 # MinIO
-MINIO_ROOT_USER=your-username
-MINIO_ROOT_PASSWORD=your-secure-password
+# =========================================
+MINIO_ROOT_USER=idocadmin
+MINIO_ROOT_PASSWORD=idocadmin123
+MINIO_PORT=9000
+MINIO_CONSOLE_PORT=9001
+
+# =========================================
+# Redis
+# =========================================
+REDIS_PORT=6379
+REDIS_MANAGEMENT_PORT=8005
+REDIS_PASSWORD=idocadmin123
+REDIS_SAVE_POLICY="60 1"
+REDIS_LOG_LEVEL=notice
+
+
 ```
 
 ## Khởi động toàn bộ stack
@@ -53,6 +71,16 @@ docker compose -p idoc-stack \
   -f docker/docker-compose.minio.yml \
   -f docker/docker-compose.redis.yml \
   --env-file docker/.env down -v
+```
+
+## Reset toàn bộ stack
+
+```sh
+# Stop the old containers
+docker compose -p idoc-stack -f docker/docker-compose.yml down
+
+# Start the new containers
+bash tools/scripts/docker.sh
 ```
 
 ## ⚠️ Lưu ý
