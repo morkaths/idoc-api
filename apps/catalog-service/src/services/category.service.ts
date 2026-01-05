@@ -1,12 +1,12 @@
 import { Types } from "mongoose";
 import { ICategory } from "../models/category.model";
 import { CategoryDto } from "../dtos/category.dto";
-import { BaseService } from "src/core/base.service";
+import { BaseService } from '@libs/core';
 import { categoryRepository } from "../repositories/category.repository";
-import { categoryTransRepository } from "src/repositories/category-translation.repository";
-import { CategoryMapper } from "src/mappers/category.mapper";
-import { CategoryTransMapper } from "src/mappers/category-translation.mapper";
-import { Pagination } from "src/types";
+import { categoryTransRepository } from "../repositories/category-translation.repository";
+import { CategoryMapper } from "../mappers/category.mapper";
+import { CategoryTransMapper } from "../mappers/category-translation.mapper";
+import { Pagination } from "../types";
 
 class CategoryService extends BaseService<ICategory, CategoryDto> {
 

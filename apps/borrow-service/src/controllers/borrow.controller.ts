@@ -1,5 +1,5 @@
 import BorrowService from '../services/borrow.service';
-import { asyncHandler } from '../middleware/error-handler.middleware';
+import { asyncHandler } from '../middleware/error.middleware';
 import { AuthRequest } from '../types';
 import * as response from '../utils/response.util';
 import { RoleEnum } from 'src/constants/security/role';

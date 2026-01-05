@@ -1,5 +1,5 @@
-import { CategoryTranslation, ICategoryTranslation } from "src/models/category-translation.model";
-import { BaseRepository } from "../core/base.repository";
+import { CategoryTranslation, ICategoryTranslation } from "../models/category-translation.model";
+import { BaseRepository } from '@libs/core';
 
 class CategoryTransRepository extends BaseRepository<ICategoryTranslation> {
   constructor() {

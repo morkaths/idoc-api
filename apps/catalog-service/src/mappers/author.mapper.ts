@@ -1,4 +1,4 @@
-import { createClassTransformerMapper } from "../core/base.mapper";
+import { createClassTransformerMapper } from '@libs/core';
 import { AuthorDto } from "../dtos/author.dto";
 import { IAuthor } from "../models/author.model";
 

@@ -1,4 +1,4 @@
-import { BaseService } from "src/core/base.service";
+import { BaseService } from '@libs/core';
 import { BookDto } from "src/dtos/book.dto";
 import { IBook } from "src/models/book.model";
 import { ICategory } from "src/models/category.model";

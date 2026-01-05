@@ -3,7 +3,7 @@ import { config } from '@libs/config';
 export const API_CONFIG = {
   timeout: config.services.timeout,
   key: config.auth.apiKey,
-  baseURL: config.services.user.url,
+  baseURL: config.app.url,
   endpoints: {
     auth: {
       verify: '/auth/verify',

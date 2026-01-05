@@ -10,7 +10,7 @@ const options = {
       description: 'API documentation for Borrow Service',
     },
     servers: [
-      { url: config.urls.api },
+      { url: config.app.url },
       { url: `${config.services.borrow.url}/api` }
     ],
     tags: [

@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
-import { Document, IDocument } from "src/models/document.model";
-import { BaseRepository } from "../core/base.repository";
-import { aggregateFile } from "src/constants/aggregations/file.aggregation";
+import { Document, IDocument } from "../models/document.model";
+import { BaseRepository } from '@libs/core';
+import { aggregateFile } from "../constants/aggregations/file.aggregation";
 
 class FileRepositoryClass extends BaseRepository<IDocument> {
   constructor() {

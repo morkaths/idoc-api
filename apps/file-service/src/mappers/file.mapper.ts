@@ -1,4 +1,4 @@
-import { createClassTransformerMapper } from "../core/base.mapper";
+import { createClassTransformerMapper } from '@libs/core';
 import { IFile } from "../models/file.model";
 import { FileDto } from "../dtos/file.dto";
 

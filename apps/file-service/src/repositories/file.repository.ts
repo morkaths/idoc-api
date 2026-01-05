@@ -1,5 +1,5 @@
-import { BaseRepository } from "../core/base.repository";
-import {  File, IFile } from "../models/file.model";
+import { BaseRepository } from '@libs/core';
+import { File, IFile } from "../models/file.model";
 
 export class FileRepository extends BaseRepository<IFile> {
   constructor() {

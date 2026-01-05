@@ -10,7 +10,7 @@ const options = {
       description: 'API documentation for File Service',
     },
     servers: [
-      { url: config.urls.api },
+      { url: config.app.url },
       { url: `${config.services.file.url}/api` }
     ],
     tags: [

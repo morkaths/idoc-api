@@ -6,7 +6,7 @@ import { Request, Response, NextFunction } from 'express';
 export const authenticate = (req: Request, res: Response, next: NextFunction) => {
   const middleware = sharedAuthenticate({
     redis: RedisClient.instance,
-    publicKey: config.auth.apiKey
+    publicKey: config.auth.rsaPublicKey
   });
   return middleware(req, res, next);
 };

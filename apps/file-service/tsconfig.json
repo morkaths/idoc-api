@@ -23,6 +23,7 @@
       "@libs/cloundinary": ["../../libs/shared/cloundinary/src/index.ts"],
       "@libs/auth": ["../../libs/shared/auth/src/index.ts"],
       "@libs/logger": ["../../libs/shared/logger/src/index.ts"],
+      "@libs/core": ["../../libs/shared/core/src/index.ts"]
     },
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

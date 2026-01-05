@@ -1,9 +1,9 @@
-import { BaseService } from "src/core/base.service";
-import { AuthorDto } from "src/dtos/author.dto";
-import { AuthorMapper } from "src/mappers/author.mapper";
-import { IAuthor } from "src/models/author.model";
-import { authorRepository } from "src/repositories/author.repository";
-import { Pagination } from "src/types";
+import { BaseService } from '@libs/core';
+import { AuthorDto } from "../dtos/author.dto";
+import { AuthorMapper } from "../mappers/author.mapper";
+import { IAuthor } from "../models/author.model";
+import { authorRepository } from "../repositories/author.repository";
+import { Pagination } from "../types";
 
 
 class AuthorService extends BaseService<IAuthor, AuthorDto> {

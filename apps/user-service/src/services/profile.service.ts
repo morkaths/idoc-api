@@ -2,7 +2,7 @@ import { IProfile } from '../models/profile.model';
 import { profileRepository } from '../repositories/profile.repository';
 import { ProfileDto } from '../dtos/profile.dto';
 import { ProfileMapper } from '../mappers/profile.mapper';
-import { BaseService } from '../core/base.service';
+import { BaseService } from '@libs/core';
 import { Pagination } from '../types';
 
 class ProfileService extends BaseService<IProfile, ProfileDto> {

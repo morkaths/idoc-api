@@ -1,37 +1,17 @@
 import createHttpError from "http-errors";
-import { BaseService } from "../core/base.service";
-import { Borrow } from "../models/borrow.model";
-import { BorrowDto } from "../dtos/borrow.dto";
+import { BaseService } from "@libs/core";
+import type { Borrow } from "../models/borrow.model";
+import type { BorrowDto } from "../dtos/borrow.dto";
+import type { Category, Pagination } from "../types";
 import { BorrowMapper } from "../mappers/borrow.mapper";
 import { borrowRepository } from "../repositories/borrow.repository";
-import { Category, Pagination } from "../types";
-import { UserClient } from "src/integrations/user.client";
-import { BookClient } from "src/integrations/book.client";
+import { UserClient } from "../integrations/user.client";
+import { BookClient } from "../integrations/book.client";
 import { publishBorrowEvent, publishReturnEvent } from "../utils/event-publisher.util";
 
 class BorrowService extends BaseService<Borrow, BorrowDto> {
   constructor() {
     super(borrowRepository, BorrowMapper);
-  }
-
-  async create(dto: BorrowDto): Promise<BorrowDto> {
-    const created = await super.create(dto);
-    
-    // Fetch book details to get category IDs
-    let categoryIds: string[] = [];
-    if (created.itemId) {
-      try {
-        const book = await BookClient.findById(created.itemId);
-        if (book && book.categories) {
-          categoryIds = book.categories.map((category: Category) => category._id);
-        }
-      } catch (error) {
-        console.error('Failed to fetch book details for category statistics:', error);
-      }
-    }
-
-    await publishBorrowEvent(created, categoryIds);
-    return created;
   }
 
   async findList(page: number, limit: number, filter: { [key: string]: any }): Promise<{ data: BorrowDto[]; pagination: Pagination }> {
@@ -54,16 +34,42 @@ class BorrowService extends BaseService<Borrow, BorrowDto> {
     return { data, pagination: result.pagination };
   }
 
+  async create(dto: BorrowDto): Promise<BorrowDto> {
+    const created = await super.create(dto);
+    let categoryIds: string[] = [];
+    if (created.itemId) {
+      try {
+        const book = await BookClient.findById(created.itemId);
+        if (book && book.categories) {
+          categoryIds = book.categories.map((category: Category) => category._id);
+        }
+      } catch (error) {
+        console.error('Failed to fetch book details for category statistics:', error);
+      }
+    }
+    await publishBorrowEvent(created, categoryIds);
+    return created;
+  }
+
   async extendBorrow(borrowId: string, userId: string, isPrivileged: boolean, extraDays: number, note?: string): Promise<BorrowDto> {
     const borrow = await borrowRepository.findById(borrowId);
     if (!borrow) throw new createHttpError.NotFound('Borrow record not found');
     if (!isPrivileged && borrow.userId !== userId) throw new createHttpError.Forbidden('You do not have permission to extend this borrow record');
     if (borrow.status !== 'active') throw new createHttpError.BadRequest('Cannot extend this borrow record');
 
+    const oldExpireTime = borrow.expireTime;
+    const newExpireTime = new Date(oldExpireTime.getTime() + extraDays * 24 * 60 * 60 * 1000);
+
     const updateData = {
-      expireTime: new Date(borrow.expireTime.getTime() + extraDays * 24 * 60 * 60 * 1000),
-      count: borrow.count + 1,
-      note,
+      expireTime: newExpireTime,
+      $push: {
+        renewals: {
+          renewedAt: new Date(),
+          oldExpireTime: oldExpireTime,
+          newExpireTime: newExpireTime
+        }
+      },
+      ...(note && { note })
     };
     const updated = await borrowRepository.update(borrowId, updateData);
     if (!updated) throw new createHttpError.BadRequest('Failed to extend borrow record');
@@ -82,7 +88,7 @@ class BorrowService extends BaseService<Borrow, BorrowDto> {
     };
     const updated = await borrowRepository.update(borrowId, updateData);
     if (!updated) throw new createHttpError.BadRequest('Failed to return borrow record');
-    
+
     // Publish to Redis
     const dto = this.mapper.toDto(updated);
     await publishReturnEvent(dto);

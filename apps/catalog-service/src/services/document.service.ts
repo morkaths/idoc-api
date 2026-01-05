@@ -1,12 +1,12 @@
 import { Types } from "mongoose";
-import { IDocument } from "src/models/document.model";
-import { BaseService } from "src/core/base.service";
-import { categoryRepository } from "src/repositories/category.repository";
-import FileRepository from "src/repositories/document.repository";
-import { Pagination } from "src/types";
-import { FileDto } from "src/dtos/file.dto";
-import { DocumentMapper } from "src/mappers/document.mapper";
-import { CategoryMapper } from "src/mappers/category.mapper";
+import { IDocument } from "../models/document.model";
+import { BaseService } from '@libs/core';
+import { categoryRepository } from "../repositories/category.repository";
+import FileRepository from "../repositories/document.repository";
+import { Pagination } from "../types";
+import { FileDto } from "../dtos/file.dto";
+import { DocumentMapper } from "../mappers/document.mapper";
+import { CategoryMapper } from "../mappers/category.mapper";
 
 class DocumentService extends BaseService<IDocument, FileDto> {
   constructor() {

@@ -1,5 +1,5 @@
-import { Author, IAuthor } from "src/models/author.model";
-import { BaseRepository } from "../core/base.repository";
+import { Author, IAuthor } from "../models/author.model";
+import { BaseRepository } from '@libs/core';
 
 class AuthorRepository extends BaseRepository<IAuthor> {
     constructor() {

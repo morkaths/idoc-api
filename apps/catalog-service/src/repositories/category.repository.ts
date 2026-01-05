@@ -1,6 +1,6 @@
-import { Category, ICategory } from "src/models/category.model";
-import { BaseRepository } from "../core/base.repository";
-import { aggregateCategory } from "src/constants/aggregations/category.aggregation";
+import { Category, ICategory } from "../models/category.model";
+import { BaseRepository } from '@libs/core';
+import { aggregateCategory } from "../constants/aggregations/category.aggregation";
 import { Types } from "mongoose";
 
 class CategoryRepository extends BaseRepository<ICategory> {

@@ -11,17 +11,31 @@ const SENSITIVE_KEYS = ['password', 'token', 'authorization', 'creditCard', 'sec
 /**
  * Recursive data masking function
  */
-function maskData(data: any): any {
+function maskData(data: any, seen = new WeakSet()): any {
     if (!data) return data;
     if (typeof data !== 'object') return data;
-    if (Array.isArray(data)) return data.map(maskData);
+    if (seen.has(data)) return '[Circular]';
+
+    seen.add(data);
+
+    if (typeof data.toJSON === 'function') {
+        try {
+            return maskData(data.toJSON(), seen);
+        } catch (err) {
+            // ignore error
+        }
+    }
+
+    if (Array.isArray(data)) {
+        return data.map(item => maskData(item, seen));
+    }
 
     const masked: any = {};
     for (const key of Object.keys(data)) {
         if (SENSITIVE_KEYS.some(k => key.toLowerCase().includes(k.toLowerCase()))) {
             masked[key] = '*****';
         } else {
-            masked[key] = maskData(data[key]);
+            masked[key] = maskData(data[key], seen);
         }
     }
     return masked;

@@ -2,7 +2,7 @@ import { CategoryDto } from "../dtos/category.dto";
 import { ICategory } from "../models/category.model";
 import { ICategoryTranslation } from "../models/category-translation.model";
 import { CategoryTransMapper } from "./category-translation.mapper";
-import { BaseMapper, createClassTransformerMapper } from "src/core/base.mapper";
+import { BaseMapper, createClassTransformerMapper } from '@libs/core';
 
 const baseCategoryMapper = createClassTransformerMapper<ICategory, CategoryDto>(CategoryDto);
 

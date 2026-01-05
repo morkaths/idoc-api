@@ -6,7 +6,7 @@ import helmet from 'helmet';
 import passport from 'passport';
 import swaggerUi from 'swagger-ui-express';
 import { Request, Response, NextFunction } from 'express';
-import { errorHandler } from './middleware/error-handler.middleware';
+import { errorHandler } from './middleware/error.middleware';
 import swaggerSpec from '../docs/swagger';
 import routes from './routes';
 import { config } from '@libs/config';

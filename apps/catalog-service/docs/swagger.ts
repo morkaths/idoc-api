@@ -10,7 +10,7 @@ const options = {
       description: 'API documentation for Catalog Service',
     },
     servers: [
-      { url: config.urls.api },
+      { url: config.app.url },
       { url: `${config.services.catalog.url}/api` }
     ],
     tags: [

@@ -5,7 +5,6 @@ export const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production']).default('development'),
   LOG_LEVEL: z.enum(['info', 'debug', 'warn', 'error']).default('info'),
   BASE_URL: z.string().url().min(1, "[ENV] Base URL must have at least 1 character"),
-  API_URL: z.string().url().min(1, "[ENV] API URL must have at least 1 character"),
 
   // === CORS ===
   ALLOWED_ORIGINS: z.string().transform((str) => str.split(/[,\s]+/).map((origin) => origin.trim()).filter(Boolean)),

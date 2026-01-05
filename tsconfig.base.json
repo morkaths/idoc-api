@@ -28,6 +28,9 @@
       "@idoc-api/schema": [
         "libs/shared/schema/src/index.ts"
       ],
+      "@idoc-api/config": [
+        "libs/shared/config/src/index.ts"
+      ],
       "@idoc-api/auth": [
         "libs/shared/auth/src/index.ts"
       ],
@@ -45,6 +48,9 @@
       ],
       "@idoc-api/cloundinary": [
         "libs/shared/cloundinary/src/index.ts"
+      ],
+      "@idoc-api/core": [
+        "libs/shared/core/src/index.ts"
       ]
     }
   }

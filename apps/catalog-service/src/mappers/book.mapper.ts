@@ -1,9 +1,9 @@
 import { Types } from "mongoose";
-import { BookDto } from "src/dtos/book.dto";
-import { IBook } from "src/models/book.model";
-import { CategoryDto } from "src/dtos/category.dto";
-import { AuthorDto } from "src/dtos/author.dto";
-import { BaseMapper, createClassTransformerMapper } from "src/core/base.mapper";
+import { BookDto } from "../dtos/book.dto";
+import { IBook } from "../models/book.model";
+import { CategoryDto } from "../dtos/category.dto";
+import { AuthorDto } from "../dtos/author.dto";
+import { BaseMapper, createClassTransformerMapper } from '@libs/core';
 
 const baseBookMapper = createClassTransformerMapper<IBook, BookDto>(BookDto);
 

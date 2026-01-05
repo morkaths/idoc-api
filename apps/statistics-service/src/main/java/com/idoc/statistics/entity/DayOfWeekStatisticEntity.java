@@ -21,12 +21,20 @@ public class DayOfWeekStatisticEntity extends BaseEntity {
     @Column(name = "total_borrows", nullable = false)
     private long totalBorrows = 0;
 
+    @Column(name = "total_returns", nullable = false)
+    private long totalReturns = 0;
+
+    @Column(name = "total_overdue", nullable = false)
+    private long totalOverdue = 0;
+
     public DayOfWeekStatisticEntity() {
     }
 
-    public DayOfWeekStatisticEntity(DayOfWeek dayOfWeek, long totalBorrows) {
+    public DayOfWeekStatisticEntity(DayOfWeek dayOfWeek, long totalBorrows, long totalReturns, long totalOverdue) {
         this.dayOfWeek = dayOfWeek;
         this.totalBorrows = totalBorrows;
+        this.totalReturns = totalReturns;
+        this.totalOverdue = totalOverdue;
     }
 
     public DayOfWeek getDayOfWeek() {
@@ -43,5 +51,21 @@ public class DayOfWeekStatisticEntity extends BaseEntity {
 
     public void setTotalBorrows(long totalBorrows) {
         this.totalBorrows = totalBorrows;
+    }
+
+    public long getTotalReturns() {
+        return totalReturns;
+    }
+
+    public void setTotalReturns(long totalReturns) {
+        this.totalReturns = totalReturns;
+    }
+
+    public long getTotalOverdue() {
+        return totalOverdue;
+    }
+
+    public void setTotalOverdue(long totalOverdue) {
+        this.totalOverdue = totalOverdue;
     }
 }

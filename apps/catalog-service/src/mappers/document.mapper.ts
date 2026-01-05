@@ -1,8 +1,8 @@
 import { Types } from "mongoose";
-import { FileDto } from "src/dtos/file.dto";
-import { IDocument } from "src/models/document.model";
-import { CategoryDto } from "src/dtos/category.dto";
-import { BaseMapper, createClassTransformerMapper } from "src/core/base.mapper";
+import { FileDto } from "../dtos/file.dto";
+import { IDocument } from "../models/document.model";
+import { CategoryDto } from "../dtos/category.dto";
+import { BaseMapper, createClassTransformerMapper } from '@libs/core';
 
 const baseDocumentMapper = createClassTransformerMapper<IDocument, FileDto>(FileDto);
 

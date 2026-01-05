@@ -1,4 +1,4 @@
-import { createClassTransformerMapper } from "../core/base.mapper";
+import { createClassTransformerMapper } from '@libs/core';
 import { ICategoryTranslation } from "../models/category-translation.model";
 import { CategoryTranslationDto } from "../dtos/category-translation.dto";
 

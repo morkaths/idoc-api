@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
-import { Book, IBook } from "src/models/book.model";
-import { BaseRepository } from "../core/base.repository";
-import { aggregateBook } from "src/constants/aggregations/book.aggregation";
+import { Book, IBook } from "../models/book.model";
+import { BaseRepository } from '@libs/core';
+import { aggregateBook } from "../constants/aggregations/book.aggregation";
 
 class BookRepository extends BaseRepository<IBook> {
   constructor() {

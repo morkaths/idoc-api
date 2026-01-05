@@ -10,7 +10,7 @@ const options: Options = {
       description: 'API documentation for User Service',
     },
     servers: [
-      { url: config.urls.api },
+      { url: config.app.url },
       { url: `${config.services.user.url}/api` }
     ],
     tags: [

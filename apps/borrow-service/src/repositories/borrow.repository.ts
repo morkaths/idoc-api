@@ -1,5 +1,5 @@
 import { Borrow, Borrow as IBorrow } from "../models/borrow.model";
-import { BaseRepository } from "../core/base.repository";
+import { BaseRepository } from "@libs/core";
 
 class BorrowRepository extends BaseRepository<IBorrow> {
     constructor() {

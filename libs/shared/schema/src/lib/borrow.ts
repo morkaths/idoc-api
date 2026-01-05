@@ -12,7 +12,11 @@ export const BorrowSchema = z.object({
     borrower: UserSchema.optional(),
     itemId: z.string(),
     item: BookSchema.optional(),
-    count: z.number().int(),
+    renewals: z.array(z.object({
+        renewedAt: dateOrString,
+        oldExpireTime: dateOrString,
+        newExpireTime: dateOrString
+    })),
     borrowTime: dateOrString,
     expireTime: dateOrString,
     returnTime: dateOrString.optional(),

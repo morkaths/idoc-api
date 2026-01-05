@@ -3,7 +3,11 @@ import { Schema, model, Document } from 'mongoose';
 export interface Borrow extends Document {
     userId: string;
     itemId: string;
-    count: number;
+    renewals: {
+        renewedAt: Date;
+        oldExpireTime: Date;
+        newExpireTime: Date;
+    }[];
     borrowTime: Date;
     expireTime: Date;
     returnTime?: Date;
@@ -17,7 +21,11 @@ const BorrowSchema = new Schema<Borrow>(
     {
         userId: { type: String, required: true },
         itemId: { type: String, required: true },
-        count: { type: Number, min: 1, default: 1 },
+        renewals: [{
+            renewedAt: { type: Date, default: Date.now },
+            oldExpireTime: { type: Date, required: true },
+            newExpireTime: { type: Date, required: true }
+        }],
         borrowTime: { type: Date, required: true, default: Date.now },
         expireTime: {
             type: Date,

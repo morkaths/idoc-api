@@ -1,5 +1,5 @@
 import { Profile, IProfile } from '../models/profile.model';
-import { BaseRepository } from '../core/base.repository';
+import { BaseRepository } from '@libs/core';
 
 class ProfileRepository extends BaseRepository<IProfile> {
   constructor() {

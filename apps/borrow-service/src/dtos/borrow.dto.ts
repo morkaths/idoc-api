@@ -1,11 +1,19 @@
 import { Expose, Type } from "class-transformer";
 import { Book, User } from "src/types";
 
+export class RenewalDto {
+  @Expose() renewedAt!: Date;
+  @Expose() oldExpireTime!: Date;
+  @Expose() newExpireTime!: Date;
+}
+
 export class BorrowDto {
   @Expose() _id!: string;
   @Expose() userId!: string;
   @Expose() itemId!: string;
-  @Expose() count!: number;
+  @Expose()
+  @Type(() => RenewalDto)
+  renewals!: RenewalDto[];
   @Expose() borrowTime!: Date;
   @Expose() expireTime!: Date;
   @Expose() returnTime?: Date;
@@ -13,7 +21,7 @@ export class BorrowDto {
   @Expose() status!: string;
   @Expose() createdAt?: Date;
   @Expose() updatedAt?: Date;
-  
+
   @Expose()
   @Type(() => Object)
   borrower?: User;

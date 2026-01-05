@@ -1,8 +1,13 @@
 package com.idoc.statistics.service;
 
+import com.idoc.statistics.dto.response.BookStatisticResponse;
+import com.idoc.statistics.dto.response.CategoryStatisticResponse;
 import com.idoc.statistics.dto.response.DailyStatisticResponse;
+import com.idoc.statistics.dto.response.DayOfWeekStatisticResponse;
 import com.idoc.statistics.dto.response.OverallStatisticResponse;
+import com.idoc.statistics.dto.response.UserStatisticResponse;
 import com.idoc.statistics.entity.DailyStatisticEntity;
+import com.idoc.statistics.entity.DayOfWeekStatisticEntity;
 import com.idoc.statistics.mapper.StatisticMapper;
 import com.idoc.statistics.repository.BookStatisticRepository;
 import com.idoc.statistics.repository.CategoryStatisticRepository;
@@ -13,6 +18,7 @@ import com.idoc.statistics.repository.UserStatisticRepository;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -109,14 +115,18 @@ public class StatisticService {
         // 5. Update Day of Week Statistics
         java.time.DayOfWeek dayOfWeek = date.getDayOfWeek();
         log.info("Incrementing borrow stats for day of week: {}", dayOfWeek);
-        com.idoc.statistics.entity.DayOfWeekStatisticEntity dayStat = dayOfWeekStatisticRepository.findById(dayOfWeek)
+        DayOfWeekStatisticEntity dayStat = dayOfWeekStatisticRepository.findById(dayOfWeek)
                 .orElseGet(() -> {
-                    com.idoc.statistics.entity.DayOfWeekStatisticEntity newStat = new com.idoc.statistics.entity.DayOfWeekStatisticEntity();
+                    DayOfWeekStatisticEntity newStat = new DayOfWeekStatisticEntity();
                     newStat.setDayOfWeek(dayOfWeek);
                     newStat.setTotalBorrows(0);
+                    newStat.setTotalReturns(0);
+                    newStat.setTotalOverdue(0);
                     return dayOfWeekStatisticRepository.save(newStat);
                 });
         dayStat.setTotalBorrows(dayStat.getTotalBorrows() + 1);
+        dayStat.setTotalReturns(dayStat.getTotalReturns() + 1);
+        dayStat.setTotalOverdue(dayStat.getTotalOverdue() + 1);
         dayOfWeekStatisticRepository.save(dayStat);
     }
 
@@ -157,31 +167,31 @@ public class StatisticService {
                 .toList();
     }
 
-    public List<com.idoc.statistics.dto.response.BookStatisticResponse> getTopBorrowedBooks(int limit) {
+    public List<BookStatisticResponse> getTopBorrowedBooks(int limit) {
         return bookStatisticRepository.findAllByOrderByTotalBorrowsDesc(
-                org.springframework.data.domain.PageRequest.of(0, limit))
+                PageRequest.of(0, limit))
                 .stream()
                 .map(statisticMapper::toResponse)
                 .toList();
     }
 
-    public List<com.idoc.statistics.dto.response.UserStatisticResponse> getTopUsers(int limit) {
+    public List<UserStatisticResponse> getTopUsers(int limit) {
         return userStatisticRepository.findAllByOrderByTotalBorrowsDesc(
-                org.springframework.data.domain.PageRequest.of(0, limit))
+                PageRequest.of(0, limit))
                 .stream()
                 .map(statisticMapper::toResponse)
                 .toList();
     }
 
-    public List<com.idoc.statistics.dto.response.CategoryStatisticResponse> getTopCategories(int limit) {
+    public List<CategoryStatisticResponse> getTopCategories(int limit) {
         return categoryStatisticRepository.findAllByOrderByTotalBorrowsDesc(
-                org.springframework.data.domain.PageRequest.of(0, limit))
+                PageRequest.of(0, limit))
                 .stream()
                 .map(statisticMapper::toResponse)
                 .toList();
     }
 
-    public List<com.idoc.statistics.dto.response.DayOfWeekStatisticResponse> getPeakBorrowingDays() {
+    public List<DayOfWeekStatisticResponse> getPeakBorrowingDays() {
         return dayOfWeekStatisticRepository.findAllByOrderByTotalBorrowsDesc()
                 .stream()
                 .map(statisticMapper::toResponse)
