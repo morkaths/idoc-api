@@ -1,7 +1,11 @@
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { Readable } from 'stream';
-import CloudinaryClient from '../config/cloundinary.config';
+import CloudinaryClient from './cloudinary.config';
 
+// Ensure connection is established when service is loaded/used, 
+// though ideally this should be called at app bootstrap.
+// We'll expose a method to init, or rely on the user to init.
+// For now, mirroring existing behavior:
 CloudinaryClient.connect();
 
 export class CloudinaryService {

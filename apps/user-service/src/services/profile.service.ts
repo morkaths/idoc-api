@@ -10,13 +10,13 @@ class ProfileService extends BaseService<IProfile, ProfileDto> {
     super(profileRepository, ProfileMapper);
   }
 
-  async getList(
+  async findList(
     page: number,
     limit: number,
     filter: { [key: string]: any }
   ): Promise<{ data: ProfileDto[]; pagination: Pagination }> {
     const result = await profileRepository.findList(page, limit, filter);
-    const data = (result.items || []).map((d: any) => this.mapper.toDto(d as IProfile));
+    const data = (result.items || []).map(profile => this.mapper.toDto(profile));
     return { data, pagination: result.pagination };
   }
 }

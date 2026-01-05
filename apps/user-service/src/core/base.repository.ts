@@ -53,6 +53,23 @@ export class BaseRepository<T extends Document> {
   }
 
   /**
+   * Find multiple documents by a list of IDs
+   * @param ids - string[]
+   * @param options - select, lean...
+   * @returns T[]
+   */
+  async findByIds(
+    ids: string[],
+    options?: { select?: any; lean?: boolean }
+  ): Promise<T[]> {
+    if (!ids || ids.length === 0) return [];
+    const findQuery = this.model.find({ _id: { $in: ids } });
+    if (options?.select) findQuery.select(options.select);
+    if (options?.lean) (findQuery as any).lean();
+    return findQuery.exec();
+  }
+
+  /**
    * Find a document by its ID
    * @param id - string
    * @returns T | null
@@ -196,8 +213,8 @@ export class BaseRepository<T extends Document> {
   }
 
   async paginateAggregate(
-    pipeline: any[], 
-    page = 1, 
+    pipeline: any[],
+    page = 1,
     limit = 10
   ): Promise<{ items: Partial<any>[]; pagination: Pagination }> {
     const _page = Math.max(1, Number(page));

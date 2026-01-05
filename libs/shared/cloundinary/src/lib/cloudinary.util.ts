@@ -1,5 +1,3 @@
-
-
 /**
  * Chuyển Cloudinary URL sang public_id
  * @param url Đường dẫn ảnh Cloudinary

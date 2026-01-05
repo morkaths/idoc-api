@@ -13,10 +13,19 @@ export class BaseService<E extends Document, D> {
   }
 
   async find(
-    query: FilterQuery<E> = {}, 
+    query: FilterQuery<E> = {},
     options?: { limit?: number; skip?: number; sort?: any; lean?: boolean; select?: any }
   ): Promise<D[]> {
     const entities = await this.repository.find(query, options);
+    return (entities as E[]).map(e => this.mapper.toDto(e));
+  }
+
+  async findByIds(
+    ids: string[],
+    options?: { lean?: boolean; select?: any }
+  ): Promise<D[]> {
+    if (!ids || ids.length === 0) return [];
+    const entities = await this.repository.findByIds(ids, options);
     return (entities as E[]).map(e => this.mapper.toDto(e));
   }
 

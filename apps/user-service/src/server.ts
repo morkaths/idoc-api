@@ -4,14 +4,20 @@ import 'reflect-metadata';
 import app from './app';
 import { MongoDBClient } from '@libs/mongodb';
 import { RedisClient } from '@libs/redis';
-import { PORT, BASE_URL, MONGODB_URI, REDIS_URI } from './config/env.config';
+import { 
+  PORT, 
+  BASE_URL, 
+  MONGODB_URI, 
+  REDIS_URI 
+} from './config/env.config';
+import { logger } from '@libs/logger';
 
 const server = http.createServer(app);
 
 // Kết nối đến MongoDB và Redis
 Promise.all([
-  MongoDBClient.connect(MONGODB_URI),
-  RedisClient.connect(REDIS_URI),
+  MongoDBClient.connect({ uri: MONGODB_URI, logger }),
+  RedisClient.connect({ url: REDIS_URI }),
 ]).then(() => {
   server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

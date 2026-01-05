@@ -11,6 +11,7 @@ import routes from './routes';
 import { ALLOWED_ORIGINS } from './config/env.config';
 import { errorHandler } from './middleware/error-handler.middleware';
 import swaggerSpec from '../docs/swagger';
+import { contextMiddleware, httpLogger } from '@libs/logger';
 
 const app = express();
 
@@ -46,8 +47,14 @@ app.use(express.urlencoded({ extended: true }));
 // 3. Cookie parser: Đọc cookie từ request
 app.use(cookieParser());
 
+// 3.1 Context Middleware (Trace ID)
+app.use(contextMiddleware);
+
 // 4. Logger: Log request ra console (dev)
 app.use(morgan('dev'));
+
+// 4.1 HTTP Logger (Winston)
+app.use(httpLogger);
 
 // 5. Helmet: Thêm các header bảo mật cho API
 app.use(

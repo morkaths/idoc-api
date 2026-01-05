@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import ProfileService from '../services/profile.service';
-import { asyncHandler } from '../middleware/error-handler.middleware';
+import { asyncHandler } from '../middleware/error.middleware';
 import { AuthRequest } from '../types';
 import * as response from '../utils/response.util';
 
 const ProfileController = {
   getList: asyncHandler(async (req: Request, res: Response) => {
     const { page = 1, limit = 10, ...filters } = req.query;
-    const { data, pagination } = await ProfileService.getList(
+    const { data, pagination } = await ProfileService.findList(
       Number(page),
       Number(limit),
       filters

@@ -6,24 +6,25 @@ import app from './app';
 import { MongoDBClient } from '@libs/mongodb';
 import { RedisClient } from '@libs/redis';
 import { MinioClient } from '@libs/minio';
-import { 
-  PORT, 
-  BASE_URL, 
-  MINIO_ENDPOINT, 
-  MINIO_PORT, 
-  MINIO_USE_SSL, 
-  MINIO_ACCESS_KEY, 
-  MINIO_SECRET_KEY, 
-  MONGODB_URI, 
-  REDIS_URI 
+import {
+  PORT,
+  BASE_URL,
+  MINIO_ENDPOINT,
+  MINIO_PORT,
+  MINIO_USE_SSL,
+  MINIO_ACCESS_KEY,
+  MINIO_SECRET_KEY,
+  MONGODB_URI,
+  REDIS_URI
 } from './config/env.config';
+import { logger } from '@libs/logger';
 
 const server = http.createServer(app);
 
 // Kết nối đến MongoDB, Minio
 Promise.all([
-  MongoDBClient.connect(MONGODB_URI),
-  RedisClient.connect(REDIS_URI),
+  MongoDBClient.connect({ uri: MONGODB_URI, logger }),
+  RedisClient.connect({ url: REDIS_URI }),
   MinioClient.connect({
     endPoint: MINIO_ENDPOINT,
     port: MINIO_PORT,

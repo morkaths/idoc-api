@@ -1,34 +1,45 @@
-import Redis from 'ioredis';
+import Redis, { RedisOptions } from 'ioredis';
+
+export interface RedisClientConfig {
+  url: string;
+  options?: RedisOptions;
+}
 
 export class RedisClient {
   private static client: Redis | null = null;
 
   static get instance(): Redis {
     if (!this.client) {
-      throw new Error('Redis client not initialized. Call RedisClient.connect() first.');
+      throw new Error('[Redis] client not initialized. Call RedisClient.connect() first.');
     }
     return this.client;
   }
 
-  static async connect(url: string): Promise<void> {
+  static async connect(config: RedisClientConfig): Promise<void> {
     if (this.client) {
       return;
     }
 
-    this.client = new Redis(url, {
+    const defaultOptions: RedisOptions = {
+      family: 4, // Force IPv4
+      keepAlive: 10000, // Ping every 10s
       maxRetriesPerRequest: null,
       retryStrategy(times) {
         const delay = Math.min(times * 50, 2000);
         return delay;
       },
-    });
+    };
+
+    const finalOptions = { ...defaultOptions, ...config.options };
+
+    this.client = new Redis(config.url, finalOptions);
 
     this.client.on('error', (err) => {
-      console.error('Redis connection error:', err);
+      console.error('[Redis] connection error:', err);
     });
 
     this.client.on('connect', () => {
-      console.log('Redis connected');
+      console.log('[Redis] connected');
     });
 
     // Wait for connection to be ready
@@ -46,7 +57,7 @@ export class RedisClient {
     if (this.client) {
       await this.client.quit();
       this.client = null;
-      console.log('Redis disconnected');
+      console.log('[Redis] disconnected');
     }
   }
 

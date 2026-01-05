@@ -17,6 +17,8 @@
     "noUnusedLocals": true,
     "skipLibCheck": true,
     "strict": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "target": "es2022",
     "customConditions": [
       "@idoc-api/source"
@@ -37,6 +39,12 @@
       ],
       "@idoc-api/minio": [
         "libs/shared/minio/src/index.ts"
+      ],
+      "@idoc-api/logger": [
+        "libs/shared/logger/src/index.ts"
+      ],
+      "@idoc-api/cloundinary": [
+        "libs/shared/cloundinary/src/index.ts"
       ]
     }
   }
