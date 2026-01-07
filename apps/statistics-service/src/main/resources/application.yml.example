@@ -1,5 +1,6 @@
+
 server:
-  port: ${SERVER_PORT:8085}
+  port: ${SERVER_PORT:8080}
   error:
     include-message: always
 
@@ -23,13 +24,13 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     open-in-view: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-        format_sql: true
-        enable_lazy_load_no_trans: true
+        format-sql: false
+        enable-lazy-load-no-trans: true
 
   data:
     redis:
@@ -37,22 +38,33 @@ spring:
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
       database: 0
+
+app:
+  jwt:
+    issuer: idoc-service
+    audience: idoc-client
+    expired-duration: 86400
+    refreshable-duration: 604800
+    public-key: |
+      -----BEGIN PUBLIC KEY-----
+      ${JWT_PUBLIC_KEY}
+      -----END PUBLIC KEY-----
+
+  google:
+    client:
+      id: ${GOOGLE_CLIENT_ID:}
+      secret: ${GOOGLE_CLIENT_SECRET:}
+
+  cors:
+    allowed-origins:
+      - "http://localhost:3000"
+      - "http://localhost:3001"
+      - "http://localhost:8000"
+      - "http://localhost:5000"
   
-jwt:
-  issuer: idoc-service
-  audience: idoc-client
-  public-key: |
-    -----BEGIN PUBLIC KEY-----
-    ${JWT_PUBLIC_KEY:}
-    -----END PUBLIC KEY-----
-
-cors:
-  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:3001,http://localhost:8000,http://localhost:5000}
-
-service:
-  key: ${SERVICE_KEY:}
-  auth:
-    url: ${AUTH_SERVICE_URL:http://localhost:8000/api/auth}
+  service:
+    key: ${API_KEY:}
+    url: ${API_URL:http://localhost:8000/api}
 
 logging:
   level:

@@ -70,7 +70,6 @@ app:
   service:
     key: ${API_KEY:}
     url: ${API_URL:http://localhost:8000/api}
-    name: ${SERVICE_NAME:auth-service}
 
 logging:
   level:
