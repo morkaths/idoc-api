@@ -38,7 +38,8 @@ const env = parsed.data;
 export const config = {
   app: {
     env: env.NODE_ENV,
-    url: env.BASE_URL,
+    url: env.API_URL,
+    web: env.WEB_URL,
     logLevel: env.LOG_LEVEL,
     allowedOrigins: env.ALLOWED_ORIGINS,
   },

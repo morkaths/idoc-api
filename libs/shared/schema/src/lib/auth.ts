@@ -38,7 +38,7 @@ export const UserSchema = z.object({
 });
 
 export const LinkedAccountSchema = z.object({
-    _id: z.string(),
+    id: z.string(),
     userId: z.string(),
     provider: z.string(),
     providerId: z.string(),
@@ -65,3 +65,9 @@ export const AuthUserSchema = z.object({
 });
 
 export type AuthUser = z.infer<typeof AuthUserSchema>;
+
+export const GoogleLoginRequestSchema = z.object({
+    idToken: z.string().min(1, 'ID Token is required'),
+});
+
+export type GoogleLoginRequest = z.infer<typeof GoogleLoginRequestSchema>;

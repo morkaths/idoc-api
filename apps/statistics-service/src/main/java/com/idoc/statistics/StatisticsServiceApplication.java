@@ -1,12 +1,12 @@
 package com.idoc.statistics;
 
-import com.idoc.statistics.security.JwtProperties;
+import com.idoc.statistics.config.AppProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
-@EnableConfigurationProperties(JwtProperties.class)
+@EnableConfigurationProperties(AppProperties.class)
 public class StatisticsServiceApplication {
 
 	public static void main(String[] args) {

@@ -76,6 +76,25 @@ class BookRepository extends BaseRepository<IBook> {
     return result[0] ?? null;
   }
 
+  async findByIds(ids: string[], options?: any) {
+    if (!ids || ids.length === 0) return [];
+
+    const validIds = ids
+      .filter((id) => Types.ObjectId.isValid(id))
+      .map((id) => new Types.ObjectId(id));
+
+    if (validIds.length === 0) return [];
+
+    const match = {
+      _id: { $in: validIds }
+    };
+
+    // Extract lang from options if it exists, assuming options might be the string 'lang' or an object
+    const lang = typeof options === 'string' ? options : options?.lang;
+
+    return Book.aggregate(aggregateBook(lang, match));
+  }
+
   async findByCategory(categoryId: string, lang?: string) {
     if (!Types.ObjectId.isValid(categoryId)) {
       throw new Error("Invalid ObjectId");

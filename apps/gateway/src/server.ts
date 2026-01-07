@@ -1,11 +1,8 @@
-import app from './app.js';
+import app from './app';
+import { config } from '@libs/config';
 
-import dotenv from 'dotenv';
+const port = config.services.gateway.port;
 
-dotenv.config();
-
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-    console.log(`Gateway Swagger UI running on http://localhost:${PORT}`);
+app.listen(port, () => {
+    console.log(`Gateway Swagger UI running on http://localhost:${port}`);
 });

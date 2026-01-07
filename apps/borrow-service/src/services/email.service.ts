@@ -10,7 +10,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const EmailService = {
-    
+
     async sendMail(options: {
         to: string;
         subject: string;
@@ -31,9 +31,9 @@ const EmailService = {
         }
     },
 
-    async sendReminder(userEmail: string, bookTitle: string, expireTime: Date) {
+    async sendReminder(userEmail: string, bookTitle: string, expireTime: Date, coverUrl?: string) {
         const subject = `[Action Required] Due Date Reminder: "${bookTitle}"`;
-        const htmlContent = getBookReminderTemplate(bookTitle, expireTime);
+        const htmlContent = getBookReminderTemplate(bookTitle, expireTime, coverUrl);
         const textContent = `You have borrowed "${bookTitle}". Due date: ${expireTime.toLocaleString()}. Please return on time.`;
         return this.sendMail({
             to: userEmail,

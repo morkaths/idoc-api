@@ -44,6 +44,12 @@ class BookService extends BaseService<IBook, BookDto> {
     return this.mapBookToDto(book);
   }
 
+  async findByIds(ids: string[]): Promise<BookDto[]> {
+    if (!ids || ids.length === 0) return [];
+    const books = await bookRepository.findByIds(ids);
+    return books.map((book) => this.mapBookToDto(book));
+  }
+
   async getByCategory(slug: string, lang?: string): Promise<BookDto[]> {
     const category = await categoryRepository.findOne({ slug }) as ICategory | null;
     if (!category) return [];

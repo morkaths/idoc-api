@@ -2,7 +2,6 @@ package com.idoc.auth.service;
 
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,12 +17,15 @@ import com.idoc.auth.entity.RoleEntity;
 import com.idoc.auth.entity.UserEntity;
 import com.idoc.auth.integration.ProfileClient;
 import com.idoc.auth.mapper.UserMapper;
+import com.idoc.auth.repository.LinkedAccountRepository;
 import com.idoc.auth.repository.RoleRepository;
 import com.idoc.auth.repository.TokenRepository;
 import com.idoc.auth.repository.UserRepository;
 import com.idoc.auth.security.jwt.JwtTokenProvider;
 import com.idoc.auth.security.jwt.JwtTokenRequest;
 import com.idoc.auth.security.model.AuthUser;
+import com.idoc.auth.config.AppProperties;
+import com.idoc.auth.security.service.GoogleIdentityService;
 import com.idoc.auth.util.PasswordUtil;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -32,30 +34,32 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class AuthServiceImpl implements AuthService {
 
-	@Value("${jwt.expired-duration}")
-	private long accessTokenExpiration;
-
-	@Value("${jwt.refreshable-duration}")
-	private long refreshTokenExpiration;
-
 	private final AuthenticationManager authenticationManager;
 	private final JwtTokenProvider jwtTokenProvider;
 	private final UserRepository userRepository;
+	private final UserMapper userMapper;
+	private final TokenRepository tokenRepository;
 	private final RoleRepository roleRepository;
 	private final ProfileClient profileClient;
-	private final TokenRepository tokenRepository;
-	private final UserMapper userMapper;
+	private final LinkedAccountRepository linkedAccountRepository;
+	private final GoogleIdentityService googleIdentityService;
+	private final AppProperties appProperties;
 
-	public AuthServiceImpl(UserRepository userRepository, RoleRepository roleRepository, ProfileClient profileClient,
-			JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager,
-			TokenRepository tokenRepository, UserMapper userMapper) {
+	public AuthServiceImpl(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider,
+			UserRepository userRepository, UserMapper userMapper, TokenRepository tokenRepository,
+			RoleRepository roleRepository, ProfileClient profileClient,
+			LinkedAccountRepository linkedAccountRepository, GoogleIdentityService googleIdentityService,
+			AppProperties appProperties) {
 		this.authenticationManager = authenticationManager;
 		this.jwtTokenProvider = jwtTokenProvider;
 		this.userRepository = userRepository;
+		this.userMapper = userMapper;
+		this.tokenRepository = tokenRepository;
 		this.roleRepository = roleRepository;
 		this.profileClient = profileClient;
-		this.tokenRepository = tokenRepository;
-		this.userMapper = userMapper;
+		this.linkedAccountRepository = linkedAccountRepository;
+		this.googleIdentityService = googleIdentityService;
+		this.appProperties = appProperties;
 	}
 
 	@Override
@@ -76,8 +80,10 @@ public class AuthServiceImpl implements AuthService {
 							.map(permission -> permission.getCode())
 							.distinct()
 							.toList());
-			String accessToken = jwtTokenProvider.createToken(request, accessTokenExpiration * 1000);
-			String refreshToken = jwtTokenProvider.createToken(request, refreshTokenExpiration * 1000);
+			String accessToken = jwtTokenProvider.createToken(request,
+					appProperties.getJwt().getExpiredDuration() * 1000);
+			String refreshToken = jwtTokenProvider.createToken(request,
+					appProperties.getJwt().getRefreshableDuration() * 1000);
 			if (accessToken == null) {
 				throw new IllegalStateException("Failed to generate token");
 			}
@@ -86,11 +92,104 @@ public class AuthServiceImpl implements AuthService {
 					accessToken,
 					refreshToken,
 					true,
-					accessTokenExpiration);
+					appProperties.getJwt().getExpiredDuration());
 			return new AuthenticationResponse(token, userMapper.toResponse(user));
 		} catch (AuthenticationException ex) {
 			throw new IllegalArgumentException("Invalid username/email or password");
 		}
+	}
+
+	@Override
+	@Transactional
+	public AuthenticationResponse loginWithGoogle(String idToken) {
+		try {
+			var payload = googleIdentityService.verify(idToken);
+			String email = payload.getEmail();
+			String providerId = payload.getSubject();
+			String name = (String) payload.get("name");
+
+			// Check Linked Account
+			return linkedAccountRepository.findByProviderAndProviderId("GOOGLE", providerId)
+					.map(linkedAccount -> generateResponse(linkedAccount.getUser()))
+					.orElseGet(() -> {
+						// Check if user exists by email
+						UserEntity user = userRepository.findByEmail(email);
+						if (user != null) {
+							// Link account
+							linkAccount(user, "GOOGLE", providerId);
+							return generateResponse(user);
+						} else {
+							// Create new user
+							String username = email;
+							if (userRepository.existsByUsername(username)) {
+								username = email.split("@")[0] + "_"
+										+ java.util.UUID.randomUUID().toString().substring(0, 4);
+							}
+
+							String randomPassword = java.util.UUID.randomUUID().toString();
+							String hashedPassword = PasswordUtil.hash(randomPassword);
+
+							RoleEntity userRole = roleRepository.findByCode(Role.USER.getValue());
+							if (userRole == null) {
+								throw new IllegalArgumentException("Default user role not found");
+							}
+
+							user = userRepository.save(new UserEntity(
+									username, hashedPassword, email, 1, Set.of(userRole)));
+
+							linkAccount(user, "GOOGLE", providerId);
+							AuthenticationResponse response = generateResponse(user);
+
+							// Create backend profile
+							ProfileRequest profile = new ProfileRequest(user.getId(),
+									name != null ? name : "User " + user.getUsername());
+							try {
+								profileClient.create(profile, response.getToken().getAccessToken());
+							} catch (Exception e) {
+
+							}
+							return response;
+						}
+					});
+
+		} catch (Exception e) {
+			throw new IllegalArgumentException("Google login failed: " + e.getMessage());
+		}
+	}
+
+	private void linkAccount(UserEntity user, String provider, String providerId) {
+		com.idoc.auth.entity.LinkedAccountEntity linked = new com.idoc.auth.entity.LinkedAccountEntity();
+		linked.setUser(user);
+		linked.setProvider(provider);
+		linked.setProviderId(providerId);
+		linked.setLinkedAt(java.time.LocalDateTime.now());
+		linkedAccountRepository.save(linked);
+	}
+
+	private AuthenticationResponse generateResponse(UserEntity user) {
+		JwtTokenRequest request = new JwtTokenRequest(
+				user.getId(),
+				user.getUsername(),
+				user.getEmail(),
+				user.getRoles().stream().map(RoleEntity::getCode).toList(),
+				user.getRoles().stream()
+						.flatMap(role -> role.getPermissions().stream())
+						.map(permission -> permission.getCode())
+						.distinct()
+						.toList());
+		String accessToken = jwtTokenProvider.createToken(request, appProperties.getJwt().getExpiredDuration() * 1000);
+		String refreshToken = jwtTokenProvider.createToken(request,
+				appProperties.getJwt().getRefreshableDuration() * 1000);
+		if (accessToken == null) {
+			throw new IllegalStateException("Failed to generate token");
+		}
+		tokenRepository.saveSession(String.valueOf(user.getId()), refreshToken);
+		TokenResponse token = new TokenResponse(
+				accessToken,
+				refreshToken,
+				true,
+				appProperties.getJwt().getExpiredDuration());
+		return new AuthenticationResponse(token, userMapper.toResponse(user));
 	}
 
 	@Override
@@ -115,17 +214,18 @@ public class AuthServiceImpl implements AuthService {
 				username, hashedPassword, email, 1, Set.of(userRole)));
 
 		JwtTokenRequest request = new JwtTokenRequest(
-					user.getId(),
-					user.getUsername(),
-					user.getEmail(),
-					user.getRoles().stream().map(RoleEntity::getCode).toList(),
-					user.getRoles().stream()
+				user.getId(),
+				user.getUsername(),
+				user.getEmail(),
+				user.getRoles().stream().map(RoleEntity::getCode).toList(),
+				user.getRoles().stream()
 						.flatMap(role -> role.getPermissions().stream())
 						.map(permission -> permission.getCode())
 						.distinct()
 						.toList());
-		String accessToken = jwtTokenProvider.createToken(request, accessTokenExpiration * 1000);
-		String refreshToken = jwtTokenProvider.createToken(request, refreshTokenExpiration * 1000);
+		String accessToken = jwtTokenProvider.createToken(request, appProperties.getJwt().getExpiredDuration() * 1000);
+		String refreshToken = jwtTokenProvider.createToken(request,
+				appProperties.getJwt().getRefreshableDuration() * 1000);
 		if (accessToken == null) {
 			throw new IllegalStateException("Failed to generate token");
 		}
@@ -136,7 +236,7 @@ public class AuthServiceImpl implements AuthService {
 				accessToken,
 				refreshToken,
 				true,
-				accessTokenExpiration);
+				appProperties.getJwt().getExpiredDuration());
 		return new AuthenticationResponse(token, userMapper.toResponse(user));
 	}
 
@@ -158,16 +258,16 @@ public class AuthServiceImpl implements AuthService {
 
 		// Sinh access token mới
 		JwtTokenRequest request = new JwtTokenRequest(
-					user.getId(),
-					user.getUsername(),
-					user.getEmail(),
-					user.getRoles().stream().map(RoleEntity::getCode).toList(),
-					user.getRoles().stream()
+				user.getId(),
+				user.getUsername(),
+				user.getEmail(),
+				user.getRoles().stream().map(RoleEntity::getCode).toList(),
+				user.getRoles().stream()
 						.flatMap(role -> role.getPermissions().stream())
 						.map(permission -> permission.getCode())
 						.distinct()
 						.toList());
-		String accessToken = jwtTokenProvider.createToken(request, accessTokenExpiration * 1000);
+		String accessToken = jwtTokenProvider.createToken(request, appProperties.getJwt().getExpiredDuration() * 1000);
 		if (accessToken == null) {
 			throw new IllegalStateException("Failed to generate access token");
 		}
@@ -176,7 +276,7 @@ public class AuthServiceImpl implements AuthService {
 				accessToken,
 				refreshToken,
 				true,
-				accessTokenExpiration);
+				appProperties.getJwt().getExpiredDuration());
 		return new AuthenticationResponse(token, userMapper.toResponse(user));
 	}
 

@@ -105,7 +105,7 @@ class BorrowService extends BaseService<Borrow, BorrowDto> {
     return result;
   }
 
-  async getBorrowsNeedingBookReminder(): Promise<Array<{ email: string; title: string; expireTime: Date }>> {
+  async getBorrowsNeedingBookReminder(): Promise<Array<{ email: string; title: string; coverUrl?: string; expireTime: Date }>> {
     const now = new Date();
     const oneDayLater = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
@@ -118,20 +118,19 @@ class BorrowService extends BaseService<Borrow, BorrowDto> {
     const itemIds = [...new Set(borrows.map(b => b.itemId).filter(Boolean))];
     const users = await UserClient.findByIds(userIds);
     const books = await BookClient.findByIds(itemIds);
-    const userMap = new Map(users.map(u => [u.id, u]));
-    const bookMap = new Map(books.map(b => [b._id, b]));
+    const userMap = new Map(users.map(u => [String(u.id), u]));
+    const bookMap = new Map(books.map(b => [String(b._id), b]));
 
-    const results = await Promise.all(
-      borrows.map(async (b: Borrow) => {
-        const user = userMap.get(b.userId);
-        const book = bookMap.get(b.itemId);
-        return {
-          email: user?.email || '',
-          title: book?.title || '',
-          expireTime: b.expireTime
-        };
-      })
-    );
+    const results = borrows.map((b: Borrow) => {
+      const user = userMap.get(String(b.userId));
+      const book = bookMap.get(String(b.itemId));
+      return {
+        email: user?.email || '',
+        title: book?.title || '',
+        coverUrl: book?.coverUrl || '',
+        expireTime: b.expireTime
+      };
+    }).filter(item => item.email !== '');
 
     return results;
   }

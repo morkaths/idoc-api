@@ -1,6 +1,7 @@
 package com.idoc.statistics.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -9,17 +10,20 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class CorsConfig {
 
-    @Value("${cors.allowed-origins}")
-    private String allowedOrigins;
+    private final AppProperties appProperties;
+
+    public CorsConfig(AppProperties appProperties) {
+        this.appProperties = appProperties;
+    }
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                String[] origins = allowedOrigins.split(",");
+                List<String> allowedOrigins = appProperties.getCors().getAllowedOrigins();
                 registry.addMapping("/**")
-                        .allowedOrigins(origins)
+                        .allowedOrigins(allowedOrigins.toArray(new String[0]))
                         .allowedMethods("*")
                         .allowedHeaders("*")
                         .allowCredentials(true);

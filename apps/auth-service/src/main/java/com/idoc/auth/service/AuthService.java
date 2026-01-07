@@ -5,6 +5,8 @@ import com.idoc.auth.dto.response.AuthenticationResponse;
 public interface AuthService {
 	AuthenticationResponse login(String identifier, String password);
 
+	AuthenticationResponse loginWithGoogle(String idToken);
+
 	AuthenticationResponse register(String email, String username, String password);
 
 	AuthenticationResponse refresh(String refreshToken);

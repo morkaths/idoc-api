@@ -61,20 +61,19 @@ public class WebSecurityConfig {
 		// Configure route authorization
 		http.authorizeHttpRequests(registry -> registry
 				.requestMatchers(
-                    "/api/auth/**",
+					"/api/auth/**",
+					"/api/auth/login/google",
 					"/api/users/**",
-                    "/v3/api-docs/**",
-                    "/swagger-ui/**",
-                    "/swagger-ui.html"
-                ).permitAll()
+					"/v3/api-docs/**",
+					"/swagger-ui/**",
+					"/swagger-ui.html")
+				.permitAll()
 				.requestMatchers("/api/roles/**").hasAnyRole(
-                    Role.MANAGER.getValue(),
-                    Role.ADMIN.getValue()
-                )
-                .requestMatchers("/api/permissions/**").hasAnyRole(
-                    Role.MANAGER.getValue(),
-                    Role.ADMIN.getValue()
-                )
+						Role.MANAGER.getValue(),
+						Role.ADMIN.getValue())
+				.requestMatchers("/api/permissions/**").hasAnyRole(
+						Role.MANAGER.getValue(),
+						Role.ADMIN.getValue())
 				.anyRequest().denyAll());
 
 		return http.build();

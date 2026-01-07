@@ -39,29 +39,38 @@ spring:
       password: ${REDIS_PASSWORD:}
       database: 0
 
-jwt:
-  issuer: idoc-service
-  audience: idoc-client
-  expired-duration: 86400
-  refreshable-duration: 604800
-  private-key: |
-    -----BEGIN PRIVATE KEY-----
-    ${JWT_PRIVATE_KEY}
-    -----END PRIVATE KEY-----
+app:
+  jwt:
+    issuer: idoc-service
+    audience: idoc-client
+    expired-duration: 86400
+    refreshable-duration: 604800
+    private-key: |
+      -----BEGIN PRIVATE KEY-----
+      ${JWT_PRIVATE_KEY}
+      -----END PRIVATE KEY-----
 
-  public-key: |
-    -----BEGIN PUBLIC KEY-----
-    ${JWT_PUBLIC_KEY}
-    -----END PUBLIC KEY-----
+    public-key: |
+      -----BEGIN PUBLIC KEY-----
+      ${JWT_PUBLIC_KEY}
+      -----END PUBLIC KEY-----
 
+  google:
+    client:
+      id: ${GOOGLE_CLIENT_ID:}
+      secret: ${GOOGLE_CLIENT_SECRET:}
 
-cors:
-  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:3001,http://localhost:8000,http://localhost:5000}
-
-service:
-  key: ${SERVICE_KEY:}
-  profile:
-    url: ${PROFILE_SERVICE_URL:http://localhost:8000/api/profile}
+  cors:
+    allowed-origins:
+      - "http://localhost:3000"
+      - "http://localhost:3001"
+      - "http://localhost:8000"
+      - "http://localhost:5000"
+  
+  service:
+    key: ${API_KEY:}
+    url: ${API_URL:http://localhost:8000/api}
+    name: ${SERVICE_NAME:auth-service}
 
 logging:
   level:

@@ -1,5 +1,7 @@
-export const getBookReminderTemplate = (bookTitle: string, expireTime: Date): string => {
-    return `
+import { config } from '@libs/config';
+
+export const getBookReminderTemplate = (bookTitle: string, expireTime: Date, coverUrl?: string): string => {
+  return `
     <table width="100%" cellpadding="0" cellspacing="0" style="background:#f6f8fb;padding:0;margin:0;">
       <tr>
         <td align="center">
@@ -19,6 +21,7 @@ export const getBookReminderTemplate = (bookTitle: string, expireTime: Date): st
                   Hello,<br>
                   This is a friendly reminder that you have borrowed the book <b style="color:#1976d2;">${bookTitle}</b> from <b>iDoc Library</b>.
                 </p>
+                ${coverUrl ? `<div style="text-align:center;margin-bottom:16px;"><img src="${coverUrl}" alt="${bookTitle}" style="max-width:150px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);"></div>` : ''}
                 <div style="background:#e3f0fc;border-radius:8px;padding:14px 18px;margin:0 0 16px 0;">
                   <span style="color:#d32f2f;font-weight:600;">Due date:</span>
                   <span style="font-size:15px;font-weight:500;color:#0a1a38;">${expireTime.toLocaleString()}</span>
@@ -28,7 +31,7 @@ export const getBookReminderTemplate = (bookTitle: string, expireTime: Date): st
                   Thank you for using <b>iDoc Library</b>!
                 </p>
                 <div style="text-align:center;margin-bottom:18px;">
-                  <a href="#" style="display:inline-block;padding:11px 28px;background:#1976d2;color:#fff;border-radius:6px;font-size:15px;font-weight:600;text-decoration:none;box-shadow:0 2px 8px #e3eafc;transition:background 0.2s;">View My Borrowings</a>
+                  <a href="${config.app.web}" style="display:inline-block;padding:11px 28px;background:#1976d2;color:#fff;border-radius:6px;font-size:15px;font-weight:600;text-decoration:none;box-shadow:0 2px 8px #e3eafc;transition:background 0.2s;">View My Borrowings</a>
                 </div>
               </td>
             </tr>

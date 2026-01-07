@@ -2,10 +2,11 @@ package com.idoc.auth.controller;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.idoc.auth.dto.request.GoogleLoginRequest;
 import com.idoc.auth.dto.request.LoginRequest;
 import com.idoc.auth.dto.request.RegisterRequest;
 import com.idoc.auth.dto.response.ApiResponse;
@@ -31,11 +33,13 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-	@Autowired
-	private AuthService authService;
+	private final AuthService authService;
+    private final UserService userService;
 
-	@Autowired
-	private UserService userService;
+	public AuthController(AuthService authService, UserService userService) {
+		this.authService = authService;
+		this.userService = userService;
+	}
 
 	@PostMapping("/login")
 	public ResponseEntity<ApiResponse<AuthenticationResponse>> login(@Valid @RequestBody LoginRequest request) {
@@ -45,6 +49,15 @@ public class AuthController {
 		}
 		return ResponseEntity.ok(ApiResponse.success(response, "Login successful"));
 	}
+
+	@PostMapping("/login/google")
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> loginGoogle(@Valid @RequestBody GoogleLoginRequest request) {
+        AuthenticationResponse response = authService.loginWithGoogle(request.getIdToken());
+        if (response == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+        }
+		return ResponseEntity.ok(ApiResponse.success(response, "Google Login successful"));
+    }
 
 	@PostMapping("/register")
 	public ResponseEntity<ApiResponse<AuthenticationResponse>> register(@Valid @RequestBody RegisterRequest request) {
@@ -57,19 +70,10 @@ public class AuthController {
 	}
 
 	@GetMapping("/verify")
-	public ResponseEntity<ApiResponse<UserResponse>> verify() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal() == null
-				|| authentication.getPrincipal().equals("anonymousUser")) {
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
-		}
-		JwtTokenRequest principal;
-		try {
-			principal = (JwtTokenRequest) authentication.getPrincipal();
-		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-					"Principal is not a valid JwtTokenRequest: " + e.getMessage());
-		}
+	public ResponseEntity<ApiResponse<UserResponse>> verify(@AuthenticationPrincipal JwtTokenRequest principal) {
+		if (principal == null) {
+            throw new BadCredentialsException("Invalid token"); 
+        }
 		UserResponse user = userService.findById(principal.getUserId());
 		if (user == null) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,

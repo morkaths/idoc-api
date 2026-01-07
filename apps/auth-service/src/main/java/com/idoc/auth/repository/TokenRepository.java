@@ -1,29 +1,30 @@
 package com.idoc.auth.repository;
 
+import com.idoc.auth.config.AppProperties;
 import java.util.concurrent.TimeUnit;
-
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class TokenRepository {
+    private final AppProperties appProperties;
     private final StringRedisTemplate redisTemplate;
 
     static final String REFRESH_TOKEN_PREFIX = "user:refresh:";
     static final String REFRESH_BLACKLIST_PREFIX = "blacklist:refresh:";
     static final String ACCESS_BLACKLIST_PREFIX = "blacklist:access:";
 
-    @Value("${jwt.refreshable-duration}")
-    private long jwtRefreshExpiration;
-
-    public TokenRepository(StringRedisTemplate redisTemplate) {
+    public TokenRepository(AppProperties appProperties, StringRedisTemplate redisTemplate) {
+        this.appProperties = appProperties;
         this.redisTemplate = redisTemplate;
     }
 
     public void saveSession(String userId, String refreshToken) {
-        String refreshKey = REFRESH_TOKEN_PREFIX + userId;
-        redisTemplate.opsForValue().set(refreshKey, refreshToken, jwtRefreshExpiration, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(
+                REFRESH_BLACKLIST_PREFIX + userId,
+                refreshToken,
+                appProperties.getJwt().getRefreshableDuration(),
+                TimeUnit.SECONDS);
     }
 
     public String findSession(String userId) {

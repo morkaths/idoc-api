@@ -5,7 +5,6 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
@@ -13,6 +12,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
+import com.idoc.auth.config.AppProperties;
 import com.idoc.auth.util.KeyUtils;
 
 import jakarta.annotation.PostConstruct;
@@ -23,32 +23,22 @@ public class JwtTokenProvider {
   private Algorithm algorithm;
   private JWTVerifier verifier;
 
-  @Value("${jwt.issuer}")
-  private String issuer;
-
-  @Value("${jwt.audience}")
-  private String audience;
-
-  @Value("${jwt.private-key}")
-  private String privateKeyStr;
-
-  @Value("${jwt.public-key}")
-  private String publicKeyStr;
-
+  private final AppProperties appProperties;
   private final KeyUtils keyUtils;
 
-  public JwtTokenProvider(KeyUtils keyUtils) {
+  public JwtTokenProvider(AppProperties appProperties, KeyUtils keyUtils) {
+    this.appProperties = appProperties;
     this.keyUtils = keyUtils;
   }
 
   @PostConstruct
   public void init() throws Exception {
-    RSAPrivateKey privateKey = keyUtils.getPrivateKey(privateKeyStr);
-    RSAPublicKey publicKey = keyUtils.getPublicKey(publicKeyStr);
+    RSAPrivateKey privateKey = keyUtils.getPrivateKey(appProperties.getJwt().getPrivateKey());
+    RSAPublicKey publicKey = keyUtils.getPublicKey(appProperties.getJwt().getPublicKey());
     this.algorithm = Algorithm.RSA256(publicKey, privateKey);
     this.verifier = JWT.require(algorithm)
-        .withIssuer(issuer)
-        .withAudience(audience)
+        .withIssuer(appProperties.getJwt().getIssuer())
+        .withAudience(appProperties.getJwt().getAudience())
         .build();
   }
 
@@ -56,8 +46,8 @@ public class JwtTokenProvider {
     return JWT.create()
         .withSubject(String.valueOf(request.getUserId()))
         .withJWTId(UUID.randomUUID().toString()) // Add JTI
-        .withIssuer(issuer)
-        .withAudience(audience)
+        .withIssuer(appProperties.getJwt().getIssuer())
+        .withAudience(appProperties.getJwt().getAudience())
         .withIssuedAt(new Date())
         .withExpiresAt(new Date(System.currentTimeMillis() + expiration))
         .withClaim("username", request.getUsername())

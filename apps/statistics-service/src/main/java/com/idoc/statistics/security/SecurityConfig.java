@@ -1,5 +1,6 @@
 package com.idoc.statistics.security;
 
+import com.idoc.statistics.config.AppProperties;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,7 +10,6 @@ import java.security.KeyFactory;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -59,13 +59,13 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtDecoder jwtDecoder(JwtProperties jwtProperties) {
-        return NimbusJwtDecoder.withPublicKey(publicKey(jwtProperties)).build();
+    public JwtDecoder jwtDecoder(AppProperties appProperties) {
+        return NimbusJwtDecoder.withPublicKey(publicKey(appProperties)).build();
     }
 
-    private RSAPublicKey publicKey(JwtProperties jwtProperties) {
+    private RSAPublicKey publicKey(AppProperties appProperties) {
         try {
-            String key = jwtProperties.getPublicKey();
+            String key = appProperties.getJwt().getPublicKey();
             if (key == null) {
                 throw new IllegalStateException("JWT Public Key is missing");
             }
@@ -85,8 +85,11 @@ public class SecurityConfig {
     @Component
     public static class ApiKeyFilter extends OncePerRequestFilter {
 
-        @Value("${service.key}") // Default or from properties
-        private String apiKey;
+        private final AppProperties appProperties;
+
+        public ApiKeyFilter(AppProperties appProperties) {
+            this.appProperties = appProperties;
+        }
 
         @Override
         protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -100,13 +103,13 @@ public class SecurityConfig {
             }
 
             String requestApiKey = request.getHeader("x-api-key");
+            String apiKey = appProperties.getService().getKey();
             if (apiKey == null || !apiKey.equals(requestApiKey)) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("Invalid or missing API Key");
                 return;
             }
 
-            // Valid API Key -> continue chain (to JwtRedisFilter/Spring Security)
             filterChain.doFilter(request, response);
         }
     }
