@@ -29,10 +29,14 @@ import com.idoc.auth.security.service.GoogleIdentityService;
 import com.idoc.auth.util.PasswordUtil;
 
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @Transactional(readOnly = true)
 public class AuthServiceImpl implements AuthService {
+
+	private static final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
 
 	private final AuthenticationManager authenticationManager;
 	private final JwtTokenProvider jwtTokenProvider;
@@ -146,7 +150,7 @@ public class AuthServiceImpl implements AuthService {
 							try {
 								profileClient.create(profile, response.getToken().getAccessToken());
 							} catch (Exception e) {
-
+								logger.error("Failed to create profile for user {}: {}", user.getId(), e.getMessage());
 							}
 							return response;
 						}

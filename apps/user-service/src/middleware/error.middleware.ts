@@ -33,6 +33,11 @@ export const errorHandler = (err: AppError, req: Request, res: Response, next: N
     return response.unauthorized(res, 'Token expired');
   }
 
+  // Mongoose CastError (Invalid ID)
+  if (err.name === 'CastError') {
+    return response.badRequest(res, 'Invalid ID format');
+  }
+
   // Default error
   if (err.statusCode === 400) {
     return response.badRequest(res, err.message || 'Bad Request');
