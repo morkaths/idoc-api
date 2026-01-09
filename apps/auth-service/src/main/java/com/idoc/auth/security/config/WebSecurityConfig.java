@@ -2,6 +2,7 @@ package com.idoc.auth.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -46,8 +47,10 @@ public class WebSecurityConfig {
 	@Bean
 	public SecurityFilterChain applicationSecurity(HttpSecurity http) throws Exception {
 
-		// Disable CORS, CSRF, Form Login, Session Management
-		http.csrf(AbstractHttpConfigurer::disable).formLogin(AbstractHttpConfigurer::disable)
+		// Disable CSRF, Form Login, Session Management. Enable CORS.
+		http.csrf(AbstractHttpConfigurer::disable)
+				.cors(Customizer.withDefaults())
+				.formLogin(AbstractHttpConfigurer::disable)
 				.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
 		// Configure exception handling
@@ -61,12 +64,12 @@ public class WebSecurityConfig {
 		// Configure route authorization
 		http.authorizeHttpRequests(registry -> registry
 				.requestMatchers(
-					"/api/auth/**",
-					"/api/auth/login/google",
-					"/api/users/**",
-					"/v3/api-docs/**",
-					"/swagger-ui/**",
-					"/swagger-ui.html")
+						"/api/auth/**",
+						"/api/auth/login/google",
+						"/api/users/**",
+						"/v3/api-docs/**",
+						"/swagger-ui/**",
+						"/swagger-ui.html")
 				.permitAll()
 				.requestMatchers("/api/roles/**").hasAnyRole(
 						Role.MANAGER.getValue(),
