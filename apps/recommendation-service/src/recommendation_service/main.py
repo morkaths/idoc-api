@@ -5,9 +5,9 @@ from typing import AsyncGenerator
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from recommendation_service.api.deps import get_recommendation_strategy
+from recommendation_service.api.deps import get_recommendation_service
 from recommendation_service.api.v1.router import api_router
-from recommendation_service.infrastructure.config.settings import get_settings
+from recommendation_service.core.config import get_settings
 
 # Setup logging cơ bản
 logging.basicConfig(level=logging.INFO)
@@ -22,10 +22,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     Quản lý vòng đời ứng dụng (Lifespan Events).
     Code ở đây chạy khi app khởi động và tắt.
     """
-    # Startup: Load ML Model thông qua Strategy
-    logger.info("Application startup: Warming up recommendation strategy...")
-    strategy = get_recommendation_strategy()
-    strategy.load_model()
+    # Startup: Load ML Model thông qua Service
+    logger.info("Application startup: Warming up recommendation service...")
+    service = get_recommendation_service()
+    service.load_model()
     
     yield
     

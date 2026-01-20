@@ -47,6 +47,5 @@ class Settings(BaseSettings):
 def get_settings() -> Settings:
     """
     Tạo và cache instance của Settings.
-    Giúp tránh việc đọc file .env nhiều lần, tối ưu hiệu năng.
     """
     return Settings()

@@ -1,19 +1,10 @@
-from ..infrastructure.strategies.collaborative_filtering import CollaborativeFilteringStrategy
-from ..application.use_cases.get_recommendations import GetRecommendationsUseCase
-from ..domain.ports.recommendation_strategy import RecommendationStrategy
+from ..services.recommendation_service import RecommendationService
 
-# Khởi tạo singleton strategy.
-# Trong môi trường production, có thể dùng Factory để quyết định strategy dựa trên config.
-_strategy = CollaborativeFilteringStrategy()
+# Khởi tạo singleton service.
+_service = RecommendationService()
 
-def get_recommendation_strategy() -> RecommendationStrategy:
+def get_recommendation_service() -> RecommendationService:
     """
-    Trả về instance của RecommendationStrategy.
+    Dependency Injection cho Service Layer.
     """
-    return _strategy
-
-def get_recommendations_use_case() -> GetRecommendationsUseCase:
-    """
-    Dependency Injection cho Use Case.
-    """
-    return GetRecommendationsUseCase(strategy=_strategy)
+    return _service
