@@ -51,6 +51,9 @@
       ],
       "@idoc-api/core": [
         "libs/shared/core/src/index.ts"
+      ],
+      "@idoc-api/excel": [
+        "libs/shared/excel/src/index.ts"
       ]
     }
   }

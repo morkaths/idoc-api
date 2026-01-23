@@ -1,5 +1,7 @@
 package com.idoc.auth.controller;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +21,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
 import com.idoc.auth.dto.request.PermissionRequest;
 import com.idoc.auth.dto.response.ApiResponse;
@@ -131,6 +138,27 @@ public class PermissionController {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Permission not found with id: " + id);
     }
     return ResponseEntity.ok(ApiResponse.deleted());
+  }
+
+  @PostMapping("/import")
+  @PreAuthorize("hasAuthority('permission.edit')")
+  public ResponseEntity<ApiResponse<String>> importExcel(@RequestParam("file") MultipartFile file) {
+    permissionService.importExcel(file);
+    return ResponseEntity.ok(ApiResponse.success("Permissions imported successfully"));
+  }
+
+  @GetMapping("/export")
+  @PreAuthorize("hasAuthority('permission.view')")
+  public ResponseEntity<Resource> exportExcel() {
+    String timestamp = LocalDateTime.now()
+        .format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+    String filename = "Permissions_" + timestamp + ".xlsx";
+    InputStreamResource file = new InputStreamResource(permissionService.exportExcel());
+
+    return ResponseEntity.ok()
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+        .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+        .body(file);
   }
 
 }

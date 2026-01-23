@@ -8,6 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from recommendation_service.api.deps import get_recommendation_service
 from recommendation_service.api.v1.router import api_router
 from recommendation_service.core.config import get_settings
+from recommendation_service.core.database import db
+from recommendation_service.models.interaction import create_interaction_indexes
 
 # Setup logging cơ bản
 logging.basicConfig(level=logging.INFO)
@@ -22,14 +24,19 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     Quản lý vòng đời ứng dụng (Lifespan Events).
     Code ở đây chạy khi app khởi động và tắt.
     """
-    # Startup: Load ML Model thông qua Service
+    # Startup: Load ML Model và Connect DB
+    logger.info("Application startup: Connection to MongoDB...")
+    await db.connect()
+    await create_interaction_indexes()
     logger.info("Application startup: Warming up recommendation service...")
     service = get_recommendation_service()
     service.load_model()
-    
+
     yield
-    
-    # Shutdown: Cleanup resources (nếu cần)
+
+    # Shutdown: Cleanup resources
+    logger.info("Application shutdown: Closing MongoDB connection...")
+    db.close()
     logger.info("Application shutdown.")
 
 
@@ -63,4 +70,10 @@ app = create_application()
 if __name__ == "__main__":
     # Dùng cho debug local
     import uvicorn
-    uvicorn.run("recommendation_service.main:app", host="0.0.0.0", port=settings.PORT, reload=True)
+
+    uvicorn.run(
+        "recommendation_service.main:app",
+        host="0.0.0.0",
+        port=settings.PORT,
+        reload=True,
+    )

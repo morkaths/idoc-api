@@ -3,7 +3,6 @@ package com.idoc.auth.security.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,8 +20,11 @@ import com.idoc.auth.security.model.AuthUser;
 @Cacheable(value = "users", key = "#identifier")
 public class CustomUserDetailService implements UserDetailsService {
 
-	@Autowired
-	private UserRepository userRepository;
+	private final UserRepository userRepository;
+
+	public CustomUserDetailService(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
 
 	/**
 	 * Load user details by username.

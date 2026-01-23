@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -13,6 +14,7 @@ import com.idoc.auth.security.jwt.JwtTokenRequest;
 
 @Configuration
 @EnableJpaAuditing
+@EnableJpaRepositories(basePackages = "com.idoc.auth.repository")
 public class JpaConfig {
   @Bean
   public AuditorAware<String> auditorProvider() {

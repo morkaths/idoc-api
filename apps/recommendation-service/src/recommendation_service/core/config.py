@@ -4,11 +4,12 @@ from typing import ClassVar
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field, computed_field
 
+
 class Settings(BaseSettings):
     """
     Quản lý cấu hình toàn cục cho ứng dụng Recommendation Service.
     """
-    
+
     # API
     API_V1_STR: str = "/api/v1"
     PROJECT_NAME: str = "IDoc Recommendation Service"
@@ -17,12 +18,18 @@ class Settings(BaseSettings):
     # Redis (Dùng để cache kết quả gợi ý)
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379
-    REDIS_PASSWORD: str | None = None 
+    REDIS_PASSWORD: str | None = None
     REDIS_DB: int = 0
+
+    # MongoDB (Motor + Beanie)
+    MONGODB_URI: str = Field(
+        default="mongodb://localhost:27017/recommendation",
+        alias="RECOMMENDATION_DB_URI",
+    )
 
     # JWT
     RSA_PUBLIC_KEY: str | None = None
-    
+
     # CORS
     CORS_ORIGINS: list[str] = ["*"]
 
@@ -37,9 +44,7 @@ class Settings(BaseSettings):
 
     # Pydantic
     model_config = SettingsConfigDict(
-        case_sensitive=True,
-        env_file=[".env", "../../.env"],
-        extra="ignore"
+        case_sensitive=True, env_file=[".env", "../../.env"], extra="ignore"
     )
 
 

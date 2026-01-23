@@ -39,13 +39,13 @@ export class BaseService<E extends Document, D> {
         return entity ? this.mapper.toDto(entity) : null;
     }
 
-    async create(dto: D): Promise<D> {
+    async create(dto: Partial<D>): Promise<D> {
         const entity = this.mapper.toEntity(dto);
         const created = await this.repository.create(entity);
         return this.mapper.toDto(created);
     }
 
-    async createMany(dtos: D[]): Promise<D[]> {
+    async createMany(dtos: Partial<D>[]): Promise<D[]> {
         const entities = dtos.map(dto => this.mapper.toEntity(dto));
         const created = await this.repository.createMany(entities);
         return created.map(entity => this.mapper.toDto(entity));

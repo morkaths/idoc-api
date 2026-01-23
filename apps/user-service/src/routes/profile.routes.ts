@@ -106,6 +106,34 @@ router.post('/', authenticate, ProfileController.create);
 
 /**
  * @openapi
+ * /profiles/bulk:
+ *   post:
+ *     summary: Tạo nhiều hồ sơ cùng lúc
+ *     tags:
+ *       - Profile
+ *     security:
+ *       - bearerAuth: []
+ *       - apiKeyAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: array
+ *             items:
+ *               $ref: '#/components/schemas/ProfileDto'
+ *     responses:
+ *       201:
+ *         description: Tạo thành công
+ *       400:
+ *         description: Dữ liệu không hợp lệ
+ *       401:
+ *         description: Chưa xác thực
+ */
+router.post('/bulk', authenticate, ProfileController.createMany);
+
+/**
+ * @openapi
  * /profiles/me:
  *   patch:
  *     summary: Cập nhật hồ sơ cá nhân

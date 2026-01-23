@@ -5,9 +5,8 @@ import { AuthorDto } from "./author.dto";
 export class BookDto {
   @Expose() _id!: string;
   @Expose() title!: string;
-  @Expose() subtitle?: string;
-  @Expose() description?: string;
   @Expose() slug?: string;
+  @Expose() description?: string;
   @Expose() publisher?: string;
   @Expose() publishedDate?: Date;
   @Expose() edition?: string;

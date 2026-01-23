@@ -1,10 +1,11 @@
 package com.idoc.auth.controller;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
 import com.idoc.auth.dto.request.UserRequest;
 import com.idoc.auth.dto.response.ApiResponse;
@@ -34,8 +40,11 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/users")
 public class UserController {
 
-	@Autowired
-	private UserService userService;
+	private final UserService userService;
+
+	public UserController(UserService userService) {
+		this.userService = userService;
+	}
 
 	@GetMapping
 	public ResponseEntity<ApiResponse<List<UserResponse>>> getList(
@@ -76,13 +85,10 @@ public class UserController {
 	public ResponseEntity<ApiResponse<List<UserResponse>>> getUsersByIds(@RequestBody Map<String, List<Long>> body) {
 		List<Long> ids = body.get("ids");
 		if (ids == null || ids.isEmpty()) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "List of IDs must not be empty");
+			return ResponseEntity.ok(ApiResponse.success(List.of(), "Lấy danh sách người dùng thành công"));
 		}
 		List<UserResponse> data = userService.findAllByIds(ids);
-		if (data.isEmpty()) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No users found for provided IDs");
-		}
-		return ResponseEntity.ok(ApiResponse.success(data, "Users retrieved successfully"));
+		return ResponseEntity.ok(ApiResponse.success(data, "Lấy danh sách người dùng thành công"));
 	}
 
 	@GetMapping("/search")
@@ -142,5 +148,27 @@ public class UserController {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + id);
 		}
 		return ResponseEntity.ok(ApiResponse.deleted());
+	}
+
+	@PostMapping("/import")
+	@PreAuthorize("hasAuthority('user.edit')")
+	public ResponseEntity<ApiResponse<String>> importExcel(@RequestParam("file") MultipartFile file) {
+		userService.importExcel(file);
+		return ResponseEntity.ok(ApiResponse.success("Users imported successfully"));
+	}
+
+	@GetMapping("/export")
+	@PreAuthorize("hasAuthority('user.view')")
+	public ResponseEntity<Resource> exportExcel() {
+		String timestamp = LocalDateTime.now()
+				.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+		String filename = "Users_" + timestamp + ".xlsx";
+		InputStreamResource file = new InputStreamResource(userService.exportExcel());
+
+		return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+				.contentType(
+						MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+				.body(file);
 	}
 }

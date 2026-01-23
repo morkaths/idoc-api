@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.springframework.data.jpa.domain.Specification;
 
-import com.idoc.auth.core.BaseSpecification;
+import com.idoc.libs.common.core.BaseSpecification;
 import com.idoc.auth.entity.PermissionEntity;
 
 public class PermissionSpecification {

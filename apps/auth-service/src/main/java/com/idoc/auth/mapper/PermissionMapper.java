@@ -2,7 +2,7 @@ package com.idoc.auth.mapper;
 
 import org.mapstruct.Mapper;
 
-import com.idoc.auth.core.BaseMapper;
+import com.idoc.libs.common.core.BaseMapper;
 import com.idoc.auth.dto.request.PermissionRequest;
 import com.idoc.auth.dto.response.PermissionResponse;
 import com.idoc.auth.entity.PermissionEntity;

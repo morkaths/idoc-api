@@ -126,6 +126,10 @@
         <module>apps/auth-service</module>
         <module>apps/payment-service</module>
         <module>apps/statistics-service</module>
+        <module>libs/common/excel</module>
+        <module>libs/common/redis</module>
+        <module>libs/common/security</module>
+        <module>libs/common/core</module>
     </modules>
 
 </project>

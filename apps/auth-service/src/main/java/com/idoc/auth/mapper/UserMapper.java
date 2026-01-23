@@ -12,7 +12,7 @@ import org.mapstruct.factory.Mappers;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.idoc.auth.core.BaseMapper;
+import com.idoc.libs.common.core.BaseMapper;
 import com.idoc.auth.dto.request.UserRequest;
 import com.idoc.auth.dto.response.UserResponse;
 import com.idoc.auth.entity.UserEntity;

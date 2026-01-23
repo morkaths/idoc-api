@@ -1,6 +1,6 @@
 import DocumentService from '../services/document.service';
 import { asyncHandler } from '../middleware/error.middleware';
-import { AuthRequest } from '../types/request';
+import { AuthRequest } from '../types';
 import * as response from '../utils/response.util';
 
 const DocumentController = {

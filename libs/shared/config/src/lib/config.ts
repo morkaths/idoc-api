@@ -45,7 +45,7 @@ export const config = {
   },
   auth: {
     apiKey: env.API_KEY,
-    rsaPublicKey: env.RSA_PUBLIC_KEY,
+    jwtPublicKey: env.JWT_PUBLIC_KEY,
   },
   services: {
     timeout: env.SERVICE_TIMEOUT,

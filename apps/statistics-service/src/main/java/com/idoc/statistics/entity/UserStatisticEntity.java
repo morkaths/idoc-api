@@ -1,6 +1,6 @@
 package com.idoc.statistics.entity;
 
-import com.idoc.statistics.core.BaseEntity;
+import com.idoc.libs.common.core.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

@@ -20,7 +20,6 @@ logs/
 # Environment & config files
 *.env
 *.env.*
-application.yml
 application-*.yml
 application.properties
 application-*.properties

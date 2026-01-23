@@ -1,4 +1,4 @@
-import { Expose } from "class-transformer";
+import { Expose, Type } from "class-transformer";
 import { CategoryTranslationDto } from "./category-translation.dto";
 
 export class CategoryDto {
@@ -7,5 +7,8 @@ export class CategoryDto {
   @Expose() parentId?: string;
   @Expose() createdAt?: Date;
   @Expose() updatedAt?: Date;
-  @Expose() translations?: CategoryTranslationDto[];
+
+  @Expose()
+  @Type(() => CategoryTranslationDto)
+  translations?: CategoryTranslationDto[];
 }

@@ -1,6 +1,6 @@
 import AuthorService from '../services/author.service';
 import { asyncHandler } from '../middleware/error.middleware';
-import { AuthRequest } from '../types/request';
+import { AuthRequest, UploadRequest } from '../types';
 import * as response from '../utils/response.util';
 
 const AuthorController = {
@@ -46,6 +46,16 @@ const AuthorController = {
     response.created(res, 'Author created successfully', author);
   }),
 
+  createMany: asyncHandler<AuthRequest>(async (req, res) => {
+    const data = req.body;
+    if (!Array.isArray(data)) {
+      return response.badRequest(res, 'Body must be an array');
+    }
+    const dtos = data.map(d => ({ ...d, updatedBy: req.user.id }));
+    const authors = await AuthorService.createMany(dtos);
+    response.created(res, 'Authors created successfully', authors);
+  }),
+
   update: asyncHandler<AuthRequest>(async (req, res) => {
     const { id } = req.params;
     const authorDto = req.body;
@@ -57,6 +67,14 @@ const AuthorController = {
     response.updated(res, 'Author updated successfully', author);
   }),
 
+  updateMany: asyncHandler<AuthRequest>(async (req, res) => {
+    const { ...filters } = req.query;
+    const dto = req.body;
+    dto.updatedBy = req.user.id;
+    const count = await AuthorService.updateMany(filters, dto);
+    response.success(res, `Updated ${count} authors successfully`, { count });
+  }),
+
   delete: asyncHandler<AuthRequest>(async (req, res) => {
     const { id } = req.params;
     const result = await AuthorService.delete(id);
@@ -64,6 +82,22 @@ const AuthorController = {
       return response.notFound(res, 'Author not found');
     }
     response.deleted(res, 'Author deleted successfully');
+  }),
+
+  importExcel: asyncHandler<UploadRequest>(async (req, res) => {
+    if (!req.file) {
+      return response.badRequest(res, 'No file uploaded');
+    }
+    const result = await AuthorService.importExcel(req.file.buffer);
+    response.success(res, 'Import finished', result);
+  }),
+
+  exportExcel: asyncHandler(async (req, res) => {
+    const { ...filters } = req.query;
+    const buffer = await AuthorService.exportExcel(filters);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=authors.xlsx');
+    res.send(buffer);
   }),
 };
 

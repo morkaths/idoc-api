@@ -1,8 +1,9 @@
 import BookService from '../services/book.service';
 import { asyncHandler } from '../middleware/error.middleware';
-import { AuthRequest } from '../types/request';
+import { AuthRequest, UploadRequest } from '../types';
 import * as response from '../utils/response.util';
 import { isValidObjectId } from 'mongoose';
+
 
 const BookController = {
   getList: asyncHandler(async (req, res) => {
@@ -21,7 +22,7 @@ const BookController = {
   getByCategory: asyncHandler(async (req, res) => {
     const { slug } = req.params;
     const lang = typeof req.query.lang === 'string' ? req.query.lang : undefined;
-    const books = await BookService.getByCategory(slug, lang);
+    const books = await BookService.findByCategory(slug, lang);
     if (!books || books.length === 0) {
       return response.notFound(res, 'No books found for this category');
     }
@@ -61,6 +62,16 @@ const BookController = {
     response.created(res, 'Book created successfully', book);
   }),
 
+  createMany: asyncHandler<AuthRequest>(async (req, res) => {
+    const data = req.body;
+    if (!Array.isArray(data)) {
+      return response.badRequest(res, 'Body must be an array');
+    }
+    const dtos = data.map(d => ({ ...d, updatedBy: req.user.id }));
+    const books = await BookService.createMany(dtos);
+    response.created(res, 'Books created successfully', books);
+  }),
+
   update: asyncHandler<AuthRequest>(async (req, res) => {
     const { id } = req.params;
     const bookDto = req.body;
@@ -72,6 +83,14 @@ const BookController = {
     response.updated(res, 'Book updated successfully', book);
   }),
 
+  updateMany: asyncHandler<AuthRequest>(async (req, res) => {
+    const { ...filters } = req.query;
+    const dto = req.body;
+    dto.updatedBy = req.user.id;
+    const count = await BookService.updateMany(filters, dto);
+    response.success(res, `Updated ${count} books successfully`, { count });
+  }),
+
   delete: asyncHandler<AuthRequest>(async (req, res) => {
     const { id } = req.params;
     const result = await BookService.delete(id);
@@ -79,6 +98,22 @@ const BookController = {
       return response.notFound(res, 'Book not found');
     }
     response.deleted(res, 'Book deleted successfully');
+  }),
+
+  importExcel: asyncHandler<UploadRequest>(async (req, res) => {
+    if (!req.file) {
+      return response.badRequest(res, 'No file uploaded');
+    }
+    const result = await BookService.importExcel(req.file.buffer);
+    response.success(res, 'Import finished', result);
+  }),
+
+  exportExcel: asyncHandler(async (req, res) => {
+    const { ...filters } = req.query;
+    const buffer = await BookService.exportExcel(filters);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=books.xlsx');
+    res.send(buffer);
   }),
 
 };

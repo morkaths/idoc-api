@@ -12,9 +12,9 @@ export const envSchema = z.object({
 
   // === AUTH / KEYS ===
   API_KEY: z.string().min(1, "[ENV] API key must have at least 1 character"),
-  RSA_PUBLIC_KEY: z.string()
-    .min(50, "[ENV] RSA public key has less than 50 characters")
-    .includes("BEGIN PUBLIC KEY", { message: "[ENV] RSA Key is missing Header 'BEGIN PUBLIC KEY'" })
+  JWT_PUBLIC_KEY: z.string()
+    .min(50, "[ENV] JWT public key has less than 50 characters")
+    .includes("BEGIN PUBLIC KEY", { message: "[ENV] JWT Key is missing Header 'BEGIN PUBLIC KEY'" })
     .transform((key) => {
       let formatted = key.replace(/^"|"$/g, '');
       formatted = formatted.replace(/\\n/g, '\n');

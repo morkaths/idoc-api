@@ -12,5 +12,5 @@ start "User Service Seed" cmd /k "cd /d "%~dp0..\..\apps\user-service" && npm ru
 REM Catalog service seeder
 start "Catalog Service Seed" cmd /k "cd /d "%~dp0..\..\apps\catalog-service" && npm run seed"
 
-REM Document service seeder
-@REM start "Document Service Seed" cmd /k "cd /d "%~dp0document-service" && npm run seed"
+REM Recommendation service seeder
+start "Recommendation Service Seed" cmd /k "cd /d "%~dp0..\..\apps\recommendation-service" && poetry run python -m recommendation_service.scripts.seed"

@@ -1,10 +1,10 @@
 package com.idoc.auth.constant;
 
 public enum Role {
-    ADMIN("admin"),
-    USER("user"),
-    STAFF("staff"),
-    MANAGER("manager");
+    ADMIN("ADMIN"),
+    USER("USER"),
+    STAFF("STAFF"),
+    MANAGER("MANAGER");
 
     private final String value;
 

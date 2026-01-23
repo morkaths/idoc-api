@@ -40,6 +40,15 @@ const ProfileController = {
     response.created(res, "Profile created successfully", profile);
   }),
 
+  createMany: asyncHandler(async (req: AuthRequest, res: Response) => {
+    const data = req.body;
+    if (!Array.isArray(data)) {
+      return response.badRequest(res, "Request body must be an array of profiles");
+    }
+    const profiles = await ProfileService.createMany(data);
+    response.created(res, "Profiles created successfully", profiles);
+  }),
+
   update: asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     const data = req.body;

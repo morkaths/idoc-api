@@ -1,9 +1,9 @@
 -- camelcase
 INSERT INTO role (code, name) VALUES 
-('admin', 'Administrator'), 
-('user', 'User'), 
-('staff', 'Staff'), 
-('manager', 'Manager');
+('ADMIN', 'Administrator'),
+('MANAGER', 'Manager'), 
+('STAFF', 'Staff'),
+('USER', 'User');
 
 -- <resource>.<action>
 INSERT INTO permission (code, name) VALUES 
@@ -20,17 +20,20 @@ INSERT INTO permission (code, name) VALUES
 
 -- Admin có tất cả quyền
 INSERT INTO role_permission (role_id, permission_id)
-SELECT r.id, p.id FROM role r, permission p WHERE r.code = 'admin';
+SELECT r.id, p.id FROM role r, permission p WHERE r.code = 'ADMIN';
 
--- User chỉ có quyền xem user
+-- Manager có quyền duyệt và xem manager, xem user, xem staff
 INSERT INTO role_permission (role_id, permission_id)
-SELECT r.id, p.id FROM role r, permission p WHERE r.code = 'user'
-  AND p.code = 'user.view';
+SELECT r.id, p.id FROM role r, permission p WHERE r.code = 'MANAGER' 
+  AND p.code NOT IN (
+    'user.delete',
+    'role.delete',
+    'permission.delete'
+  );
 
 -- Staff có quyền xem và sửa staff, xem user
 INSERT INTO role_permission (role_id, permission_id)
-SELECT r.id, p.id FROM role r, permission p 
-WHERE r.code = 'staff'
+SELECT r.id, p.id FROM role r, permission p WHERE r.code = 'STAFF'
   AND p.code NOT IN (
     'user.delete',
     'role.edit',
@@ -39,11 +42,7 @@ WHERE r.code = 'staff'
     'permission.delete'
   );
 
--- Manager có quyền duyệt và xem manager, xem user, xem staff
+-- User chỉ có quyền xem user
 INSERT INTO role_permission (role_id, permission_id)
-SELECT r.id, p.id FROM role r, permission p WHERE r.code = 'manager' 
-  AND p.code NOT IN (
-    'user.delete',
-    'role.delete',
-    'permission.delete'
-  );
+SELECT r.id, p.id FROM role r, permission p WHERE r.code = 'USER'
+  AND p.code = 'user.view';

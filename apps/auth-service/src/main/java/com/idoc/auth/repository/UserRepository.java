@@ -1,5 +1,8 @@
 package com.idoc.auth.repository;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -34,4 +37,13 @@ public interface UserRepository extends JpaRepository<UserEntity, Long>, JpaSpec
 			WHERE u.username = :username
 			""")
 	UserEntity findByUsernameWithRolesAndPermissions(@Param("username") String username);
+
+	// Optimization for Import: Batch check
+	List<UserEntity> findByUsernameIn(Collection<String> usernames);
+
+	List<UserEntity> findByEmailIn(Collection<String> emails);
+
+	// Optimization for Export: Fetch with Roles
+	@Query("SELECT u FROM UserEntity u LEFT JOIN FETCH u.roles")
+	List<UserEntity> findAllWithRoles();
 }

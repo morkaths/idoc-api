@@ -1,5 +1,7 @@
 package com.idoc.auth.controller;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +21,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
 import com.idoc.auth.dto.request.RoleRequest;
 import com.idoc.auth.dto.response.ApiResponse;
@@ -105,6 +112,27 @@ public class RoleController {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found with id: " + id);
     }
     return ResponseEntity.ok(ApiResponse.deleted());
+  }
+
+  @PostMapping("/import")
+  @PreAuthorize("hasAuthority('role.edit')")
+  public ResponseEntity<ApiResponse<String>> importExcel(@RequestParam("file") MultipartFile file) {
+    roleService.importExcel(file);
+    return ResponseEntity.ok(ApiResponse.success("Roles imported successfully"));
+  }
+
+  @GetMapping("/export")
+  @PreAuthorize("hasAuthority('role.view')")
+  public ResponseEntity<Resource> exportExcel() {
+    String timestamp = LocalDateTime.now()
+        .format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+    String filename = "Roles_" + timestamp + ".xlsx";
+    InputStreamResource file = new InputStreamResource(roleService.exportExcel());
+
+    return ResponseEntity.ok()
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+        .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+        .body(file);
   }
 
 }

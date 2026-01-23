@@ -1,6 +1,6 @@
 package com.idoc.auth.entity;
 
-import com.idoc.auth.core.BaseEntity;
+import com.idoc.libs.common.core.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

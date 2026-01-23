@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-import com.idoc.auth.core.BaseMapper;
+import com.idoc.libs.common.core.BaseMapper;
 import com.idoc.auth.dto.request.RoleRequest;
 import com.idoc.auth.dto.response.RoleResponse;
 import com.idoc.auth.entity.RoleEntity;

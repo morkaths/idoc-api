@@ -1,6 +1,6 @@
 import CategoryService from '../services/category.service';
 import { asyncHandler } from '../middleware/error.middleware';
-import { AuthRequest } from '../types/request';
+import { AuthRequest, UploadRequest } from '../types';
 import * as response from '../utils/response.util';
 
 const CategoryController = {
@@ -46,6 +46,16 @@ const CategoryController = {
     response.created(res, 'Category created successfully', category);
   }),
 
+  createMany: asyncHandler<AuthRequest>(async (req, res) => {
+    const data = req.body;
+    if (!Array.isArray(data)) {
+      return response.badRequest(res, 'Body must be an array');
+    }
+    const dtos = data.map(d => ({ ...d, updatedBy: req.user.id }));
+    const categories = await CategoryService.createMany(dtos);
+    response.created(res, 'Categories created successfully', categories);
+  }),
+
   update: asyncHandler<AuthRequest>(async (req, res) => {
     const { id } = req.params;
     const categoryDto = req.body;
@@ -57,6 +67,14 @@ const CategoryController = {
     response.updated(res, 'Category updated successfully', category);
   }),
 
+  updateMany: asyncHandler<AuthRequest>(async (req, res) => {
+    const { ...filters } = req.query;
+    const dto = req.body;
+    dto.updatedBy = req.user.id;
+    const count = await CategoryService.updateMany(filters, dto);
+    response.success(res, `Updated ${count} categories successfully`, { count });
+  }),
+
   delete: asyncHandler<AuthRequest>(async (req, res) => {
     const { id } = req.params;
     const result = await CategoryService.delete(id);
@@ -64,6 +82,22 @@ const CategoryController = {
       return response.notFound(res, 'Category not found');
     }
     response.deleted(res, 'Category deleted successfully');
+  }),
+
+  importExcel: asyncHandler<UploadRequest>(async (req, res) => {
+    if (!req.file) {
+      return response.badRequest(res, 'No file uploaded');
+    }
+    const result = await CategoryService.importExcel(req.file.buffer);
+    response.success(res, 'Import finished', result);
+  }),
+
+  exportExcel: asyncHandler(async (req, res) => {
+    const { ...filters } = req.query;
+    const buffer = await CategoryService.exportExcel(filters);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=categories.xlsx');
+    res.send(buffer);
   }),
 
 };
