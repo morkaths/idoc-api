@@ -1,36 +1,36 @@
-from typing import Annotated, Optional
+from typing import Annotated
 
 import jwt
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from pydantic import ValidationError
-
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from recommendation_service.core.config import get_settings
 
-# OAuth2 scheme: Client gửi token via Header: Authorization: Bearer <token>
-oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl=f"{get_settings().API_V1_STR}/auth/login"
-)  # URL này chỉ là dummy cho Swagger UI
+# Sử dụng HTTPBearer để lấy token từ header Authorization
+security = HTTPBearer()
 
 
-def get_current_user_id(token: Annotated[str, Depends(oauth2_scheme)]) -> str:
+def get_current_user_id(
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
+) -> str:
     """
     Validate JWT Token và lấy user_id (sub).
     Sử dụng RSA Public Key được share từ Auth Service.
     """
     settings = get_settings()
+    token = credentials.credentials
 
-    if not settings.RSA_PUBLIC_KEY:
+    if not settings.JWT_PUBLIC_KEY:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="RSA Public Key not configured",
+            detail="JWT Public Key not configured",
         )
 
     try:
         # Decode và Verify Signature dùng RSA256
+        # Lưu ý: Client cần gửi Public Key đúng định dạng PEM
         payload = jwt.decode(
             token,
-            settings.RSA_PUBLIC_KEY,
+            settings.JWT_PUBLIC_KEY,
             algorithms=["RS256"],
             options={"verify_aud": False},  # Tùy chỉnh nếu cần verify audience
         )

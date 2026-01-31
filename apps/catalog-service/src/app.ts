@@ -8,9 +8,9 @@ import swaggerUi from 'swagger-ui-express';
 import { Request, Response, NextFunction } from 'express';
 
 import routes from './routes';
+import swaggerSpec from '../docs/swagger';
 import { config } from '@libs/config';
 import { errorHandler } from './middleware/error.middleware';
-import swaggerSpec from '../docs/swagger';
 import { contextMiddleware, httpLogger } from '@libs/logger';
 
 const app = express();

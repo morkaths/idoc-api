@@ -1,7 +1,7 @@
 import { Expose } from "class-transformer";
 
 export class AuthorDto {
-  @Expose() _id!: string;
+  @Expose({ name: '_id' }) id!: string;
   @Expose() name!: string;
   @Expose() avatarUrl?: string;
   @Expose() birthDate?: Date;

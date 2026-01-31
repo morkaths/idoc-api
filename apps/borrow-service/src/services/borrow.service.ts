@@ -22,7 +22,7 @@ class BorrowService extends BaseService<Borrow, BorrowDto> {
     const users = await UserClient.findByIds(userIds);
     const items = await BookClient.findByIds(itemIds);
     const userMap = new Map(users.map(u => [String(u.id), u]));
-    const itemMap = new Map(items.map(b => [String(b._id), b]));
+    const itemMap = new Map(items.map(b => [String(b.id), b]));
     const data = borrows.map((borrow: Partial<Borrow>) => {
       const user = userMap.get(borrow.userId || '');
       const item = itemMap.get(borrow.itemId || '');
@@ -41,7 +41,7 @@ class BorrowService extends BaseService<Borrow, BorrowDto> {
       try {
         const book = await BookClient.findById(created.itemId);
         if (book && book.categories) {
-          categoryIds = book.categories.map((category: Category) => category._id);
+          categoryIds = book.categories.map((category: Category) => category.id);
         }
       } catch (error) {
         console.error('Failed to fetch book details for category statistics:', error);
@@ -119,7 +119,7 @@ class BorrowService extends BaseService<Borrow, BorrowDto> {
     const users = await UserClient.findByIds(userIds);
     const books = await BookClient.findByIds(itemIds);
     const userMap = new Map(users.map(u => [String(u.id), u]));
-    const bookMap = new Map(books.map(b => [String(b._id), b]));
+    const bookMap = new Map(books.map(b => [String(b.id), b]));
 
     const results = borrows.map((b: Borrow) => {
       const user = userMap.get(String(b.userId));

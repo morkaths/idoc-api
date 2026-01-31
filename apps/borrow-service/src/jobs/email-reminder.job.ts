@@ -4,8 +4,8 @@ import EmailService from '../services/email.service';
 import BorrowService from '../services/borrow.service';
 
 export function startEmailReminderJob() {
-  // cron.schedule('0 0 * * *', async () => {
-  cron.schedule('*/5 * * * *', async () => {
+  // cron.schedule('*/5 * * * *', async () => {
+  cron.schedule('0 0 * * *', async () => {
     try {
       const borrows = await BorrowService.getBorrowsNeedingBookReminder();
       for (const borrow of borrows) {

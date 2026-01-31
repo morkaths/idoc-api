@@ -19,8 +19,8 @@ export interface Borrow extends Document {
 
 const BorrowSchema = new Schema<Borrow>(
     {
-        userId: { type: String, required: true },
-        itemId: { type: String, required: true },
+        userId: { type: String, required: true, trim: true },
+        itemId: { type: String, required: true, trim: true },
         renewals: [{
             renewedAt: { type: Date, default: Date.now },
             oldExpireTime: { type: Date, required: true },
@@ -47,9 +47,19 @@ const BorrowSchema = new Schema<Borrow>(
             }
         },
         note: { type: String, trim: true },
-        status: { type: String, trim: true, default: 'active' }
+        status: { 
+            type: String, 
+            trim: true, 
+            enum: ['active', 'returned', 'overdue', 'cancelled'],
+            default: 'active' 
+        }
     },
     { timestamps: true }
 );
+
+BorrowSchema.index({ userId: 1, status: 1 });
+BorrowSchema.index({ itemId: 1, status: 1 });
+BorrowSchema.index({ status: 1 });
+BorrowSchema.index({ expireTime: 1 }, { partialFilterExpression: { status: 'active' } });
 
 export const Borrow = model<Borrow>('Borrow', BorrowSchema);

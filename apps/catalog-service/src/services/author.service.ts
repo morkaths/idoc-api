@@ -11,22 +11,12 @@ class AuthorService extends BaseService<IAuthor, AuthorDto> {
     super(authorRepository, AuthorMapper);
   }
 
-  /**
-   * Lấy danh sách tác giả với phân trang và bộ lọc
-   * @param page - Số trang
-   * @param limit - Số lượng items mỗi trang
-   * @param filter - Bộ lọc
-   */
   async findList(page: number, limit: number, filter: { [key: string]: any }): Promise<{ data: AuthorDto[]; pagination: Pagination }> {
     const result = await authorRepository.findList(page, limit, filter);
     const data = (result.items || []).map((d: any) => this.mapper.toDto(d));
     return { data, pagination: result.pagination };
   }
 
-  /**
-   * Import dữ liệu tác giả từ file Excel
-   * @param buffer - Buffer của file Excel
-   */
   async importExcel(buffer: Buffer): Promise<{ total: number; success: number; errors: any[] }> {
     const excelService = new ExcelService();
 
@@ -41,79 +31,67 @@ class AuthorService extends BaseService<IAuthor, AuthorDto> {
     const rows = await excelService.readExcel<AuthorRow>(buffer);
 
     if (!rows || rows.length === 0) {
-      throw new Error('File Excel không có dữ liệu');
+      throw new Error('No data found in Excel file');
     }
 
     const errors: any[] = [];
     const validAuthors: Partial<AuthorDto>[] = [];
     const namesToCheck = new Set<string>();
+    
+    
+    // Helper function
+    const getValue = (row: any, key: string) => excelService.getCellValue(row, key);
 
-    // Validate basic data and collect names
+    // 1. Extraction & Validation
     rows.forEach((row, index) => {
-      if (!row.name) {
-        errors.push({ row: index + 2, error: 'Tên tác giả là bắt buộc' });
+      const name = getValue(row, 'name');
+      if (!name) {
+        errors.push({ row: index + 2, error: 'Name is required' });
         return;
       }
-      namesToCheck.add(row.name.trim());
+      namesToCheck.add(name);
     });
 
-    // Check duplicates using batched queries
+    // 2. Bulk Duplicate Check
     const existingMap = new Set<string>();
     if (namesToCheck.size > 0) {
-      const uniqueNames = Array.from(namesToCheck);
-      const BATCH_SIZE = 50;
-
-      for (let i = 0; i < uniqueNames.length; i += BATCH_SIZE) {
-        const batch = uniqueNames.slice(i, i + BATCH_SIZE);
-        const condition = batch.map(name => ({
-          name: { $regex: new RegExp(`^${name}$`, 'i') }
-        }));
-
-        try {
-          const existing = await authorRepository.find({ $or: condition });
-          existing.forEach(a => existingMap.add(a.name.toLowerCase()));
-        } catch (error) {
-          console.error(`Error checking duplicate authors for batch ${i}:`, error);
-          // Continue to next batch rather than failing everything, 
-          // though strictly we might want to fail if duplicate check fails.
-          // For now, log and proceed.
-        }
-      }
+      // Create case-insensitive regex conditions for all names
+      const conditions = Array.from(namesToCheck).map(name => ({
+        name: { $regex: new RegExp(`^${name}$`, 'i') }
+      }));
+      
+      // Load all matching authors
+      const existing = await authorRepository.find({ $or: conditions });
+      existing.forEach(a => existingMap.add(a.name.toLowerCase()));
     }
 
+    // 3. Construction
     rows.forEach((row, index) => {
-      if (!row.name) return; // Errors handled previously
-      const name = row.name.trim();
+      const name = getValue(row, 'name');
+      if (!name) return; // Already handled in validation
 
       if (existingMap.has(name.toLowerCase())) {
-        errors.push({ row: index + 2, error: `Tác giả '${name}' đã tồn tại` });
+        errors.push({ row: index + 2, error: `Author '${name}' already exists` });
         return;
       }
-
-      const getLinkValue = (val: any): string => {
-        if (!val) return '';
-        if (typeof val === 'object' && 'text' in val) {
-          return val.text;
-        }
-        return String(val);
-      };
 
       validAuthors.push({
         name: name,
-        bio: row.bio,
-        nationality: row.nationality,
-        birthDate: row.birthDate ? new Date(row.birthDate) : undefined,
-        avatarUrl: getLinkValue(row.avatarUrl),
+        bio: getValue(row, 'bio'),
+        nationality: getValue(row, 'nationality'),
+        birthDate: getValue(row, 'birth date') ? new Date(getValue(row, 'birth date')) : undefined,
+        avatarUrl: getValue(row, 'avatar url'),
       });
     });
 
+    // 4. Bulk Insert
     let successCount = 0;
     if (validAuthors.length > 0) {
       try {
         await this.createMany(validAuthors);
         successCount = validAuthors.length;
       } catch (error: any) {
-        throw new Error(`Lỗi khi lưu dữ liệu: ${error.message}`);
+        throw new Error(`Bulk insert error: ${error.message}`);
       }
     }
 
@@ -124,24 +102,18 @@ class AuthorService extends BaseService<IAuthor, AuthorDto> {
     };
   }
 
-  /**
-   * Xuất danh sách tác giả ra Excel
-   * @param filters - Bộ lọc
-   */
   async exportExcel(filters: any): Promise<Buffer> {
     const { data } = await this.findList(1, 1000, filters);
 
     const columns: ExcelColumn[] = [
-      { header: '_id', key: '_id', width: 25 },
-      { header: 'name', key: 'name', width: 30 },
-      { header: 'bio', key: 'bio', width: 50 },
-      { header: 'nationality', key: 'nationality', width: 20 },
-      { header: 'birthDate', key: 'birthDate', width: 15 },
-      { header: 'avatarUrl', key: 'avatarUrl', width: 40 },
+      { header: 'Name', key: 'name' },
+      { header: 'Bio', key: 'bio' },
+      { header: 'Nationality', key: 'nationality' },
+      { header: 'Birth Date', key: 'birthDate' },
+      { header: 'Avatar URL', key: 'avatarUrl' },
     ];
 
     const excelData = data.map(author => ({
-      _id: author._id.toString(),
       name: author.name,
       bio: author.bio,
       nationality: author.nationality,

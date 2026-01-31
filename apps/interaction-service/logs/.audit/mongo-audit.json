@@ -1,0 +1,20 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "logs/.audit/mongo-audit.json",
+    "files": [
+        {
+            "date": 1769599873900,
+            "name": "logs\\mongo-2026-01-28.log",
+            "hash": "31f0d3369c969d7ec3c2a3b45c4a7b877bbaf1348c9c66f81f3e828d0548ecc6"
+        },
+        {
+            "date": 1769853733673,
+            "name": "logs\\mongo-2026-01-31.log",
+            "hash": "bcccb113052abf72f3a4a657ddc99cbd88a57899c71025904fe167766470f757"
+        }
+    ],
+    "hashType": "sha256"
+}

@@ -16,9 +16,6 @@ class BookService extends BaseService<IBook, BookDto> {
     super(bookRepository, BookMapper);
   }
 
-  /**
-   * Helper: Map book với categories và authors
-   */
   private mapBookToDto(book: any): BookDto {
     return BookMapper.toDto(
       book,
@@ -59,7 +56,7 @@ class BookService extends BaseService<IBook, BookDto> {
     return books.map(book => this.mapBookToDto(book));
   }
 
-  async importExcel(buffer: Buffer): Promise<{ total: number; success: number; errors: any[] }> {
+  async importExcel(buffer: Buffer, userId?: string): Promise<{ total: number; success: number; errors: any[] }> {
     const excelService = new ExcelService();
     const rows = await excelService.readExcel<any>(buffer);
 
@@ -70,102 +67,108 @@ class BookService extends BaseService<IBook, BookDto> {
     const errors: any[] = [];
     const validBooks: Partial<BookDto>[] = [];
 
-    // 1. Extraction & Validation
+    // Helper functions
+    const getValue = (row: any, key: string) => excelService.getCellValue(row, key);
+    const splitValues = (val: string) => val ? val.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+    const buildBookDto = (row: any, authorMap: Map<string, string>, categoryMap: Map<string, string>): Partial<BookDto> => {
+      const bookDto: Partial<BookDto> = {
+        title: getValue(row, 'title'),
+        slug: getValue(row, 'slug') || undefined,
+        description: getValue(row, 'description'),
+        publisher: getValue(row, 'publisher'),
+        publishedDate: getValue(row, 'published date') ? new Date(getValue(row, 'published date')) : undefined,
+        edition: getValue(row, 'edition'),
+        isbn: getValue(row, 'isbn'),
+        language: getValue(row, 'language'),
+        pages: getValue(row, 'pages') ? Number(getValue(row, 'pages')) : 0,
+        price: getValue(row, 'price') ? Number(getValue(row, 'price')) : 0,
+        stock: getValue(row, 'stock') ? Number(getValue(row, 'stock')) : 0,
+        coverUrl: getValue(row, 'cover url'),
+        tags: splitValues(getValue(row, 'tags')),
+        updatedBy: userId,
+      };
+
+      // Map Authors
+      const rawAuthors = splitValues(getValue(row, 'authors'));
+      if (rawAuthors.length > 0) {
+        const authorIds = rawAuthors
+          .map(name => authorMap.get(name.toLowerCase()))
+          .filter((id): id is string => !!id);
+        if (authorIds.length > 0) {
+          bookDto.authorIds = Array.from(new Set(authorIds));
+        }
+      }
+
+      // Map Categories
+      const rawCategories = splitValues(getValue(row, 'categories'));
+      if (rawCategories.length > 0) {
+        const cateIds = rawCategories
+          .map(slug => categoryMap.get(slug.toLowerCase()))
+          .filter((id): id is string => !!id);
+        if (cateIds.length > 0) {
+          bookDto.categoryIds = Array.from(new Set(cateIds));
+        }
+      }
+      
+      return bookDto;
+    };
+
+    // 1. Extraction
     const authorNames = new Set<string>();
     const categoryIdents = new Set<string>();
-    const rowsToProcess: { row: any; index: number }[] = [];
+    const isbnSet = new Set<string>();
+    const validRows: { row: any; index: number }[] = [];
 
     rows.forEach((row, index) => {
-      if (!row.title) {
+      const title = getValue(row, 'title');
+      if (!title) {
         errors.push({ row: index + 2, error: 'Title is required' });
         return;
       }
 
-      if (row.authors) {
-        String(row.authors).split(',').forEach(n => {
-          const name = n.trim();
-          if (name) authorNames.add(name);
-        });
-      }
+      splitValues(getValue(row, 'authors')).forEach(n => authorNames.add(n));
+      splitValues(getValue(row, 'categories')).forEach(c => categoryIdents.add(c));
+      
+      const isbn = getValue(row, 'isbn');
+      if (isbn) isbnSet.add(isbn);
 
-      if (row.categories) {
-        String(row.categories).split(',').forEach(c => {
-          const ident = c.trim();
-          if (ident) categoryIdents.add(ident);
-        });
-      }
-
-      rowsToProcess.push({ row, index });
+      validRows.push({ row, index });
     });
 
-    // 2. Bulk Loookup
-    const authorMap = new Map<string, string>(); // Name (lowercase) -> ID
-    const categoryMap = new Map<string, string>(); // Slug (lowercase) -> ID
+    // 2. Parallel Bulk Lookup
+    const authorPromise = authorNames.size > 0
+      ? authorRepository.find({
+          $or: Array.from(authorNames).map(name => ({
+            name: { $regex: new RegExp(`^${name}$`, 'i') }
+          }))
+        })
+      : Promise.resolve([]);
 
-    if (authorNames.size > 0) {
-      const conditions = Array.from(authorNames).map(name => ({
-        name: { $regex: new RegExp(`^${name}$`, 'i') }
-      }));
-      const authors = await authorRepository.find({ $or: conditions });
-      authors.forEach(a => authorMap.set(a.name.toLowerCase(), a._id.toString()));
-    }
+    const categoryPromise = categoryIdents.size > 0
+      ? categoryRepository.find({ slug: { $in: Array.from(categoryIdents) } })
+      : Promise.resolve([]);
 
-    if (categoryIdents.size > 0) {
-      const idents = Array.from(categoryIdents);
-      // Lookup by Slug ONLY
-      const catsBySlug = await categoryRepository.find({ slug: { $in: idents } });
-      catsBySlug.forEach(c => categoryMap.set(c.slug.toLowerCase(), c._id.toString()));
-    }
+    const bookPromise = isbnSet.size > 0
+      ? bookRepository.find({ isbn: { $in: Array.from(isbnSet) } })
+      : Promise.resolve([]);
 
-    // Helper to extract link value
-    const getLinkValue = (val: any): string => {
-      if (!val) return '';
-      if (typeof val === 'object' && 'text' in val) {
-        return val.text;
-      }
-      return String(val);
-    };
+    const [authors, categories, existingBooks] = await Promise.all([authorPromise, categoryPromise, bookPromise]);
+
+    const authorMap = new Map(authors.map(a => [a.name.toLowerCase(), a._id.toString()]));
+    const categoryMap = new Map(categories.map(c => [c.slug.toLowerCase(), c._id.toString()]));
+    const existingIsbnSet = new Set(existingBooks.map((b: IBook) => b.isbn));
 
     // 3. Construction
-    for (const { row, index } of rowsToProcess) {
+    for (const { row, index } of validRows) {
       try {
-        const bookDto: Partial<BookDto> = {
-          title: row.title,
-          slug: row.slug,
-          description: row.description,
-          publisher: row.publisher,
-          publishedDate: row.publishedDate ? new Date(row.publishedDate) : undefined,
-          edition: row.edition?.toString(),
-          isbn: row.isbn?.toString(),
-          language: row.language,
-          pages: row.pages ? Number(row.pages) : 0,
-          price: row.price ? Number(row.price) : 0,
-          stock: row.stock ? Number(row.stock) : 0,
-          coverUrl: getLinkValue(row.coverUrl),
-          tags: row.tags ? String(row.tags).split(',').map((t: string) => t.trim()) : [],
-        };
-
-        // Map Authors
-        if (row.authors) {
-          const foundIds = new Set<string>();
-          String(row.authors).split(',').forEach(n => {
-            const id = authorMap.get(n.trim().toLowerCase());
-            if (id) foundIds.add(id);
-          });
-          if (foundIds.size > 0) bookDto.authorIds = Array.from(foundIds);
+        const isbn = getValue(row, 'isbn');
+        if (isbn && existingIsbnSet.has(isbn)) {
+             errors.push({ row: index + 2, error: `Duplicate ISBN: ${isbn}` });
+             continue;
         }
 
-        // Map Categories
-        if (row.categories) {
-          const foundIds = new Set<string>();
-          String(row.categories).split(',').forEach(c => {
-            const key = c.trim().toLowerCase();
-            const id = categoryMap.get(key);
-            if (id) foundIds.add(id);
-          });
-          if (foundIds.size > 0) bookDto.categoryIds = Array.from(foundIds);
-        }
-
+        const bookDto = buildBookDto(row, authorMap, categoryMap);
         validBooks.push(bookDto);
       } catch (error: any) {
         errors.push({ row: index + 2, error: error.message });
@@ -179,7 +182,7 @@ class BookService extends BaseService<IBook, BookDto> {
         await this.createMany(validBooks);
         successCount = validBooks.length;
       } catch (error: any) {
-        throw new Error(`Bulk insert failed: ${error.message}`);
+        throw new Error(`Bulk insert error: ${error.message}`);
       }
     }
 
@@ -194,30 +197,28 @@ class BookService extends BaseService<IBook, BookDto> {
     const { data } = await this.findList(1, 1000, filters);
 
     const columns: ExcelColumn[] = [
-      { header: '_id', key: '_id' },
-      { header: 'title', key: 'title' },
-      { header: 'slug', key: 'slug' },
-      { header: 'description', key: 'description' },
-      { header: 'authors', key: 'authors' },
-      { header: 'categories', key: 'categories' },
-      { header: 'publisher', key: 'publisher' },
-      { header: 'publishedDate', key: 'publishedDate' },
-      { header: 'edition', key: 'edition' },
-      { header: 'isbn', key: 'isbn' },
-      { header: 'language', key: 'language' },
-      { header: 'pages', key: 'pages' },
-      { header: 'price', key: 'price' },
-      { header: 'stock', key: 'stock' },
-      { header: 'coverUrl', key: 'coverUrl' },
-      { header: 'tags', key: 'tags' },
+      { header: 'Title', key: 'title' },
+      { header: 'Slug', key: 'slug' },
+      { header: 'Description', key: 'description' },
+      { header: 'Authors', key: 'authors' },
+      { header: 'Categories', key: 'categories' },
+      { header: 'Publisher', key: 'publisher' },
+      { header: 'Published Date', key: 'publishedDate' },
+      { header: 'Edition', key: 'edition' },
+      { header: 'ISBN', key: 'isbn' },
+      { header: 'Language', key: 'language' },
+      { header: 'Pages', key: 'pages' },
+      { header: 'Price', key: 'price' },
+      { header: 'Stock', key: 'stock' },
+      { header: 'Cover URL', key: 'coverUrl' },
+      { header: 'Tags', key: 'tags' },
     ];
 
-    const excelData = data.map((book: any) => ({
-      _id: book._id?.toString(),
+    const excelData = data.map(book => ({
       title: book.title,
       description: book.description,
-      authors: book.authors?.map((a: any) => a.name).join(', ') || '',
-      categories: book.categories?.map((c: any) => c.slug).join(', ') || '',
+      authors: book.authors?.map(a => a.name).join(', ') || '',
+      categories: book.categories?.map(c => c.slug).join(', ') || '',
       publisher: book.publisher,
       publishedDate: book.publishedDate ? new Date(book.publishedDate).toISOString().split('T')[0] : '',
       edition: book.edition,

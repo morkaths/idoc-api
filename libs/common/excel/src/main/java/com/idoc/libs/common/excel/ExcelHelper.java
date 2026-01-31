@@ -88,7 +88,7 @@ public class ExcelHelper {
                 for (Cell cell : headerRow) {
                     String headerValue = getCellStringValue(headerRow, cell.getColumnIndex());
                     if (headerValue != null && !headerValue.trim().isEmpty()) {
-                        headerMap.put(headerValue.trim(), cell.getColumnIndex());
+                        headerMap.put(headerValue.trim().toLowerCase(), cell.getColumnIndex());
                     }
                 }
                 rowNumber++;
@@ -170,5 +170,17 @@ public class ExcelHelper {
             default:
                 return null;
         }
+    }
+
+    public static String getCellStringValue(Row row, Map<String, Integer> headerMap, String columnName) {
+        if (headerMap == null || columnName == null) {
+            return null;
+        }
+        // Case-insensitive lookup
+        Integer cellIndex = headerMap.get(columnName.toLowerCase());
+        if (cellIndex == null) {
+            return null;
+        }
+        return getCellStringValue(row, cellIndex);
     }
 }

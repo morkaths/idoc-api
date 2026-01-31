@@ -64,10 +64,9 @@ export const AuthUserSchema = z.object({
     permissions: z.array(z.string()).optional(),
 });
 
-export type AuthUser = z.infer<typeof AuthUserSchema>;
-
 export const GoogleLoginRequestSchema = z.object({
     idToken: z.string().min(1, 'ID Token is required'),
 });
 
+export type AuthUser = z.infer<typeof AuthUserSchema>;
 export type GoogleLoginRequest = z.infer<typeof GoogleLoginRequestSchema>;

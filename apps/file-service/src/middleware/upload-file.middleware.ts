@@ -43,6 +43,9 @@ const fileFilter = (
     'application/zip',
     'application/x-rar-compressed',
     'application/x-7z-compressed',
+
+    // Ebooks
+    'application/epub+zip',
   ];
 
   if (allowedTypes.includes(file.mimetype)) {

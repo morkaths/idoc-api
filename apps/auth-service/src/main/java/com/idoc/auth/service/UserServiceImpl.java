@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -187,26 +186,22 @@ public class UserServiceImpl
 			List<UserRequest> userRequests = ExcelHelper.importFromExcel(file.getInputStream(), (row, headerMap) -> {
 				UserRequest req = new UserRequest();
 
-				// Helper to get string value by header name safely
-				BiFunction<String, String, String> getValue = (header, defaultValue) -> {
-					Integer idx = headerMap.get(header);
-					if (idx == null)
-						return defaultValue;
-					String val = ExcelHelper.getCellStringValue(row, idx);
-					return val != null ? val : defaultValue;
-				};
-
 				// "Username"
-				req.setUsername(getValue.apply("Username", null));
+				String username = ExcelHelper.getCellStringValue(row, headerMap, "Username");
+				req.setUsername(username);
 
 				// "Email"
-				req.setEmail(getValue.apply("Email", null));
+				String email = ExcelHelper.getCellStringValue(row, headerMap, "Email");
+				req.setEmail(email);
 
 				// "Password" (default 123456)
-				req.setPassword(getValue.apply("Password", "123456"));
+				String password = ExcelHelper.getCellStringValue(row, headerMap, "Password");
+				req.setPassword(password != null ? password : "123456");
 
 				// "Status" (default 1)
-				String statusStr = getValue.apply("Status", "1");
+				String statusStr = ExcelHelper.getCellStringValue(row, headerMap, "Status");
+				if (statusStr == null)
+					statusStr = "1";
 				try {
 					req.setStatus(Integer.parseInt(statusStr));
 				} catch (NumberFormatException e) {
@@ -214,7 +209,7 @@ public class UserServiceImpl
 				}
 
 				// "Roles"
-				String roleCodes = getValue.apply("Roles", null);
+				String roleCodes = ExcelHelper.getCellStringValue(row, headerMap, "Roles");
 				Set<Long> roleIds = new HashSet<>();
 				if (roleCodes != null && !roleCodes.isEmpty()) {
 					String[] codes = roleCodes.split(",");

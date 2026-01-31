@@ -29,13 +29,20 @@ public class JwtRedisFilter extends OncePerRequestFilter {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication instanceof JwtAuthenticationToken jwtToken) {
-            String tokenValue = jwtToken.getToken().getTokenValue();
-            // Check if token is blacklisted
-            String blacklistKey = "blacklist:" + tokenValue;
-            if (Boolean.TRUE.equals(redisTemplate.hasKey(blacklistKey))) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Token is blacklisted");
-                return;
+            // Get JTI from claims
+            String jti = jwtToken.getToken().getId();
+            // Fallback if ID is not set in standard field, check claims
+            if (jti == null) {
+                jti = jwtToken.getToken().getClaimAsString("jti");
+            }
+
+            if (jti != null) {
+                String blacklistKey = "idoc:auth:blacklist:access:" + jti;
+                if (Boolean.TRUE.equals(redisTemplate.hasKey(blacklistKey))) {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("Token is blacklisted");
+                    return;
+                }
             }
         }
 

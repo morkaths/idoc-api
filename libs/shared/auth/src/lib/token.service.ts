@@ -1,7 +1,7 @@
 import * as jwt from 'jsonwebtoken';
 import { AuthConfig } from './type';
 
-const ACCESS_BLACKLIST_PREFIX = 'blacklist:access:';
+const ACCESS_BLACKLIST_PREFIX = 'idoc:auth:blacklist:access:';
 
 export class TokenService {
   constructor(private readonly config: AuthConfig) {}

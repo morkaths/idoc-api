@@ -1,14 +1,14 @@
 import { z } from 'zod';
 import { dateOrString } from './common';
 import { UserSchema } from './auth';
-import { BookSchema } from './document';
+import { BookSchema } from './catalog';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // BORROW TYPES: Xử lý mượn sách
 // ═══════════════════════════════════════════════════════════════════════════════
 export const BorrowSchema = z.object({
-    _id: z.string(),
-    userId: z.string(),
+    id: z.string(),
+    userId: z.string().trim(),
     borrower: UserSchema.optional(),
     itemId: z.string(),
     item: BookSchema.optional(),
@@ -20,8 +20,8 @@ export const BorrowSchema = z.object({
     borrowTime: dateOrString,
     expireTime: dateOrString,
     returnTime: dateOrString.optional(),
-    note: z.string().optional(),
-    status: z.string(),
+    note: z.string().trim().optional(),
+    status: z.enum(['active', 'returned', 'overdue', 'cancelled']),
     createdAt: dateOrString,
     updatedAt: dateOrString,
 });

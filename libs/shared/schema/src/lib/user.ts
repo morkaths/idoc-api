@@ -5,13 +5,13 @@ import { dateOrString } from './common';
 // USER TYPES: Xử lý hồ sơ và cài đặt người dùng
 // ═══════════════════════════════════════════════════════════════════════════════
 export const ProfileSchema = z.object({
-    _id: z.string(),
+    id: z.string(),
     userId: z.string(),
-    fullName: z.string().optional(),
+    fullName: z.string().min(2).max(100).trim().optional(),
     birthday: dateOrString,
-    avatar: z.string().optional(),
-    bio: z.string().optional(),
-    location: z.string().optional(),
+    avatar: z.string().url().optional().or(z.literal('')),
+    bio: z.string().max(500).trim().optional(),
+    location: z.string().max(500).trim().optional(),
     updatedAt: dateOrString,
 });
 
@@ -31,7 +31,7 @@ const NotificationsSchema = z
     .optional();
 
 export const SettingsSchema = z.object({
-    _id: z.string(),
+    id: z.string(),
     userId: z.string(),
     theme: ThemeSchema,
     notifications: NotificationsSchema,

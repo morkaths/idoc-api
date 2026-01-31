@@ -8,12 +8,9 @@ export class RenewalDto {
 }
 
 export class BorrowDto {
-  @Expose() _id!: string;
+  @Expose({ name: '_id' }) id!: string;
   @Expose() userId!: string;
   @Expose() itemId!: string;
-  @Expose()
-  @Type(() => RenewalDto)
-  renewals!: RenewalDto[];
   @Expose() borrowTime!: Date;
   @Expose() expireTime!: Date;
   @Expose() returnTime?: Date;
@@ -21,6 +18,10 @@ export class BorrowDto {
   @Expose() status!: string;
   @Expose() createdAt?: Date;
   @Expose() updatedAt?: Date;
+
+  @Expose()
+  @Type(() => RenewalDto)
+  renewals!: RenewalDto[];
 
   @Expose()
   @Type(() => Object)

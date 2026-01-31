@@ -2,27 +2,21 @@ package com.idoc.statistics.dto.event;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
+import java.util.List;
 
 public class BorrowEvent {
     private String userId;
     private String bookId;
-    private java.util.List<String> categoryIds;
+    private List<String> categoryIds;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate eventDate;
 
-    private String type; // "BORROW" or "RETURN"
-
-    public BorrowEvent() {
-    }
-
-    public BorrowEvent(String userId, String bookId, java.util.List<String> categoryIds, LocalDate eventDate,
-            String type) {
+    public BorrowEvent(String userId, String bookId, List<String> categoryIds, LocalDate eventDate) {
         this.userId = userId;
         this.bookId = bookId;
         this.categoryIds = categoryIds;
         this.eventDate = eventDate;
-        this.type = type;
     }
 
     public String getUserId() {
@@ -41,11 +35,11 @@ public class BorrowEvent {
         this.bookId = bookId;
     }
 
-    public java.util.List<String> getCategoryIds() {
+    public List<String> getCategoryIds() {
         return categoryIds;
     }
 
-    public void setCategoryIds(java.util.List<String> categoryIds) {
+    public void setCategoryIds(List<String> categoryIds) {
         this.categoryIds = categoryIds;
     }
 
@@ -55,13 +49,5 @@ public class BorrowEvent {
 
     public void setEventDate(LocalDate eventDate) {
         this.eventDate = eventDate;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 }

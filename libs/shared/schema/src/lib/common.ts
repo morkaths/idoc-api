@@ -12,18 +12,8 @@ export const dateOrString = z.preprocess((val) => {
 
 export const AuditSchema = z.object({
     createdAt: dateOrString,
-    updatedAt: dateOrString.optional(), // Some use modifiedAt, some updatedAt. using updatedAt as standard or both for compat? 
-    // Looking at original schema:
-    // Permission/Role/User: createdAt, modifiedAt, modifiedBy
-    // Author/Category/Book: createdAt, updatedAt (Book has updatedBy)
-    // FileMeta: none
-    // Borrow: createdAt, updatedAt
-    // Profile/Settings: updatedAt
-    // Let's keep specific fields in specific schemas for now to avoid breaking changes, but export common ones suitable for composition if needed.
+    updatedAt: dateOrString.optional(),
 });
-
-// Re-export specific audit parts if we want to standardize later, 
-// for now I'll just keep the helper 'dateOrString' which is the main common piece.
 
 export interface Pagination {
     total: number;  // Tổng số item (bản ghi) trong toàn bộ dữ liệu

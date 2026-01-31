@@ -10,28 +10,34 @@ class Settings(BaseSettings):
     Quản lý cấu hình toàn cục cho ứng dụng Recommendation Service.
     """
 
+    APP_NAME: str = "idoc"
+
     # API
-    API_V1_STR: str = "/api/v1"
-    PROJECT_NAME: str = "IDoc Recommendation Service"
-    PORT: int = Field(default=8000, alias="RECOMMENDATION_PORT")
+    API_URL: str = "http://localhost:8000/api"
+    API_KEY: str = ""
+
+    # CORS
+    CORS_ORIGINS: list[str] = ["*"]
+
+    # JWT
+    JWT_PUBLIC_KEY: str | None = None
+
+    # Recommendation Service
+    RECOMMENDATION_PORT: int = Field(default=5005, alias="RECOMMENDATION_PORT")
+    RECOMMENDATION_URL: str = Field(
+        default="http://localhost:5005",
+        alias="RECOMMENDATION_URL",
+    )
+    RECOMMENDATION_DB_URI: str = Field(
+        default="mongodb://localhost:27017/recommendation",
+        alias="RECOMMENDATION_DB_URI",
+    )
 
     # Redis (Dùng để cache kết quả gợi ý)
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379
     REDIS_PASSWORD: str | None = None
     REDIS_DB: int = 0
-
-    # MongoDB (Motor + Beanie)
-    MONGODB_URI: str = Field(
-        default="mongodb://localhost:27017/recommendation",
-        alias="RECOMMENDATION_DB_URI",
-    )
-
-    # JWT
-    RSA_PUBLIC_KEY: str | None = None
-
-    # CORS
-    CORS_ORIGINS: list[str] = ["*"]
 
     # Redis URL
     @computed_field

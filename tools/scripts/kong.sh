@@ -7,8 +7,8 @@ KONG_ADMIN="http://localhost:8001"
 function create_service() {
   local name=$1
   local url=$2
-  echo "Creating service: $name"
-  curl -i -s -X POST $KONG_ADMIN/services \
+  echo "Creating/Updating service: $name"
+  curl -i -s -X PUT $KONG_ADMIN/services/$name \
     --data "name=$name" \
     --data "url=$url" > /dev/null
 }
@@ -17,8 +17,8 @@ function create_route() {
   local service=$1
   local name=$2
   local path=$3
-  echo "Creating route: $name for $service"
-  curl -i -s -X POST $KONG_ADMIN/services/$service/routes \
+  echo "Creating/Updating route: $name for $service"
+  curl -i -s -X PUT $KONG_ADMIN/services/$service/routes/$name \
     --data "name=$name" \
     --data "paths[]=$path" \
     --data "strip_path=false" > /dev/null
@@ -42,13 +42,14 @@ echo "Waiting for Kong to start..."
 sleep 5
 
 # === Services ===
-create_service "gateway"            "http://host.docker.internal:5000"
-create_service "auth-service"       "http://host.docker.internal:8080"
-create_service "statistics-service" "http://host.docker.internal:8085"
-create_service "user-service"       "http://host.docker.internal:5001"
-create_service "catalog-service"    "http://host.docker.internal:5002"
-create_service "file-service"       "http://host.docker.internal:5003"
-create_service "borrow-service"     "http://host.docker.internal:5004"
+create_service "gateway"               "http://host.docker.internal:5000"
+create_service "auth-service"          "http://host.docker.internal:8080"
+create_service "statistics-service"    "http://host.docker.internal:8085"
+create_service "user-service"          "http://host.docker.internal:5001"
+create_service "catalog-service"       "http://host.docker.internal:5002"
+create_service "file-service"          "http://host.docker.internal:5003"
+create_service "borrow-service"        "http://host.docker.internal:5004"
+create_service "interaction-service"   "http://host.docker.internal:5005"
 
 # === Routes ===
 # Gateway
@@ -77,6 +78,11 @@ create_route "file-service" "images-route" "/api/images"
 
 # Borrow Service
 create_route "borrow-service" "borrows-route" "/api/borrows"
+
+# Interaction Service
+create_route "interaction-service" "reviews-route" "/api/reviews"
+create_route "interaction-service" "bookmarks-route" "/api/bookmarks"
+create_route "interaction-service" "collections-route" "/api/collections"
 
 # === Plugins ===
 
@@ -122,6 +128,14 @@ add_plugin "file-service" \
 
 # Key Auth for Borrow Service
 add_plugin "borrow-service" \
+  --data "name=key-auth" \
+  --data "config.key_names[]=x-api-key" \
+  --data "config.key_in_header=true" \
+  --data "config.key_in_query=true" \
+  --data "config.run_on_preflight=true"
+
+# Key Auth for Interaction Service
+add_plugin "interaction-service" \
   --data "name=key-auth" \
   --data "config.key_names[]=x-api-key" \
   --data "config.key_in_header=true" \

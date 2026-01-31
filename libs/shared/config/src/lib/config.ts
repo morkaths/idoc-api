@@ -81,6 +81,16 @@ export const config = {
       url: env.BORROW_URL,
       db: env.BORROW_DB_URI,
     },
+    interaction: {
+      port: env.INTERACTION_PORT,
+      url: env.INTERACTION_URL,
+      db: env.INTERACTION_DB_URI,
+    },
+    recommendation: {
+      port: env.RECOMMENDATION_PORT,
+      url: env.RECOMMENDATION_URL,
+      db: env.RECOMMENDATION_DB_URI,
+    },
   },
   storage: {
     minio: {

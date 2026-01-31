@@ -3,7 +3,7 @@ import { CategoryDto } from "./category.dto";
 import { AuthorDto } from "./author.dto";
 
 export class BookDto {
-  @Expose() _id!: string;
+  @Expose({ name: '_id' }) id!: string;
   @Expose() title!: string;
   @Expose() slug?: string;
   @Expose() description?: string;
@@ -25,4 +25,6 @@ export class BookDto {
   @Expose() categoryIds?: string[];
   @Expose() categories?: CategoryDto[];
   @Expose() authors?: AuthorDto[];
+  @Expose() rating?: number;
+  @Expose() totalReviews?: number;
 }

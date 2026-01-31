@@ -44,6 +44,9 @@
     },
     {
       "path": "./libs/shared/excel"
+    },
+    {
+      "path": "./apps/interaction-service"
     }
   ]
 }

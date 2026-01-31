@@ -1,7 +1,7 @@
 import { Expose } from 'class-transformer';
 
 export class ProfileDto {
-  @Expose() _id!: string;
+  @Expose({ name: '_id' }) id!: string;
   @Expose() userId!: number;
   @Expose() fullName?: string;
   @Expose() birthday?: Date;

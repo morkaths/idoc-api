@@ -37,7 +37,7 @@ const options = {
         BookDto: {
           type: 'object',
           properties: {
-            _id: { type: 'string' },
+            id: { type: 'string' },
             title: { type: 'string' },
             subtitle: { type: 'string' },
             description: { type: 'string' },

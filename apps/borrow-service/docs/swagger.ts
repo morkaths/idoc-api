@@ -35,9 +35,9 @@ const options = {
         BorrowDto: {
           type: 'object',
           properties: {
-            _id: { type: 'string' },
+            id: { type: 'string' },
             userId: { type: 'string' },
-            bookId: { type: 'string' },
+            itemId: { type: 'string' },
             borrowTime: { type: 'string', format: 'date-time' },
             expireTime: { type: 'string', format: 'date-time' },
             returnTime: { type: 'string', format: 'date-time', nullable: true },

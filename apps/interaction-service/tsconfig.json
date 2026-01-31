@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "outDir": "dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "types": ["node"],
+    "paths": {
+      "src/*": ["src/*"],
+      "@libs/config": ["../../libs/shared/config/src/index.ts"],
+      "@libs/schema": ["../../libs/shared/schema/src/index.ts"],
+      "@libs/axios": ["../../libs/shared/axios/src/index.ts"],
+      "@libs/redis": ["../../libs/shared/redis/src/index.ts"],
+      "@libs/mongodb": ["../../libs/shared/mongodb/src/index.ts"],
+      "@libs/auth": ["../../libs/shared/auth/src/index.ts"],
+      "@libs/logger": ["../../libs/shared/logger/src/index.ts"],
+      "@libs/core": ["../../libs/shared/core/src/index.ts"],
+      "@libs/excel": ["../../libs/shared/excel/src/index.ts"]
+    },
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+  }
+}

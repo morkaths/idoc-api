@@ -10,9 +10,9 @@ public class TokenRepository {
     private final AppProperties appProperties;
     private final StringRedisTemplate redisTemplate;
 
-    static final String REFRESH_TOKEN_PREFIX = "user:refresh:";
-    static final String REFRESH_BLACKLIST_PREFIX = "blacklist:refresh:";
-    static final String ACCESS_BLACKLIST_PREFIX = "blacklist:access:";
+    static final String REFRESH_TOKEN_PREFIX = "idoc:auth:user:refresh:";
+    static final String REFRESH_BLACKLIST_PREFIX = "idoc:auth:blacklist:refresh:";
+    static final String ACCESS_BLACKLIST_PREFIX = "idoc:auth:blacklist:access:";
 
     public TokenRepository(AppProperties appProperties, StringRedisTemplate redisTemplate) {
         this.appProperties = appProperties;

@@ -22,7 +22,7 @@ public class RedisListenerConfig {
             MessageListenerAdapter listenerAdapter) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        container.addMessageListener(listenerAdapter, new ChannelTopic("borrow_topic"));
+        container.addMessageListener(listenerAdapter, new ChannelTopic("idoc:borrow:events"));
         return container;
     }
 }

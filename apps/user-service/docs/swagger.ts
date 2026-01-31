@@ -35,7 +35,7 @@ const options: Options = {
         ProfileDto: {
           type: 'object',
           properties: {
-            _id: { type: 'string' },
+            id: { type: 'string' },
             userId: { type: 'number' },
             fullName: { type: 'string' },
             birthday: { type: 'string', format: 'date-time' },

@@ -73,7 +73,7 @@ export class ExcelService {
       if (rowNumber === 1) {
         // Read headers
         row.eachCell((cell: ExcelJS.Cell, colNumber: number) => {
-          headers[colNumber] = cell.value ? cell.value.toString() : '';
+          headers[colNumber] = cell.value ? cell.value.toString().trim() : '';
         });
       } else {
         // Read data
@@ -89,5 +89,23 @@ export class ExcelService {
     });
 
     return data;
+  }
+
+  getCellValue(row: any, key: string): string {
+    const keys = Object.keys(row);
+    const foundKey = keys.find(k => k.toLowerCase() === key.toLowerCase());
+    if (!foundKey || !row[foundKey]) return '';
+    
+    const value = row[foundKey];
+    if (typeof value === 'object' && value !== null) {
+      if ('text' in value && value.text) {
+        return String(value.text).trim();
+      }
+      if ('hyperlink' in value && value.hyperlink) {
+        return String(value.hyperlink).trim();
+      }
+    }
+    
+    return String(value).trim();
   }
 }

@@ -10,12 +10,20 @@ export const API_CONFIG = {
       verifyRole: (id: string) => `/auth/roles/${id}`,
     },
     user: {
-      getAll: '/users',
+      getList: '/users',
       getById: (id: string) => `/users/${id}`,
       search: '/users/search',
       create: '/users',
       update: (id: string) => `/users/${id}`,
       delete: (id: string) => `/users/${id}`,
+    },
+    bookmark: {
+      getList: '/bookmarks',
+      getById: (id: string) => `/bookmarks/${id}`,
+      search: '/bookmarks/search',
+      create: '/bookmarks',
+      update: (id: string) => `/bookmarks/${id}`,
+      delete: (id: string) => `/bookmarks/${id}`,
     }
   }
 }

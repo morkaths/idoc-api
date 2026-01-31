@@ -104,7 +104,7 @@ const BookController = {
     if (!req.file) {
       return response.badRequest(res, 'No file uploaded');
     }
-    const result = await BookService.importExcel(req.file.buffer);
+    const result = await BookService.importExcel(req.file.buffer, req.user?.id);
     response.success(res, 'Import finished', result);
   }),
 

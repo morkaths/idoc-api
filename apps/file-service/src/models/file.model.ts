@@ -45,24 +45,25 @@ const FileSchema = new Schema<IFile>(
       type: String,
       default: FileType.OTHER,
     },
-    size: { type: Number, required: true },
+    size: { type: Number, required: true, min: 0 },
     bucket: { type: String, trim: true },
     provider: { 
       type: String, 
       enum: Object.values(StorageProvider), 
       default: StorageProvider.MINIO
     },
-    checksum: { type: String },
+    checksum: { type: String, trim: true },
     metadata: { type: Schema.Types.Mixed },
     uploadedBy: { type: String, trim: true }
   }, 
   { timestamps: true }
 );
 
-FileSchema.index({ key: 1 });
+FileSchema.index({ key: 1 }, { unique: true, sparse: true });
+FileSchema.index({ objectName: 1, bucket: 1 }, { unique: true });
 FileSchema.index({ provider: 1, bucket: 1 });
 FileSchema.index({ checksum: 1 });
-FileSchema.index({ uploadedBy: 1 });
-FileSchema.index({ createdAt: -1 });
+FileSchema.index({ uploadedBy: 1, createdAt: -1 });
+FileSchema.index({ type: 1 });
 
 export const File = mongoose.model<IFile>("FileMetadata", FileSchema);

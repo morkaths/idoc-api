@@ -73,16 +73,16 @@ public class PermissionServiceImpl
     }
 
     try {
-      List<PermissionRequest> requests = ExcelHelper.importFromExcel(file.getInputStream(), row -> {
+      List<PermissionRequest> requests = ExcelHelper.importFromExcel(file.getInputStream(), (row, headerMap) -> {
         PermissionRequest req = new PermissionRequest();
-        // Col 0: Name
-        req.setName(ExcelHelper.getCellStringValue(row, 0));
+        // Col: Name
+        req.setName(ExcelHelper.getCellStringValue(row, headerMap, "Name"));
 
-        // Col 1: Code
-        req.setCode(ExcelHelper.getCellStringValue(row, 1));
+        // Col: Code
+        req.setCode(ExcelHelper.getCellStringValue(row, headerMap, "Code"));
 
         return req;
-      }, 1);
+      });
 
       for (PermissionRequest req : requests) {
         try {

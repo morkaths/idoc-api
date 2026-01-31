@@ -3,9 +3,9 @@ import type { User } from 'src/types';
 import { API_CONFIG } from 'src/config/api.config';
 
 export const UserClient = {
-  getAll: async (): Promise<User[]> => {
+  getList: async (): Promise<User[]> => {
     const response = await ApiClient.get<User[]>(
-      API_CONFIG.endpoints.user.getAll,
+      API_CONFIG.endpoints.user.getList,
       { mode: 'public' }
     );
     if (response.success && response.data) {

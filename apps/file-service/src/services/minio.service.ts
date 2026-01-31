@@ -2,6 +2,7 @@ import { MinioClient } from '@libs/minio';
 import { config } from '@libs/config';
 import { RedisClient } from '@libs/redis';
 import { IFile, StorageProvider } from '../models/file.model';
+import { determineFileType } from '../utils/file-type.util';
 import { KeyGenerator } from '../utils/key.util';
 
 export const MinioService = {
@@ -24,25 +25,27 @@ export const MinioService = {
 
   // Xác nhận upload và lấy metadata
   async confirmUpload(userId: string, key: string): Promise<Partial<IFile>> {
-    const pending = await RedisClient.get<Partial<IFile>>(`upload:pending:${key}`);
+    const pending = await RedisClient.get<Partial<IFile>>(`idoc:file:upload:pending:${key}`);
     if (!pending || !pending.objectName) throw new Error('Upload session expired or not found');
     const client = MinioClient.get();
     const stat = await client.statObject(config.storage.minio.bucket, pending.objectName);
     if (!stat) throw new Error('File not found on storage');
 
+    const mimeType = stat.metaData?.['content-type'] || 'application/octet-stream';
+
     const metadata: Partial<IFile> = {
       key,
       filename: pending.filename,
       objectName: pending.objectName,
-      mimeType: stat.metaData?.['content-type'] || 'application/octet-stream',
-      type: pending.type,
+      mimeType,
+      type: determineFileType(mimeType),
       size: stat.size,
       bucket: pending.bucket,
       provider: pending.provider,
       uploadedBy: userId
     };
 
-    await RedisClient.delete(`upload:pending:${key}`);
+    await RedisClient.delete(`idoc:file:upload:pending:${key}`);
     return metadata;
   },
 
@@ -106,7 +109,7 @@ export const MinioService = {
       provider: StorageProvider.MINIO,
       uploadedBy: userId
     };
-    await RedisClient.set(`upload:pending:${key}`, pendingMetadata, 600);
+    await RedisClient.set(`idoc:file:upload:pending:${key}`, pendingMetadata, 600);
     return { url, key };
   },
 

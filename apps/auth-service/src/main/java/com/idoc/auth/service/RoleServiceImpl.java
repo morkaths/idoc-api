@@ -111,16 +111,16 @@ public class RoleServiceImpl
       Map<String, Long> permissionMap = permissionRepository.findAll().stream()
           .collect(Collectors.toMap(PermissionEntity::getCode, PermissionEntity::getId));
 
-      List<RoleRequest> requests = ExcelHelper.importFromExcel(file.getInputStream(), row -> {
+      List<RoleRequest> requests = ExcelHelper.importFromExcel(file.getInputStream(), (row, headerMap) -> {
         RoleRequest req = new RoleRequest();
-        // Col 0: Name
-        req.setName(ExcelHelper.getCellStringValue(row, 0));
+        // Col: Name
+        req.setName(ExcelHelper.getCellStringValue(row, headerMap, "Name"));
 
-        // Col 1: Code
-        req.setCode(ExcelHelper.getCellStringValue(row, 1));
+        // Col: Code
+        req.setCode(ExcelHelper.getCellStringValue(row, headerMap, "Code"));
 
-        // Col 2: Permissions (comma separated codes)
-        String permCodes = ExcelHelper.getCellStringValue(row, 2);
+        // Col: Permissions (comma separated codes)
+        String permCodes = ExcelHelper.getCellStringValue(row, headerMap, "Permissions");
         Set<Long> permIds = new HashSet<>();
         if (permCodes != null && !permCodes.isEmpty()) {
           String[] codes = permCodes.split(",");
@@ -134,7 +134,7 @@ public class RoleServiceImpl
         req.setPermissionIds(permIds);
 
         return req;
-      }, 1);
+      });
 
       for (RoleRequest req : requests) {
         try {

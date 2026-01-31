@@ -1,7 +1,7 @@
 import { Expose } from "class-transformer";
 
 export class FileDto {
-  @Expose() _id!: string;
+  @Expose({ name: '_id' }) id!: string;
   @Expose() key!: string;
   @Expose() filename!: string;
   @Expose() mimeType!: string;

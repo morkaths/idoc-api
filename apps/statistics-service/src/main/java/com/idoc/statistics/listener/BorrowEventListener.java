@@ -1,5 +1,7 @@
 package com.idoc.statistics.listener;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.idoc.statistics.dto.event.EventMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.idoc.statistics.dto.event.BorrowEvent;
 import com.idoc.statistics.service.StatisticService;
@@ -21,16 +23,26 @@ public class BorrowEventListener {
 
     public void handleMessage(String message) {
         try {
-            log.info("Received event from Redis: {}", message);
-            BorrowEvent event = objectMapper.readValue(message, BorrowEvent.class);
+            log.info("Received raw event from Redis: {}", message);
 
-            if ("BORROW".equalsIgnoreCase(event.getType())) {
+            // Deserialize into Envelope
+            EventMessage<BorrowEvent> envelope = objectMapper.readValue(
+                    message,
+                    new TypeReference<EventMessage<BorrowEvent>>() {
+                    });
+
+            log.info("Processing event id: {}, type: {}, source: {}", envelope.getId(), envelope.getType(),
+                    envelope.getSource());
+
+            BorrowEvent event = envelope.getPayload();
+
+            if ("BORROW".equalsIgnoreCase(envelope.getType())) {
                 statisticService.incrementDailyBorrow(event.getEventDate(), event.getBookId(), event.getUserId(),
                         event.getCategoryIds());
-            } else if ("RETURN".equalsIgnoreCase(event.getType())) {
+            } else if ("RETURN".equalsIgnoreCase(envelope.getType())) {
                 statisticService.incrementDailyReturn(event.getEventDate());
             } else {
-                log.warn("Unknown event type: {}", event.getType());
+                log.warn("Unknown event type: {}", envelope.getType());
             }
 
         } catch (Exception e) {

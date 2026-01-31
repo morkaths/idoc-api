@@ -21,8 +21,6 @@ const CategoryTranslationSchema = new Schema<ICategoryTranslation>(
 
 
 CategoryTranslationSchema.index({ categoryId: 1, lang: 1 }, { unique: true });
-
-// Index search name
 CategoryTranslationSchema.index({ name: 'text' });
 
 export const CategoryTranslation = mongoose.model<ICategoryTranslation>('CategoryTranslation', CategoryTranslationSchema);

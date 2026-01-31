@@ -57,6 +57,16 @@ export const envSchema = z.object({
   BORROW_URL: z.string().url().min(1, "[ENV] Borrow URL must have at least 1 character"),
   BORROW_DB_URI: z.string().startsWith('mongodb', "[ENV] Borrow DB URI must start with 'mongodb://'").url(),
 
+  // Interaction Service
+  INTERACTION_PORT: z.coerce.number().default(5005),
+  INTERACTION_URL: z.string().url().min(1, "[ENV] Interaction URL must have at least 1 character"),
+  INTERACTION_DB_URI: z.string().startsWith('mongodb', "[ENV] Interaction DB URI must start with 'mongodb://'").url(),
+
+  // Recommendation Service
+  RECOMMENDATION_PORT: z.coerce.number().default(6000),
+  RECOMMENDATION_URL: z.string().url().min(1, "[ENV] Recommendation URL must have at least 1 character"),
+  RECOMMENDATION_DB_URI: z.string().startsWith('mongodb', "[ENV] Recommendation DB URI must start with 'mongodb://'").url(),
+
   // === MINIO / S3 ===
   MINIO_ENDPOINT: z.string().min(1, "[ENV] Minio endpoint must have at least 1 character"),
   MINIO_PORT: z.coerce.number().default(9000),

@@ -4,6 +4,7 @@ import { FileDto } from '../dtos/file.dto';
 import { IFile, StorageProvider } from 'src/models/file.model';
 import { fileMapper } from 'src/mappers/file.mapper';
 import { MinioService } from './minio.service';
+import { determineFileType } from '../utils/file-type.util';
 
 async function toDtoWithUrl(file: IFile | Partial<IFile>): Promise<FileDto> {
   if (!file.objectName) throw new Error('File path is required');
@@ -25,10 +26,10 @@ export const FileService = {
   },
 
   async getByKey(key: string): Promise<FileDto | null> {
-    const cached = await RedisClient.get<IFile>(`file:metadata:${key}`);
+    const cached = await RedisClient.get<IFile>(`idoc:file:metadata:${key}`);
     const metadata = cached || await fileRepository.findByKey(key);
     if (!metadata || !metadata.objectName) return null;
-    if (!cached) await RedisClient.set(`file:metadata:${key}`, metadata, 3600);
+    if (!cached) await RedisClient.set(`idoc:file:metadata:${key}`, metadata, 3600);
     return toDtoWithUrl(metadata);
   },
 
@@ -57,17 +58,18 @@ export const FileService = {
       size: file.size,
       bucket: result.bucket,
       provider: StorageProvider.MINIO,
-      uploadedBy: userId
+      uploadedBy: userId,
+      type: determineFileType(file.mimetype)
     };
     const savedMetadata = await fileRepository.create(metadata);
-    await RedisClient.set(`file:metadata:${savedMetadata.key}`, savedMetadata, 3600);
+    await RedisClient.set(`idoc:file:metadata:${savedMetadata.key}`, savedMetadata, 3600);
     return toDtoWithUrl(savedMetadata);
   },
 
   async confirm(userId: string, key: string): Promise<FileDto> {
     const metadata = await MinioService.confirmUpload(userId, key);
     const saved = await fileRepository.create(metadata);
-    await RedisClient.set(`file:metadata:${saved.key}`, saved, 3600);
+    await RedisClient.set(`idoc:file:metadata:${saved.key}`, saved, 3600);
     return toDtoWithUrl(saved);
   },
 
@@ -83,7 +85,7 @@ export const FileService = {
     if (!metadata || !metadata.objectName) throw new Error('File not found');
     await MinioService.delete(metadata.objectName);
     await fileRepository.delete(key);
-    await RedisClient.delete(`file:metadata:${key}`);
+    await RedisClient.delete(`idoc:file:metadata:${key}`);
   },
 
 };
