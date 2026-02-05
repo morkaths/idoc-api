@@ -82,7 +82,7 @@ public class UserController {
 	}
 
 	@PostMapping("/batch")
-	public ResponseEntity<ApiResponse<List<UserResponse>>> getUsersByIds(@RequestBody Map<String, List<Long>> body) {
+	public ResponseEntity<ApiResponse<List<UserResponse>>> getByIds(@RequestBody Map<String, List<Long>> body) {
 		List<Long> ids = body.get("ids");
 		if (ids == null || ids.isEmpty()) {
 			return ResponseEntity.ok(ApiResponse.success(List.of(), "Lấy danh sách người dùng thành công"));

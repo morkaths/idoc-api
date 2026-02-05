@@ -12,6 +12,26 @@ class BookmarkService extends BaseService<IBookmark, BookmarkDto> {
         super(bookmarkRepository, bookmarkMapper);
     }
 
+    async findList(page: number, limit: number, filter: { [key: string]: any }): Promise<{ data: BookmarkDto[]; pagination: Pagination }> {
+        const result = await bookmarkRepository.findList(page, limit, filter);
+        const data = (result.items || []).map((d: any) => this.mapper.toDto(d));
+        return { data, pagination: result.pagination };
+    }
+
+    async findByItemIds(userId: string, itemIds: string[]): Promise<Record<string, string | null>> {
+        const bookmarks = await bookmarkRepository.find({
+            userId,
+            itemId: { $in: itemIds }
+        });
+        const bookmarkMap = new Map();
+        bookmarks.forEach((b: any) => bookmarkMap.set(b.itemId.toString(), b._id.toString()));
+        const result: Record<string, string | null> = {};
+        itemIds.forEach(id => {
+            result[id] = bookmarkMap.get(id) || null;
+        });
+        return result;
+    }
+
     async create(dto: Partial<BookmarkDto>): Promise<BookmarkDto> {
         const result = await super.create(dto);
         if (dto.collectionId) {
@@ -31,25 +51,6 @@ class BookmarkService extends BaseService<IBookmark, BookmarkDto> {
         return false;
     }
 
-    async getByItemIds(userId: string, itemIds: string[]): Promise<Record<string, string | null>> {
-        const bookmarks = await bookmarkRepository.find({
-            userId,
-            itemId: { $in: itemIds }
-        });
-        const bookmarkMap = new Map();
-        bookmarks.forEach((b: any) => bookmarkMap.set(b.itemId.toString(), b._id.toString()));
-        const result: Record<string, string | null> = {};
-        itemIds.forEach(id => {
-            result[id] = bookmarkMap.get(id) || null;
-        });
-        return result;
-    }
-
-    async findList(page: number, limit: number, filter: { [key: string]: any }): Promise<{ data: BookmarkDto[]; pagination: Pagination }> {
-        const result = await bookmarkRepository.findList(page, limit, filter);
-        const data = (result.items || []).map((d: any) => this.mapper.toDto(d));
-        return { data, pagination: result.pagination };
-    }
 }
 
 export const bookmarkService = new BookmarkService();

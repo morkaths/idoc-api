@@ -1,4 +1,10 @@
-import { Expose } from "class-transformer";
+import { Expose, Type } from "class-transformer";
+
+export class ReviewUserDto {
+    @Expose() id!: string;
+    @Expose() email!: string;
+    @Expose() username!: string;
+}
 
 export class ReviewDto {
     @Expose({ name: '_id' }) id!: string;
@@ -9,4 +15,8 @@ export class ReviewDto {
     @Expose() isHidden?: boolean;
     @Expose() createdAt?: Date;
     @Expose() updatedAt?: Date;
+
+    @Expose()
+    @Type(() => ReviewUserDto)
+    user?: ReviewUserDto;
 }

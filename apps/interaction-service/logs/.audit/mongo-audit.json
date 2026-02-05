@@ -14,6 +14,21 @@
             "date": 1769853733673,
             "name": "logs\\mongo-2026-01-31.log",
             "hash": "bcccb113052abf72f3a4a657ddc99cbd88a57899c71025904fe167766470f757"
+        },
+        {
+            "date": 1770127512308,
+            "name": "logs\\mongo-2026-02-03.log",
+            "hash": "9ff4df8e86d57046e4ee97e829e668d56d545709b5f01d0acdc22712edb4cb3d"
+        },
+        {
+            "date": 1770280380129,
+            "name": "logs\\mongo-2026-02-05.log",
+            "hash": "36834a987c331256e2628d70918a1898a2c6c09008d739a0426de3c3138ecb85"
+        },
+        {
+            "date": 1770311160226,
+            "name": "logs\\mongo-2026-02-06.log",
+            "hash": "dd3f04f38efdb8820e210b719624130996bd1d8f012005c8c422370b7d3cae9b"
         }
     ],
     "hashType": "sha256"

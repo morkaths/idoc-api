@@ -43,7 +43,7 @@ const BookmarkController = {
         if (!Array.isArray(itemIds)) {
             return response.badRequest(res, 'itemIds must be an array');
         }
-        const result = await bookmarkService.getByItemIds(req.user.id, itemIds);
+        const result = await bookmarkService.findByItemIds(req.user.id, itemIds);
         response.success(res, 'Get bookmark statuses successfully', result);
     }),
 

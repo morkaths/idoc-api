@@ -115,6 +115,10 @@ export class ApiClient {
     return ApiClient.request<T>('put', url, options);
   }
 
+  static patch<T>(url: string, options?: ApiOptions) {
+    return ApiClient.request<T>('patch', url, options);
+  }
+
   static delete<T>(url: string, options?: ApiOptions) {
     return ApiClient.request<T>('delete', url, options);
   }

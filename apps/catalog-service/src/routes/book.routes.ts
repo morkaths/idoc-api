@@ -369,4 +369,46 @@ router.delete(
   BookController.delete
 );
 
+/**
+ * @openapi
+ * /books/{id}/rating:
+ *   patch:
+ *     summary: Cập nhật rating sách (Internal)
+ *     tags:
+ *       - Book
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Book ID
+ *       - in: header
+ *         name: x-api-key
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Internal API Key
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               rating:
+ *                 type: number
+ *               totalReviews:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: Cập nhật thành công
+ *       403:
+ *         description: Access Denied
+ */
+router.patch(
+  '/:id/rating',
+  BookController.updateRating
+);
+
 export default router;

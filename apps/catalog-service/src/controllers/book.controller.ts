@@ -116,6 +116,20 @@ const BookController = {
     res.send(buffer);
   }),
 
+
+
+  updateRating: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { rating, totalReviews } = req.body;
+
+    if (rating === undefined || totalReviews === undefined) {
+      return response.badRequest(res, 'Rating and totalReviews are required');
+    }
+
+    await BookService.updateRating(id, rating, totalReviews);
+    response.success(res, 'Rating updated successfully');
+  }),
+
 };
 
 export default BookController;

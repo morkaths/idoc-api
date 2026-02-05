@@ -110,7 +110,7 @@ class BookService extends BaseService<IBook, BookDto> {
           bookDto.categoryIds = Array.from(new Set(cateIds));
         }
       }
-      
+
       return bookDto;
     };
 
@@ -129,7 +129,7 @@ class BookService extends BaseService<IBook, BookDto> {
 
       splitValues(getValue(row, 'authors')).forEach(n => authorNames.add(n));
       splitValues(getValue(row, 'categories')).forEach(c => categoryIdents.add(c));
-      
+
       const isbn = getValue(row, 'isbn');
       if (isbn) isbnSet.add(isbn);
 
@@ -139,10 +139,10 @@ class BookService extends BaseService<IBook, BookDto> {
     // 2. Parallel Bulk Lookup
     const authorPromise = authorNames.size > 0
       ? authorRepository.find({
-          $or: Array.from(authorNames).map(name => ({
-            name: { $regex: new RegExp(`^${name}$`, 'i') }
-          }))
-        })
+        $or: Array.from(authorNames).map(name => ({
+          name: { $regex: new RegExp(`^${name}$`, 'i') }
+        }))
+      })
       : Promise.resolve([]);
 
     const categoryPromise = categoryIdents.size > 0
@@ -164,8 +164,8 @@ class BookService extends BaseService<IBook, BookDto> {
       try {
         const isbn = getValue(row, 'isbn');
         if (isbn && existingIsbnSet.has(isbn)) {
-             errors.push({ row: index + 2, error: `Duplicate ISBN: ${isbn}` });
-             continue;
+          errors.push({ row: index + 2, error: `Duplicate ISBN: ${isbn}` });
+          continue;
         }
 
         const bookDto = buildBookDto(row, authorMap, categoryMap);
@@ -233,6 +233,10 @@ class BookService extends BaseService<IBook, BookDto> {
 
     const excelService = new ExcelService();
     return excelService.generateExcel(columns, excelData, 'Books');
+  }
+
+  async updateRating(id: string, rating: number, totalReviews: number): Promise<void> {
+    await bookRepository.update(id, { rating, totalReviews });
   }
 
 };

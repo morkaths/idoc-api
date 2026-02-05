@@ -44,6 +44,25 @@ class ReviewRepository extends BaseRepository<IReview> {
 
         return this.paginate(match, options);
     }
+
+    async calculateAverageRating(itemId: string): Promise<{ averageRating: number; totalReviews: number }> {
+        const stats = await this.model.aggregate([
+            { $match: { itemId, isHidden: false } },
+            {
+                $group: {
+                    _id: '$itemId',
+                    averageRating: { $avg: '$rating' },
+                    totalReviews: { $sum: 1 }
+                }
+            }
+        ]);
+
+        const result = stats[0] || { averageRating: 0, totalReviews: 0 };
+        return {
+            averageRating: Math.round(result.averageRating * 10) / 10,
+            totalReviews: result.totalReviews
+        };
+    }
 }
 
 export const reviewRepository = new ReviewRepository();
